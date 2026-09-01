@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^(\.env|bootstrap\.php)$ - [F,L]
+RewriteRule ^(src|views|data)(/|$) - [F,L]
+RewriteRule \.db$ - [F,L]
+
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+RewriteRule ^ index.php [QSA,L]

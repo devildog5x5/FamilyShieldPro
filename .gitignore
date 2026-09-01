@@ -1,0 +1,5 @@
+php/.env
+php/data/*.db
+php/data/*.db-journal
+php/data/uploads/
+.DS_Store
