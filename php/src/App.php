@@ -35,6 +35,8 @@ final class App
             $this->forgot();
         } elseif ($method === 'POST' && $path === '/forgot/code') {
             $this->forgotCode();
+        } elseif ($path === '/reset') {
+            $this->resetPassword();
         } elseif ($method === 'GET' && $path === '/privacy') {
             $this->legal('privacy');
         } elseif ($method === 'GET' && $path === '/terms') {
@@ -47,6 +49,8 @@ final class App
             $this->healthz();
         } elseif ($method === 'POST' && $path === '/support/chat') {
             $this->chat();
+        } elseif ($path === '/admin/forgot') {
+            $this->adminForgot();
         } elseif ($path === '/admin/login' || $path === '/admin') {
             $this->admin($path, $method);
         } elseif (preg_match('#^/join/([A-Za-z0-9_-]{8,})$#', $path, $m)) {
@@ -288,23 +292,24 @@ final class App
 
     private function forgot(): void
     {
+        $qToken = trim((string) ($_GET['token'] ?? ''));
+        if (Http::method() === 'GET' && $qToken !== '') {
+            Http::redirect('/reset?token=' . rawurlencode($qToken));
+        }
         if (Http::method() === 'POST') {
             Http::csrfCheck();
             $email = strtolower(trim((string) ($_POST['email'] ?? '')));
-            $st = $this->db->prepare('SELECT * FROM users WHERE lower(email)=?');
-            $st->execute([$email]);
-            $row = $st->fetch();
-            if ($row && Mailer::configured()) {
-                $token = bin2hex(random_bytes(16));
-                $_SESSION['reset_' . $email] = ['t' => $token, 'exp' => time() + 3600];
-                $link = Http::baseUrl() . '/forgot?email=' . rawurlencode($email) . '&token=' . $token;
-                try {
-                    Mailer::send($email, 'Reset your OurCircle password', "Use this one-hour link:\n{$link}\n");
-                } catch (Throwable $e) {
-                    // same public message either way
+            if ($email !== '' && str_contains($email, '@')) {
+                $st = $this->db->prepare('SELECT * FROM users WHERE lower(email)=?');
+                $st->execute([$email]);
+                $row = $st->fetch();
+                if ($row) {
+                    $token = Db::issueResetToken($this->db, 'user', (int) $row['id']);
+                    $link = Http::baseUrl() . '/reset?token=' . rawurlencode($token);
+                    $this->deliverReset((string) $row['email'], $link, 'user');
                 }
             }
-            Http::flash('If that email is on a circle, we sent reset instructions. Check spam. You can also use a recovery code on this page.');
+            Http::flash(Db::RESET_NOTICE);
             Http::redirect('/forgot');
         }
         $this->view('forgot');
@@ -319,22 +324,95 @@ final class App
         $st = $this->db->prepare('SELECT * FROM users WHERE lower(email)=?');
         $st->execute([$email]);
         $row = $st->fetch();
-        $ok = false;
         if ($row && strlen($password) >= 8 && $code !== '') {
             $codes = json_decode((string) $row['recovery_codes'], true) ?: [];
             foreach ($codes as $i => $stored) {
                 if (hash_equals((string) $stored, $code)) {
                     unset($codes[$i]);
-                    $ok = true;
                     $this->db->prepare('UPDATE users SET password_hash=?, recovery_codes=? WHERE id=?')
                         ->execute([password_hash($password, PASSWORD_DEFAULT), json_encode(array_values($codes)), $row['id']]);
                     break;
                 }
             }
         }
-        unset($ok);
         Http::flash('If that email and recovery code matched, the password is updated. Sign in.');
         Http::redirect('/login');
+    }
+
+    private function resetPassword(): void
+    {
+        $token = trim((string) ($_GET['token'] ?? $_POST['token'] ?? ''));
+        $row = Db::peekResetToken($this->db, $token);
+        $showForm = $row !== null;
+        $error = '';
+        if (Http::method() === 'POST') {
+            Http::csrfCheck();
+            $password = (string) ($_POST['password'] ?? '');
+            $confirm = (string) ($_POST['password_confirm'] ?? '');
+            if (strlen($password) < 8) {
+                $error = 'Password must be at least 8 characters.';
+            } elseif ($password !== $confirm) {
+                $error = 'Passwords do not match.';
+            } else {
+                $used = Db::consumeResetToken($this->db, $token, password_hash($password, PASSWORD_DEFAULT));
+                if ($used) {
+                    $login = ((string) $used['kind'] === 'operator') ? '/admin/login' : '/login';
+                    Http::flash('Password updated. Sign in.');
+                    Http::redirect($login);
+                }
+                $error = 'This reset link is invalid or has expired.';
+                $showForm = false;
+            }
+        } elseif (!$showForm) {
+            $error = 'This reset link is invalid or has expired.';
+        }
+        $this->view('reset', [
+            'error' => $error,
+            'token' => $token,
+            'show_form' => $showForm,
+            'is_operator' => $row && (string) $row['kind'] === 'operator',
+        ]);
+    }
+
+    private function deliverReset(string $email, string $url, string $kind = 'user'): void
+    {
+        $who = $kind === 'operator' ? 'Family Shield Pro operator' : 'OurCircle';
+        $body = "Reset your {$who} password\n\n"
+            . "We received a request to reset the password for this account.\n\n"
+            . "Open this link within 1 hour:\n{$url}\n\n"
+            . "If you didn't request this, you can ignore this message.\n";
+        $sent = false;
+        if (Mailer::configured()) {
+            try {
+                Mailer::send($email, 'Reset your Family Shield Pro password', $body);
+                $sent = true;
+            } catch (Throwable $e) {
+                $sent = false;
+            }
+        }
+        if (!$sent) {
+            Db::writeResetFile($url, $kind === 'operator' ? 'operator' : 'circle');
+        }
+    }
+
+    private function adminForgot(): void
+    {
+        if (!empty($_SESSION['admin'])) {
+            Http::redirect('/admin');
+        }
+        if (Http::method() === 'POST') {
+            Http::csrfCheck();
+            $email = strtolower(trim((string) ($_POST['email'] ?? '')));
+            $op = Db::operatorRow($this->db);
+            if ($op && $email !== '' && hash_equals(strtolower((string) $op['email']), $email)) {
+                $token = Db::issueResetToken($this->db, 'operator', (int) $op['id']);
+                $link = Http::baseUrl() . '/reset?token=' . rawurlencode($token);
+                $this->deliverReset((string) $op['email'], $link, 'operator');
+            }
+            Http::flash(Db::RESET_NOTICE);
+            Http::redirect('/admin/forgot');
+        }
+        $this->view('admin-forgot');
     }
 
     private function home(array $user): never
@@ -841,7 +919,7 @@ final class App
             return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup.';
         }
         if (preg_match('/login|password|forgot|sign in/', $low)) {
-            return 'Use /login with the email on your circle. Forgot password sends a one-hour link if mail is set up, or use a recovery code from 2FA. Demo circle (sandbox): family@ourcircle.app / password123.';
+            return 'Use /login with the email on your circle. Forgot password sends a one-hour link, or saves it next to the database if mail is not connected. 2FA recovery codes also work. Operator console: /admin/login has its own forgot-password link. Demo circle (sandbox): family@ourcircle.app / password123.';
         }
         if (preg_match('/sms|text|twilio|forward/', $low)) {
             return 'Save your mobile on Account. When texting is connected, invites and “Please call me before I pay” can go by SMS. Reply STOP to opt out. This is not a customer-service hotline.';
@@ -859,7 +937,7 @@ final class App
         header('Content-Type: text/plain; charset=utf-8');
         $host = parse_url(Http::baseUrl(), PHP_URL_HOST) ?: 'familyshieldpro.com';
         echo "User-agent: *\nAllow: /\nAllow: /signup\nAllow: /login\nAllow: /forgot\nAllow: /privacy\nAllow: /terms\n";
-        echo "Disallow: /home\nDisallow: /circle\nDisallow: /trusted\nDisallow: /checks\nDisallow: /uploads\nDisallow: /join\nDisallow: /billing\nDisallow: /report\nDisallow: /account\nDisallow: /logout\nDisallow: /admin\n\n";
+        echo "Disallow: /home\nDisallow: /circle\nDisallow: /trusted\nDisallow: /checks\nDisallow: /uploads\nDisallow: /join\nDisallow: /billing\nDisallow: /report\nDisallow: /account\nDisallow: /logout\nDisallow: /admin\nDisallow: /reset\n\n";
         echo 'Host: ' . $host . "\n";
         echo 'Sitemap: ' . Http::baseUrl() . "/sitemap.xml\n";
         exit;
@@ -891,14 +969,13 @@ final class App
             $payload['mail'] = Mailer::configured();
             $payload['stripe'] = trim(Env::get('STRIPE_SECRET_KEY')) !== '';
             $payload['sms'] = trim(Env::get('TWILIO_AUTH_TOKEN')) !== '';
-            $payload['admin'] = trim(Env::get('OPERATOR_PASSWORD')) !== '';
+            $payload['admin'] = Db::operatorRow($this->db) !== null || trim(Env::get('OPERATOR_PASSWORD')) !== '';
         }
         Http::json($payload);
     }
 
     private function admin(string $path, string $method): void
     {
-        $need = Env::get('OPERATOR_PASSWORD');
         if ($path === '/admin') {
             if (empty($_SESSION['admin'])) {
                 Http::redirect('/admin/login');
@@ -912,7 +989,7 @@ final class App
         if ($method === 'POST') {
             Http::csrfCheck();
             $pw = (string) ($_POST['password'] ?? '');
-            if ($need === '' || !hash_equals($need, $pw)) {
+            if (!$this->operatorPasswordOk($pw)) {
                 Http::flash('Operator password did not match.', 'error');
                 $this->view('admin-login');
             }
@@ -920,6 +997,16 @@ final class App
             Http::redirect('/admin');
         }
         $this->view('admin-login');
+    }
+
+    private function operatorPasswordOk(string $pw): bool
+    {
+        $row = Db::operatorRow($this->db);
+        if ($row) {
+            return password_verify($pw, (string) $row['password_hash']);
+        }
+        $need = Env::get('OPERATOR_PASSWORD');
+        return $need !== '' && hash_equals($need, $pw);
     }
 
     private function mailCircle(array $user, int $checkId, string $kind): int

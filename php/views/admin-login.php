@@ -10,5 +10,6 @@ Layout::start('Operator console · Family Shield Pro', null, 'auth-page');
     <input name="password" type="password" required autocomplete="current-password" />
     <p><button class="btn wide" type="submit">Open console</button></p>
   </form>
+  <p><a href="/admin/forgot">Forgot operator password</a></p>
 </div>
 <?php Layout::end();

@@ -32,7 +32,7 @@ Layout::start('Account', $user);
       <p>2FA is off. An authenticator app (Google Authenticator, Authy, 1Password, iCloud Keychain) adds a second step after the password.</p>
       <p><a class="btn" href="/account/2fa/setup">Turn on 2FA</a></p>
     <?php endif; ?>
-    <p>Password reset: email link (when mail is connected) or a recovery code on the <a href="/forgot">forgot-password page</a>.</p>
+    <p>Password reset: email link, a file next to the database when mail is off, or a 2FA recovery code on the <a href="/forgot">forgot-password page</a>.</p>
   </div>
 </div>
 <?php Layout::end($user);

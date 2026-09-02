@@ -88,7 +88,7 @@ final class Http
             $_SESSION['flash'] = 'That form expired. Please try again.';
             $_SESSION['flash_type'] = 'error';
         $path = self::path();
-        $stay = in_array($path, ['/login', '/signup', '/forgot', '/admin/login'], true)
+        $stay = in_array($path, ['/login', '/signup', '/forgot', '/reset', '/admin/login', '/admin/forgot'], true)
             || str_starts_with($path, '/join/');
         if ($path === '/forgot/code') {
             $stay = true;

@@ -2,6 +2,7 @@ php/.env
 php/data/*.db
 php/data/*.db-journal
 php/data/uploads/
+php/data/password-reset.txt
 build/
 installers/
 .DS_Store

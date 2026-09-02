@@ -26,7 +26,8 @@ Family Shield Pro (OurCircle) — Hostinger
 3. Set APP_SECRET (long random string) and BASE_URL=https://yourdomain.com
 4. hPanel → PHP Configuration: PHP 8.2 or 8.3, enable pdo_sqlite
 5. Open the site. Demo login (if SHOW_DEMO_LOGIN=1): family@ourcircle.app / password123
-6. Back up any existing data/*.db before replacing files on a live site.
+6. Set OPERATOR_EMAIL and OPERATOR_PASSWORD. Forgot password for the circle (/forgot) and operator (/admin/forgot) emails a link, or writes data/password-reset.txt if mail is off.
+7. Back up any existing data/*.db before replacing files on a live site.
 
 SQLite is created at data/ourcircle.db (blocked from the web by .htaccess).
 "@

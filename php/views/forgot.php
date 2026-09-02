@@ -3,7 +3,7 @@ Layout::start('Forgot password · OurCircle', null, 'auth-page');
 ?>
 <div class="auth-card">
   <h1>Reset with email</h1>
-  <p>We’ll send a one-hour link if this email is on a circle. We never say whether the email exists.</p>
+  <p>We’ll send a one-hour link if this email is on a circle. When mail is not connected, the link is saved as <code>password-reset.txt</code> next to the database (not on the public web). We never say whether the email exists.</p>
   <?php Layout::flash(); ?>
   <form method="post" action="/forgot">
     <?= Http::csrfField() ?>

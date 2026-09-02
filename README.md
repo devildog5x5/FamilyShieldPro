@@ -6,7 +6,7 @@ Live sandbox: https://sandbox.familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.3.2** includes the sandbox test fixes plus dark mode and a faint operator hatch to `/admin/login`.
+Canonical PHP source for Hostinger (`public_html`). Version **1.3.3** includes circle and operator password recovery (email link, or `data/password-reset.txt` when mail is off), dark mode, and a faint operator hatch to `/admin/login`.
 
 **Hostinger zip:** [FamilyShieldPro-PHP.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/latest/download/FamilyShieldPro-PHP.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1`.
 
@@ -25,7 +25,7 @@ Open http://127.0.0.1:8080 — demo login `family@ourcircle.app` / `password123`
 ## Deploy (Hostinger)
 
 1. Download [FamilyShieldPro-PHP.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/latest/download/FamilyShieldPro-PHP.zip) and unzip into `public_html` (not a nested folder).
-2. Copy `.env.example` to `.env`. Set `APP_SECRET` and `BASE_URL`.
+2. Copy `.env.example` to `.env`. Set `APP_SECRET`, `BASE_URL`, `OPERATOR_EMAIL`, and `OPERATOR_PASSWORD`.
 3. PHP 8.2/8.3 with `pdo_sqlite`.
 4. Database file: `public_html/data/ourcircle.db` (blocked by `.htaccess`).
 
@@ -40,6 +40,8 @@ If you already have a live SQLite file, **back it up first**. This schema is not
 - Owner can cancel invites and remove members
 - Only the owner can change the household plan
 - Empty circle notes are rejected
+- Circle members reset passwords at `/forgot` (email, file fallback, or 2FA recovery code)
+- Operators reset at `/admin/forgot` (same email/file flow; new password is stored so it survives `.env`)
 
 ## Support
 

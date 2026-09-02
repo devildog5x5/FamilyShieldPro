@@ -12,8 +12,9 @@ Or by hand:
    - `APP_SECRET` — long random string
    - `BASE_URL=https://yourdomain.com`
    - `CONTACT_PHONE` only if you have a real number (leave blank rather than XXX)
-   - `OPERATOR_PASSWORD` for `/admin/login`
-   - Resend or SMTP when you want invite/reset mail
+   - `OPERATOR_EMAIL` — where operator password-reset mail goes (defaults to `SUPPORT_EMAIL`)
+   - `OPERATOR_PASSWORD` for `/admin/login` (hashed into the database on first load so forgot-password can replace it)
+   - Resend or SMTP when you want invite/reset mail. If mail is off, circle and operator reset links are written to `data/password-reset.txt` (blocked from the web).
 4. PHP 8.2 or 8.3. Enable `pdo_sqlite`.
 5. Backup `data/ourcircle.db` before replacing files on a live site.
 

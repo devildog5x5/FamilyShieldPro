@@ -6,10 +6,14 @@ final class Db
     public const DEMO_EMAIL = 'family@ourcircle.app';
     public const DEMO_NAME = 'Pat Foster';
     public const DEMO_PASSWORD = 'password123';
-    public const VERSION = '1.3.2';
+    public const VERSION = '1.3.3';
+    public const RESET_NOTICE = 'If that email is on file, a one-hour reset link is on the way. When mail is not connected, the link is saved as password-reset.txt next to the database (blocked from the web).';
+
+    private static ?string $path = null;
 
     public static function connect(string $path): PDO
     {
+        self::$path = $path;
         $dir = dirname($path);
         if (!is_dir($dir)) {
             mkdir($dir, 0775, true);
@@ -109,11 +113,138 @@ final class Db
                 abs_path TEXT NOT NULL,
                 created_at TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS operators (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kind TEXT NOT NULL,
+                subject_id INTEGER NOT NULL,
+                token_hash TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                used_at TEXT,
+                created_at TEXT NOT NULL
+            );
         SQL);
         $n = (int) $db->query('SELECT COUNT(*) FROM circles')->fetchColumn();
         if ($n === 0) {
             self::seedDemo($db);
         }
+        self::ensureOperator($db);
+    }
+
+    public static function operatorEmail(): string
+    {
+        $email = strtolower(trim(Env::get('OPERATOR_EMAIL')));
+        if ($email === '') {
+            $email = strtolower(trim(Env::get('SUPPORT_EMAIL', 'CustomerService@FamilyShieldPro.com')));
+        }
+        return $email;
+    }
+
+    public static function operatorRow(PDO $db): ?array
+    {
+        $row = $db->query('SELECT * FROM operators ORDER BY id ASC LIMIT 1')->fetch();
+        return $row ?: null;
+    }
+
+    public static function ensureOperator(PDO $db): void
+    {
+        $email = self::operatorEmail();
+        $plain = Env::get('OPERATOR_PASSWORD');
+        if ($email === '' || !str_contains($email, '@') || $plain === '') {
+            return;
+        }
+        $row = self::operatorRow($db);
+        if ($row) {
+            if (strtolower((string) $row['email']) !== $email) {
+                $db->prepare('UPDATE operators SET email=? WHERE id=?')->execute([$email, $row['id']]);
+            }
+            return;
+        }
+        $db->prepare('INSERT INTO operators (email, password_hash, created_at) VALUES (?,?,?)')
+            ->execute([$email, password_hash($plain, PASSWORD_DEFAULT), Http::now()]);
+    }
+
+    public static function resetFilePath(): string
+    {
+        $dir = self::$path ? dirname(self::$path) : (dirname(__DIR__) . '/data');
+        return $dir . DIRECTORY_SEPARATOR . 'password-reset.txt';
+    }
+
+    public static function writeResetFile(string $url, string $kind = 'circle'): void
+    {
+        $path = self::resetFilePath();
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $who = $kind === 'operator' ? 'operator console' : 'circle member';
+        $body = "Family Shield Pro password reset ({$who})\nGenerated: " . Http::now() . "\n\n"
+            . "Open this link in your browser (expires in 1 hour):\n\n"
+            . $url . "\n\n"
+            . "If you did not request this, delete this file.\n";
+        file_put_contents($path, $body);
+    }
+
+    public static function clearResetFile(): void
+    {
+        $path = self::resetFilePath();
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+
+    public static function issueResetToken(PDO $db, string $kind, int $subjectId): string
+    {
+        $kind = $kind === 'operator' ? 'operator' : 'user';
+        $token = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+        $now = Http::now();
+        $expires = gmdate('Y-m-d\TH:i:s\Z', time() + 3600);
+        $db->prepare('UPDATE password_resets SET used_at=? WHERE kind=? AND subject_id=? AND used_at IS NULL')
+            ->execute([$now, $kind, $subjectId]);
+        $db->prepare(
+            'INSERT INTO password_resets (kind, subject_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)'
+        )->execute([$kind, $subjectId, hash('sha256', $token), $expires, $now]);
+        return $token;
+    }
+
+    public static function peekResetToken(PDO $db, string $token): ?array
+    {
+        $token = trim($token);
+        if ($token === '') {
+            return null;
+        }
+        $st = $db->prepare(
+            'SELECT * FROM password_resets WHERE token_hash=? AND used_at IS NULL'
+        );
+        $st->execute([hash('sha256', $token)]);
+        $row = $st->fetch();
+        if (!$row || (($row['expires_at'] ?? '') < Http::now())) {
+            return null;
+        }
+        return $row;
+    }
+
+    public static function consumeResetToken(PDO $db, string $token, string $passwordHash): ?array
+    {
+        $row = self::peekResetToken($db, $token);
+        if (!$row) {
+            return null;
+        }
+        $kind = (string) $row['kind'];
+        $id = (int) $row['subject_id'];
+        if ($kind === 'operator') {
+            $db->prepare('UPDATE operators SET password_hash=? WHERE id=?')->execute([$passwordHash, $id]);
+        } else {
+            $db->prepare('UPDATE users SET password_hash=? WHERE id=?')->execute([$passwordHash, $id]);
+        }
+        $db->prepare('UPDATE password_resets SET used_at=? WHERE id=?')->execute([Http::now(), $row['id']]);
+        self::clearResetFile();
+        return $row;
     }
 
     public static function seedDemo(PDO $db): void
