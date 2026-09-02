@@ -6,7 +6,7 @@ final class Db
     public const DEMO_EMAIL = 'family@ourcircle.app';
     public const DEMO_NAME = 'Pat Foster';
     public const DEMO_PASSWORD = 'password123';
-    public const VERSION = '1.3.3';
+    public const VERSION = '1.3.4';
     public const RESET_NOTICE = 'If that email is on file, a one-hour reset link is on the way. When mail is not connected, the link is saved as password-reset.txt next to the database (blocked from the web).';
 
     private static ?string $path = null;
@@ -167,6 +167,60 @@ final class Db
         }
         $db->prepare('INSERT INTO operators (email, password_hash, created_at) VALUES (?,?,?)')
             ->execute([$email, password_hash($plain, PASSWORD_DEFAULT), Http::now()]);
+    }
+
+    public static function factoryReset(PDO $db): void
+    {
+        $savedOp = self::operatorRow($db);
+        $tables = [
+            'check_notes',
+            'alerts',
+            'checks',
+            'uploads',
+            'trusted',
+            'invites',
+            'users',
+            'circles',
+            'password_resets',
+            'operators',
+        ];
+        $db->exec('PRAGMA foreign_keys = OFF');
+        foreach ($tables as $table) {
+            $db->exec('DROP TABLE IF EXISTS "' . $table . '"');
+        }
+        $db->exec('PRAGMA foreign_keys = ON');
+        self::wipeUploadFiles();
+        self::clearResetFile();
+        self::init($db);
+        if (!self::operatorRow($db) && $savedOp) {
+            $db->prepare('INSERT INTO operators (email, password_hash, created_at) VALUES (?,?,?)')
+                ->execute([
+                    (string) $savedOp['email'],
+                    (string) $savedOp['password_hash'],
+                    Http::now(),
+                ]);
+        }
+    }
+
+    public static function wipeUploadFiles(): void
+    {
+        $dir = (self::$path ? dirname(self::$path) : (dirname(__DIR__) . '/data'))
+            . DIRECTORY_SEPARATOR . 'uploads';
+        if (!is_dir($dir)) {
+            return;
+        }
+        $it = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($it as $file) {
+            $path = $file->getPathname();
+            if ($file->isDir()) {
+                @rmdir($path);
+            } else {
+                @unlink($path);
+            }
+        }
     }
 
     public static function resetFilePath(): string

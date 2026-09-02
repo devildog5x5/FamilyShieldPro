@@ -6,9 +6,9 @@ Live sandbox: https://sandbox.familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.3.3** includes circle and operator password recovery (email link, or `data/password-reset.txt` when mail is off), dark mode, and a faint operator hatch to `/admin/login`.
+Canonical PHP source for Hostinger (`public_html`). Version **1.3.4** includes an operator factory reset, circle and operator password recovery, dark mode, and a faint operator hatch to `/admin/login`.
 
-**Hostinger zip:** [FamilyShieldPro-PHP-1.3.3.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.3/FamilyShieldPro-PHP-1.3.3.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`).
+**Hostinger zip:** [FamilyShieldPro-PHP-1.3.4.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.4/FamilyShieldPro-PHP-1.3.4.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`).
 
 ## Local run
 
@@ -24,7 +24,7 @@ Open http://127.0.0.1:8080 — demo login `family@ourcircle.app` / `password123`
 
 ## Deploy (Hostinger)
 
-1. Download [FamilyShieldPro-PHP-1.3.3.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.3/FamilyShieldPro-PHP-1.3.3.zip) and unzip into `public_html` (not a nested folder).
+1. Download [FamilyShieldPro-PHP-1.3.4.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.4/FamilyShieldPro-PHP-1.3.4.zip) and unzip into `public_html` (not a nested folder).
 2. Copy `.env.example` to `.env`. Set `APP_SECRET`, `BASE_URL`, `OPERATOR_EMAIL`, and `OPERATOR_PASSWORD`.
 3. PHP 8.2/8.3 with `pdo_sqlite`.
 4. Database file: `public_html/data/ourcircle.db` (blocked by `.htaccess`).
@@ -42,6 +42,7 @@ If you already have a live SQLite file, **back it up first**. This schema is not
 - Empty circle notes are rejected
 - Circle members reset passwords at `/forgot` (email, file fallback, or 2FA recovery code)
 - Operators reset at `/admin/forgot` (same email/file flow; new password is stored so it survives `.env`)
+- Operators can restore factory data from `/admin` (type FACTORY, re-enter operator password)
 
 ## Support
 

@@ -51,6 +51,8 @@ final class App
             $this->chat();
         } elseif ($path === '/admin/forgot') {
             $this->adminForgot();
+        } elseif ($method === 'POST' && $path === '/admin/factory-reset') {
+            $this->adminFactoryReset();
         } elseif ($path === '/admin/login' || $path === '/admin') {
             $this->admin($path, $method);
         } elseif (preg_match('#^/join/([A-Za-z0-9_-]{8,})$#', $path, $m)) {
@@ -997,6 +999,24 @@ final class App
             Http::redirect('/admin');
         }
         $this->view('admin-login');
+    }
+
+    private function adminFactoryReset(): void
+    {
+        if (empty($_SESSION['admin'])) {
+            Http::redirect('/admin/login');
+        }
+        Http::csrfCheck();
+        $confirm = strtoupper(trim((string) ($_POST['confirm'] ?? '')));
+        $pw = (string) ($_POST['password'] ?? '');
+        if ($confirm !== 'FACTORY' || !$this->operatorPasswordOk($pw)) {
+            Http::flash('Factory reset was not run. Type FACTORY and enter the operator password.', 'error');
+            Http::redirect('/admin');
+        }
+        Db::factoryReset($this->db);
+        unset($_SESSION['user_id'], $_SESSION['totp_ok']);
+        Http::flash('Database restored to factory settings. Demo circle: family@ourcircle.app / password123.');
+        Http::redirect('/admin');
     }
 
     private function operatorPasswordOk(string $pw): bool

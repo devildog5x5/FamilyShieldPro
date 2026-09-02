@@ -94,6 +94,10 @@ final class Http
             $stay = true;
             $path = '/forgot';
         }
+        if ($path === '/admin/factory-reset') {
+            $stay = true;
+            $path = '/admin';
+        }
         self::redirect($stay ? $path : '/home');
         }
     }
