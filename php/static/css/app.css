@@ -244,6 +244,8 @@ textarea { min-height: 140px; }
 .table { width: 100%; border-collapse: collapse; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .table th, .table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.admin-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+.sql-box { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9rem; }
 .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--gold-soft); font-size: 0.8rem; font-weight: 700; }
 .status-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 16px; }
 .status-arrow { color: var(--muted); font-weight: 700; }

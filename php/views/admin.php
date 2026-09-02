@@ -3,6 +3,7 @@ Layout::start('Operator console · Family Shield Pro', null, 'app-bare');
 ?>
 <div class="wrap app-main">
   <h1>Circles</h1>
+  <p><a class="btn" href="/admin/data">Open database</a></p>
   <?php Layout::flash(); ?>
   <div class="table-wrap">
     <table class="table">

@@ -53,6 +53,10 @@ final class App
             $this->adminForgot();
         } elseif ($method === 'POST' && $path === '/admin/factory-reset') {
             $this->adminFactoryReset();
+        } elseif ($path === '/admin/data' || str_starts_with($path, '/admin/data/')) {
+            $this->adminData($path, $method);
+        } elseif ($path === '/admin/sql' && $method === 'POST') {
+            $this->adminSql();
         } elseif ($path === '/admin/login' || $path === '/admin') {
             $this->admin($path, $method);
         } elseif (preg_match('#^/join/([A-Za-z0-9_-]{8,})$#', $path, $m)) {
@@ -999,6 +1003,233 @@ final class App
             Http::redirect('/admin');
         }
         $this->view('admin-login');
+    }
+
+    private const ADMIN_TABLES = [
+        'circles',
+        'users',
+        'invites',
+        'trusted',
+        'checks',
+        'check_notes',
+        'alerts',
+        'uploads',
+        'operators',
+        'password_resets',
+    ];
+
+    private const ADMIN_SECRET_COLS = [
+        'password_hash',
+        'totp_secret',
+        'totp_pending',
+        'recovery_codes',
+        'token_hash',
+    ];
+
+    private function requireAdmin(): void
+    {
+        if (empty($_SESSION['admin'])) {
+            Http::redirect('/admin/login');
+        }
+    }
+
+    private function adminTable(string $name): string
+    {
+        $name = strtolower(trim($name));
+        if (!in_array($name, self::ADMIN_TABLES, true)) {
+            Http::flash('That table is not available.', 'error');
+            Http::redirect('/admin/data');
+        }
+        return $name;
+    }
+
+    private function adminColumns(string $table): array
+    {
+        $st = $this->db->query('PRAGMA table_info("' . $table . '")');
+        $cols = [];
+        foreach ($st->fetchAll() as $c) {
+            $cols[] = (string) $c['name'];
+        }
+        return $cols;
+    }
+
+    private function adminData(string $path, string $method): void
+    {
+        $this->requireAdmin();
+        if ($method === 'POST' && $path === '/admin/data/save') {
+            $this->adminDataSave();
+        }
+        if ($method === 'POST' && $path === '/admin/data/insert') {
+            $this->adminDataInsert();
+        }
+        if ($method === 'POST' && $path === '/admin/data/delete') {
+            $this->adminDataDelete();
+        }
+        $table = $this->adminTable((string) ($_GET['table'] ?? 'circles'));
+        $editId = (int) ($_GET['id'] ?? 0);
+        $cols = $this->adminColumns($table);
+        $rows = $this->db->query('SELECT * FROM "' . $table . '" ORDER BY id DESC LIMIT 200')->fetchAll();
+        $edit = null;
+        if ($editId > 0) {
+            $st = $this->db->prepare('SELECT * FROM "' . $table . '" WHERE id=?');
+            $st->execute([$editId]);
+            $edit = $st->fetch() ?: null;
+        }
+        $sql = (string) ($_SESSION['admin_sql'] ?? '');
+        $sqlRows = $_SESSION['admin_sql_rows'] ?? null;
+        $sqlCols = $_SESSION['admin_sql_cols'] ?? null;
+        $sqlCount = $_SESSION['admin_sql_count'] ?? null;
+        unset($_SESSION['admin_sql_rows'], $_SESSION['admin_sql_cols'], $_SESSION['admin_sql_count']);
+        $this->view('admin-data', [
+            'tables' => self::ADMIN_TABLES,
+            'table' => $table,
+            'cols' => $cols,
+            'rows' => $rows,
+            'edit' => $edit,
+            'secrets' => self::ADMIN_SECRET_COLS,
+            'sql' => $sql,
+            'sql_rows' => $sqlRows,
+            'sql_cols' => $sqlCols,
+            'sql_count' => $sqlCount,
+        ]);
+    }
+
+    private function adminPostedRow(string $table, bool $insert): array
+    {
+        $cols = $this->adminColumns($table);
+        $out = [];
+        foreach ($cols as $col) {
+            if ($col === 'id') {
+                continue;
+            }
+            if (!array_key_exists($col, $_POST)) {
+                continue;
+            }
+            $v = (string) $_POST[$col];
+            if (in_array($col, self::ADMIN_SECRET_COLS, true) && trim($v) === '') {
+                if ($insert) {
+                    $out[$col] = '';
+                }
+                continue;
+            }
+            if ($col === 'password_hash') {
+                $v = password_hash($v, PASSWORD_DEFAULT);
+            }
+            $out[$col] = $v;
+        }
+        return $out;
+    }
+
+    private function adminDataSave(): never
+    {
+        Http::csrfCheck();
+        $table = $this->adminTable((string) ($_POST['table'] ?? ''));
+        $id = (int) ($_POST['id'] ?? 0);
+        $fields = $this->adminPostedRow($table, false);
+        if ($id < 1 || $fields === []) {
+            Http::flash('Nothing to save.', 'error');
+            Http::redirect('/admin/data?table=' . rawurlencode($table));
+        }
+        $sets = [];
+        $vals = [];
+        foreach ($fields as $col => $v) {
+            $sets[] = '"' . $col . '"=?';
+            $vals[] = $v;
+        }
+        $vals[] = $id;
+        try {
+            $this->db->prepare('UPDATE "' . $table . '" SET ' . implode(',', $sets) . ' WHERE id=?')->execute($vals);
+        } catch (Throwable $e) {
+            Http::flash('Update failed: ' . $e->getMessage(), 'error');
+            Http::redirect('/admin/data?table=' . rawurlencode($table) . '&id=' . $id);
+        }
+        Http::flash('Row ' . $id . ' in ' . $table . ' updated.');
+        Http::redirect('/admin/data?table=' . rawurlencode($table));
+    }
+
+    private function adminDataInsert(): never
+    {
+        Http::csrfCheck();
+        $table = $this->adminTable((string) ($_POST['table'] ?? ''));
+        $fields = $this->adminPostedRow($table, true);
+        if ($fields === []) {
+            Http::flash('Add at least one field.', 'error');
+            Http::redirect('/admin/data?table=' . rawurlencode($table));
+        }
+        $cols = array_keys($fields);
+        $qs = implode(',', array_fill(0, count($cols), '?'));
+        $quoted = implode(',', array_map(static fn(string $c): string => '"' . $c . '"', $cols));
+        try {
+            $this->db->prepare('INSERT INTO "' . $table . '" (' . $quoted . ') VALUES (' . $qs . ')')
+                ->execute(array_values($fields));
+        } catch (Throwable $e) {
+            Http::flash('Insert failed: ' . $e->getMessage(), 'error');
+            Http::redirect('/admin/data?table=' . rawurlencode($table));
+        }
+        Http::flash('Row added to ' . $table . ' (id ' . $this->db->lastInsertId() . ').');
+        Http::redirect('/admin/data?table=' . rawurlencode($table));
+    }
+
+    private function adminDataDelete(): never
+    {
+        Http::csrfCheck();
+        $table = $this->adminTable((string) ($_POST['table'] ?? ''));
+        $id = (int) ($_POST['id'] ?? 0);
+        if ($id < 1) {
+            Http::flash('Missing row id.', 'error');
+            Http::redirect('/admin/data?table=' . rawurlencode($table));
+        }
+        try {
+            $this->db->prepare('DELETE FROM "' . $table . '" WHERE id=?')->execute([$id]);
+        } catch (Throwable $e) {
+            Http::flash('Delete failed: ' . $e->getMessage(), 'error');
+            Http::redirect('/admin/data?table=' . rawurlencode($table));
+        }
+        Http::flash('Deleted ' . $table . ' row ' . $id . '.');
+        Http::redirect('/admin/data?table=' . rawurlencode($table));
+    }
+
+    private function adminSql(): never
+    {
+        $this->requireAdmin();
+        Http::csrfCheck();
+        $sql = trim((string) ($_POST['sql'] ?? ''));
+        $pw = (string) ($_POST['password'] ?? '');
+        $_SESSION['admin_sql'] = $sql;
+        unset($_SESSION['admin_sql_rows'], $_SESSION['admin_sql_cols'], $_SESSION['admin_sql_count']);
+        if ($sql === '') {
+            Http::flash('Enter a SQL statement.', 'error');
+            Http::redirect('/admin/data');
+        }
+        if (!$this->operatorPasswordOk($pw)) {
+            Http::flash('Operator password did not match. SQL was not run.', 'error');
+            Http::redirect('/admin/data');
+        }
+        $one = rtrim($sql, "; \t\n\r");
+        if (str_contains($one, ';')) {
+            Http::flash('Run one statement at a time.', 'error');
+            Http::redirect('/admin/data');
+        }
+        if (preg_match('/\b(attach|detach)\b/i', $one) || preg_match('/vacuum\s+into/i', $one)) {
+            Http::flash('ATTACH, DETACH, and VACUUM INTO are not allowed.', 'error');
+            Http::redirect('/admin/data');
+        }
+        try {
+            if (preg_match('/^\s*(select|with|pragma|explain)\b/i', $one)) {
+                $st = $this->db->query($one);
+                $rows = $st->fetchAll();
+                $_SESSION['admin_sql_cols'] = $rows !== [] ? array_keys($rows[0]) : [];
+                $_SESSION['admin_sql_rows'] = $rows;
+                Http::flash('Query returned ' . count($rows) . ' row(s).');
+            } else {
+                $n = $this->db->exec($one);
+                $_SESSION['admin_sql_count'] = $n;
+                Http::flash('Statement finished. Rows affected: ' . $n . '.');
+            }
+        } catch (Throwable $e) {
+            Http::flash('SQL error: ' . $e->getMessage(), 'error');
+        }
+        Http::redirect('/admin/data');
     }
 
     private function adminFactoryReset(): void

@@ -98,6 +98,10 @@ final class Http
             $stay = true;
             $path = '/admin';
         }
+        if ($path === '/admin/sql' || str_starts_with($path, '/admin/data')) {
+            $stay = true;
+            $path = '/admin/data';
+        }
         self::redirect($stay ? $path : '/home');
         }
     }
