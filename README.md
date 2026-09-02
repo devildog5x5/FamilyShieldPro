@@ -6,7 +6,9 @@ Live sandbox: https://sandbox.familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.3.0** fixes isolation, invites, call-me attribution, billing permissions, legal pages, and security headers found in sandbox testing.
+Canonical PHP source for Hostinger (`public_html`). Version **1.3.2** includes the sandbox test fixes plus dark mode and a faint operator hatch to `/admin/login`.
+
+**Hostinger zip:** [FamilyShieldPro-PHP.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/latest/download/FamilyShieldPro-PHP.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1`.
 
 ## Local run
 
@@ -22,7 +24,7 @@ Open http://127.0.0.1:8080 — demo login `family@ourcircle.app` / `password123`
 
 ## Deploy (Hostinger)
 
-1. Upload everything inside `php/` into `public_html` (not a nested folder).
+1. Download [FamilyShieldPro-PHP.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/latest/download/FamilyShieldPro-PHP.zip) and unzip into `public_html` (not a nested folder).
 2. Copy `.env.example` to `.env`. Set `APP_SECRET` and `BASE_URL`.
 3. PHP 8.2/8.3 with `pdo_sqlite`.
 4. Database file: `public_html/data/ourcircle.db` (blocked by `.htaccess`).

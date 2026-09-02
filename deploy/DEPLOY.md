@@ -2,6 +2,10 @@
 
 PHP app in `php/` → Hostinger `public_html`.
 
+**Easiest:** download [FamilyShieldPro-PHP.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/latest/download/FamilyShieldPro-PHP.zip) and unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1`.
+
+Or by hand:
+
 1. Zip the **contents** of `php/` (index.php, .htaccess, src, views, static, data).
 2. hPanel → File Manager → unzip into `public_html`.
 3. Copy `.env.example` to `.env`. Set:

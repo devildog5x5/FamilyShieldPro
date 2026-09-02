@@ -2,4 +2,6 @@ php/.env
 php/data/*.db
 php/data/*.db-journal
 php/data/uploads/
+build/
+installers/
 .DS_Store

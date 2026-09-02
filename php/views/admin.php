@@ -1,5 +1,5 @@
 <?php
-Layout::start('Operator console · Family Shield Pro');
+Layout::start('Operator console · Family Shield Pro', null, 'app-bare');
 ?>
 <div class="wrap app-main">
   <h1>Circles</h1>

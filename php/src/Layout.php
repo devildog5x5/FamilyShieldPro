@@ -32,12 +32,16 @@ final class Layout
         echo '<title>' . Http::e($title) . '</title>';
         echo '<link rel="canonical" href="' . Http::e($base . Http::path()) . '" />';
         echo '<link rel="icon" type="image/png" href="/static/img/logo.png" />';
+        echo '<meta name="color-scheme" content="light dark" />';
+        echo '<script src="/static/js/fsp-theme.js?v=' . Http::e($v) . '"></script>';
         echo '<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />';
         echo '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />';
         echo '<link rel="stylesheet" href="/static/css/app.css?v=' . Http::e($v) . '" />';
         echo '</head><body class="' . Http::e($bodyClass) . '">';
         if ($user) {
             self::appHeader($user);
+        } elseif ($bodyClass === 'auth-page' || $bodyClass === 'app-bare') {
+            echo '<div class="theme-toggle-wrap">' . self::themeToggle() . '</div>';
         }
     }
 
@@ -57,6 +61,7 @@ final class Layout
         ] as $href => $label) {
             echo '<a href="' . $href . '">' . $label . '</a>';
         }
+        echo self::themeToggle();
         echo '</nav></header></div>';
         echo '<div class="wrap"><p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p></div>';
     }
@@ -73,7 +78,7 @@ final class Layout
 
     public static function end(?array $user = null): void
     {
-        echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee.</p></div>';
+        echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee.<a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
         self::chat();
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '</body></html>';
@@ -104,6 +109,12 @@ final class Layout
         echo '<a href="#contact">Contact</a>';
         echo '<a href="/login">Sign in</a>';
         echo '<a class="btn sm" href="/signup">Start a circle</a>';
+        echo self::themeToggle();
         echo '</nav></header></div>';
+    }
+
+    public static function themeToggle(): string
+    {
+        return '<button type="button" class="theme-toggle" id="fsp-theme-toggle" aria-pressed="false" title="Switch to dark appearance">Dark</button>';
     }
 }
