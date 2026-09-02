@@ -1,9 +1,16 @@
-# Build FamilyShieldPro-PHP.zip for Hostinger public_html
+# Build FamilyShieldPro-PHP-<version>.zip for Hostinger public_html
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $Out = Join-Path $Root "installers"
 $Stage = Join-Path $Root "build\phpdrop"
-$Zip = Join-Path $Out "FamilyShieldPro-PHP.zip"
+$DbFile = Join-Path $Root "php\src\Db.php"
+$DbText = Get-Content -Path $DbFile -Raw
+if ($DbText -notmatch "VERSION\s*=\s*'([^']+)'") {
+    throw "Could not read VERSION from php/src/Db.php"
+}
+$Version = $Matches[1]
+$ZipName = "FamilyShieldPro-PHP-$Version.zip"
+$Zip = Join-Path $Out $ZipName
 
 New-Item -ItemType Directory -Force -Path $Out | Out-Null
 if (Test-Path $Stage) { Remove-Item -Recurse -Force $Stage }
@@ -20,6 +27,7 @@ if (Test-Path $uploads) { Remove-Item -Recurse -Force $uploads }
 
 $readme = @"
 Family Shield Pro (OurCircle) — Hostinger
+Build: $Version
 =========================================
 1. Unzip ALL of these files into public_html (not a subfolder).
 2. Copy .env.example to .env
@@ -33,8 +41,9 @@ SQLite is created at data/ourcircle.db (blocked from the web by .htaccess).
 "@
 Set-Content -Path (Join-Path $Stage "HOSTINGER.txt") -Value $readme -Encoding UTF8
 
-if (Test-Path $Zip) { Remove-Item $Zip -Force }
+Get-ChildItem -Path $Out -Filter "FamilyShieldPro-PHP*.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
 Get-ChildItem -Path $Stage -Force | Compress-Archive -DestinationPath $Zip -Force
 
-Write-Host "Built $Zip"
+Write-Host "Built v$Version"
+Write-Host "  $Zip"
 Write-Host ("Size {0:N1} KB" -f ((Get-Item $Zip).Length / 1KB))
