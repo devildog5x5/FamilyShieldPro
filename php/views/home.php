@@ -79,7 +79,7 @@ $total = count($members) + count($pending);
       <div class="panel" style="margin-top:16px">
         <h3>Recent checks</h3>
         <?php if (!$checks): ?>
-          <p>None yet. Paste the odd message in the box to the left, then check it before you reply.</p>
+          <p>None yet. Paste the odd message in the box to the left, then check it. Do not reply.</p>
         <?php else: ?>
           <?php foreach ($checks as $c): ?>
             <p><a href="/checks/<?= (int) $c['id'] ?>"><?= Http::e($c['level']) ?> · <?= Http::e(substr((string) $c['text'], 0, 80)) ?></a></p>
