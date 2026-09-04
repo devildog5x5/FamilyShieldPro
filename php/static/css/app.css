@@ -227,6 +227,26 @@ input, textarea, select {
   background: var(--input);
   color: var(--ink);
 }
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 48px; }
+.pw-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.pw-toggle:hover { color: var(--ink); }
+.pw-toggle svg { width: 22px; height: 22px; display: block; }
 textarea { min-height: 140px; }
 .muted { color: var(--muted); }
 .risk {

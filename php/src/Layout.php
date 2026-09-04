@@ -81,6 +81,7 @@ final class Layout
         echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee.<a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
         self::chat();
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
+        echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-focus.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '</body></html>';
     }
