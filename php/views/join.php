@@ -20,8 +20,9 @@ $inv = $invite;
     <label>Choose a password (8+)</label>
     <input name="password" type="password" required minlength="8" />
     <details class="more">
-      <summary>Mobile (optional — for call-me texts)</summary>
+      <summary>Mobile (optional)</summary>
       <input name="phone" type="tel" inputmode="tel" placeholder="(555) 010-1234" autocomplete="tel" value="<?= Http::e($inv['phone'] ?? '') ?>" />
+      <p class="muted">Password reset uses your email. Texts are only for circle invites and alerts if SMS is on.</p>
     </details>
     <p><button class="btn wide" type="submit">Join the circle</button></p>
   </form>

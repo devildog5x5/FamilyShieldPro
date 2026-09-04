@@ -13,8 +13,9 @@ Layout::start('Start a circle · OurCircle', null, 'auth-page');
     <input name="email" type="email" required autocomplete="username" />
     <label>Password (8+ characters)</label>
     <input name="password" type="password" required minlength="8" autocomplete="new-password" />
-    <label>Mobile number (so we can text call-me)</label>
+    <label>Mobile number (optional)</label>
     <input name="phone" type="tel" inputmode="tel" autocomplete="tel" />
+    <p class="muted">Password reset uses your email, not this number. We only text this number for circle invites and alerts if SMS is turned on.</p>
     <p><button class="btn wide" type="submit">Start the family circle</button></p>
   </form>
   <p><a href="/login">Already have a login</a></p>

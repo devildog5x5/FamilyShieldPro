@@ -49,14 +49,12 @@ $phone = $phone ?? Layout::contactPhone();
   <h2 id="plans">Family plans</h2>
   <div class="plans">
     <div class="panel">
-      <div class="plan-badge">Best for families</div>
       <h3>Family monthly</h3>
       <p><strong>$14.99/month</strong></p>
       <p>Up to five people in one circle. Pause, trusted list, and call-me-before-I-pay.</p>
       <p><a class="btn wide" href="/signup">Start a circle</a></p>
     </div>
     <div class="panel featured">
-      <div class="plan-badge">Best for families</div>
       <h3>Family yearly</h3>
       <p><strong>$119.99/year</strong></p>
       <p>Same circle. Pay once a year — about $10 a month.</p>

@@ -24,7 +24,6 @@ $stripe = !empty($stripe);
       <?php endif; ?>
     </div>
     <div class="panel featured">
-      <div class="plan-badge">Best for families</div>
       <h3>Family yearly</h3>
       <p><strong>$119.99/year</strong></p>
       <p>Same circle. Pay once a year — about $10 a month.</p>

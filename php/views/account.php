@@ -21,7 +21,7 @@ Layout::start('Account', $user);
       <input name="phone" type="tel" inputmode="tel" value="<?= Http::e($user['phone'] ?? '') ?>" placeholder="(555) 010-1234" autocomplete="tel" />
       <label class="check-row"><input type="checkbox" name="sms_opt_out" value="1" <?= !empty($user['sms_opt_out']) ? 'checked' : '' ?> /> Opt out of Family Shield Pro texts</label>
       <p><button class="btn" type="submit">Save mobile</button></p>
-      <p class="disclaimer">When texting is connected, we can send circle invites and “Please call me before I pay” alerts. This is not a customer-service hotline. Reply STOP to opt out.</p>
+      <p class="disclaimer">Password reset uses your email, not this number. When SMS is connected, we can text circle invites and “Please call me before I pay” alerts. This is not a customer-service hotline. Reply STOP to opt out.</p>
     </form>
   </div>
   <div class="panel" style="margin-top:16px">
