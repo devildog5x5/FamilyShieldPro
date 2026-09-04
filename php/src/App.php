@@ -915,8 +915,8 @@ final class App
             return 'Ask me about plans, login, or how the circle works. For a person, email ' . $em . '.';
         }
         $low = strtolower($msg);
-        if (preg_match('/safe|legit|real|scam or not/', $low)) {
-            return 'OurCircle cannot tell you that a request is safe. Pause, read the warning signs, check your trusted list, and call someone in your circle. Then you decide.';
+        if (preg_match('/safe|legit|real|scam or not|snopes|ftc|ic3|bbb/', $low)) {
+            return 'OurCircle cannot tell you that a request is safe. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. Official reports: ReportFraud.ftc.gov and IC3.gov. Then call someone in your circle.';
         }
         if (preg_match('/year|annual|119/', $low)) {
             return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup. Paying does not make a request safe.';

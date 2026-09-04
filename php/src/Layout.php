@@ -108,6 +108,7 @@ final class Layout
         echo '<div class="wrap"><header class="site-header">';
         echo '<a class="brand" href="' . Http::e(Http::baseUrl()) . '"><img src="/static/img/logo.png" alt="Family Shield Pro" /><div><strong>OurCircle</strong><span>Family Shield Pro</span></div></a>';
         echo '<nav class="nav">';
+        echo '<a href="#lookup">Look it up</a>';
         echo '<a href="#contact">Contact</a>';
         echo '<a href="/login">Sign in</a>';
         echo '<a class="btn sm" href="/signup">Start a circle</a>';
@@ -118,5 +119,23 @@ final class Layout
     public static function themeToggle(): string
     {
         return '<button type="button" class="theme-toggle" id="fsp-theme-toggle" aria-pressed="false" title="Switch to dark appearance">Dark</button>';
+    }
+
+    public static function scamRefs(string $heading = 'h3'): void
+    {
+        $h = $heading === 'h2' ? 'h2' : 'h3';
+        echo '<' . $h . '>Look it up yourself</' . $h . '>';
+        echo '<p class="muted">Search the claim on these sites. Do not tap links inside the suspicious message. A match or a missing article is not a stamp that something is safe.</p>';
+        echo '<ul class="list scam-refs">';
+        foreach ([
+            ['https://www.snopes.com/', 'Snopes', 'Search a prize, news story, or viral claim.'],
+            ['https://consumer.ftc.gov/features/scam-alerts', 'FTC Scam Alerts', 'Current scam patterns the FTC is warning about.'],
+            ['https://www.bbb.org/scamtracker', 'BBB Scam Tracker', 'See if others reported the same ask.'],
+            ['https://reportfraud.ftc.gov', 'ReportFraud.ftc.gov', 'Official U.S. fraud report.'],
+            ['https://www.ic3.gov', 'IC3.gov', 'FBI internet-crime reports.'],
+        ] as $row) {
+            echo '<li><a href="' . Http::e($row[0]) . '" rel="noopener noreferrer" target="_blank">' . Http::e($row[1]) . '</a> — ' . Http::e($row[2]) . '</li>';
+        }
+        echo '</ul>';
     }
 }

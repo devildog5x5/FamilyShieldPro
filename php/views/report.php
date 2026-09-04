@@ -18,5 +18,8 @@ Layout::start('Report &amp; recover', $user);
     </ol>
     <p class="disclaimer">This application offers guidance, not a guarantee. We cannot reverse a payment for you.</p>
   </div>
+  <div class="panel" style="margin-top:16px">
+    <?php Layout::scamRefs(); ?>
+  </div>
 </div>
 <?php Layout::end($user);

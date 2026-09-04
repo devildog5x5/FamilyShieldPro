@@ -50,6 +50,7 @@ $riskClass = $level === 'pause' ? 'pause' : ($level === 'caution' ? 'caution' : 
         <li><?= Http::e($s) ?></li>
       <?php endforeach; ?>
     </ol>
+    <?php Layout::scamRefs(); ?>
   </div>
 
   <div class="panel" style="margin-top:16px">

@@ -46,6 +46,11 @@ $phone = $phone ?? Layout::contactPhone();
   <h3>If something already went wrong</h3>
   <p>Get calm instructions to report fraud, freeze cards, and tell the people who can actually stop a payment. Speed matters more than shame.</p>
 
+  <section id="lookup" class="panel" style="margin:24px 0">
+    <?php Layout::scamRefs('h2'); ?>
+    <p><a href="/report">If money or passwords already went out → Report &amp; recover</a></p>
+  </section>
+
   <h2 id="plans">Family plans</h2>
   <div class="plans">
     <div class="panel">

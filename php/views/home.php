@@ -73,6 +73,10 @@ $total = count($members) + count($pending);
         <p><a href="/trusted">Open list</a></p>
       </div>
       <div class="panel" style="margin-top:16px">
+        <?php Layout::scamRefs(); ?>
+        <p><a href="/report">If money already went out</a></p>
+      </div>
+      <div class="panel" style="margin-top:16px">
         <h3>Recent checks</h3>
         <?php if (!$checks): ?>
           <p>None yet. Paste the next odd message here before you reply.</p>
