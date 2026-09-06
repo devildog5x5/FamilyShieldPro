@@ -1,23 +1,7 @@
 (function () {
-  var KEY = "fsp-theme";
-
-  function stored() {
-    try {
-      return localStorage.getItem(KEY);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function systemDark() {
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  }
-
-  function resolve() {
-    var saved = stored();
-    if (saved === "dark" || saved === "light") return saved;
-    return systemDark() ? "dark" : "light";
-  }
+  try {
+    localStorage.removeItem("fsp-theme");
+  } catch (e) {}
 
   function apply(mode) {
     var dark = mode === "dark";
@@ -31,18 +15,36 @@
     }
   }
 
-  apply(resolve());
+  function current() {
+    return document.documentElement.classList.contains("dark") ? "dark" : "light";
+  }
+
+  function save(mode) {
+    var csrf = "";
+    var meta = document.querySelector('meta[name="csrf-token"]');
+    if (meta) csrf = meta.getAttribute("content") || "";
+    var body = "_csrf=" + encodeURIComponent(csrf) + "&theme=" + encodeURIComponent(mode);
+    fetch("/theme", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-Requested-With": "fetch",
+      },
+      body: body,
+      credentials: "same-origin",
+    }).catch(function () {});
+  }
+
+  apply(current());
 
   document.addEventListener("DOMContentLoaded", function () {
-    apply(resolve());
+    apply(current());
     var btn = document.getElementById("fsp-theme-toggle");
     if (!btn) return;
     btn.addEventListener("click", function () {
-      var next = document.documentElement.classList.contains("dark") ? "light" : "dark";
-      try {
-        localStorage.setItem(KEY, next);
-      } catch (e) {}
+      var next = current() === "dark" ? "light" : "dark";
       apply(next);
+      save(next);
     });
   });
 })();

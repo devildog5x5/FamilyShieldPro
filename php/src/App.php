@@ -47,6 +47,8 @@ final class App
             $this->sitemap();
         } elseif ($method === 'GET' && $path === '/healthz') {
             $this->healthz();
+        } elseif ($method === 'POST' && $path === '/theme') {
+            $this->setTheme($user);
         } elseif ($method === 'POST' && $path === '/support/chat') {
             $this->chat();
         } elseif ($path === '/admin/forgot') {
@@ -188,6 +190,39 @@ final class App
         exit;
     }
 
+    private function setTheme(?array $user): never
+    {
+        Http::csrfCheck();
+        $mode = strtolower(trim((string) ($_POST['theme'] ?? '')));
+        if ($mode !== 'dark' && $mode !== 'light') {
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+                Http::json(['ok' => false], 400);
+            }
+            Http::redirect('/');
+        }
+        $_SESSION['theme'] = $mode;
+        if ($user) {
+            $this->db->prepare('UPDATE users SET theme=? WHERE id=?')->execute([$mode, $user['id']]);
+        }
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+            Http::json(['ok' => true, 'theme' => $mode]);
+        }
+        Http::redirect('/');
+    }
+
+    private function rememberTheme(array $user): void
+    {
+        $saved = strtolower(trim((string) ($user['theme'] ?? '')));
+        if ($saved === 'dark' || $saved === 'light') {
+            $_SESSION['theme'] = $saved;
+            return;
+        }
+        $session = strtolower(trim((string) ($_SESSION['theme'] ?? '')));
+        if ($session === 'dark' || $session === 'light') {
+            $this->db->prepare('UPDATE users SET theme=? WHERE id=?')->execute([$session, $user['id']]);
+        }
+    }
+
     private function landing(): never
     {
         $this->view('landing', [
@@ -222,6 +257,7 @@ final class App
                     session_regenerate_id(true);
                     $_SESSION['user_id'] = $row['id'];
                     $_SESSION['totp_ok'] = 1;
+                    $this->rememberTheme($row);
                     $this->db->prepare('UPDATE users SET status=?, last_seen_at=? WHERE id=?')
                         ->execute(['access', Http::now(), $row['id']]);
                     Http::redirect($next);
@@ -250,6 +286,7 @@ final class App
             session_regenerate_id(true);
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['totp_ok'] = 1;
+            $this->rememberTheme($row);
             $this->db->prepare('UPDATE users SET status=?, last_seen_at=? WHERE id=?')
                 ->execute(['access', Http::now(), $row['id']]);
             Http::redirect($next);
@@ -285,13 +322,15 @@ final class App
         $this->db->prepare('INSERT INTO circles (name, plan, created_at) VALUES (?,?,?)')
             ->execute([$name . "'s circle", 'yearly', $now]);
         $cid = (int) $this->db->lastInsertId();
+        $theme = Layout::theme(null);
         $this->db->prepare(
-            'INSERT INTO users (circle_id, email, name, password_hash, phone, role, status, created_at)
-             VALUES (?,?,?,?,?,?,?,?)'
-        )->execute([$cid, $email, $name, password_hash($password, PASSWORD_DEFAULT), $phone, 'owner', 'access', $now]);
+            'INSERT INTO users (circle_id, email, name, password_hash, phone, role, status, theme, created_at)
+             VALUES (?,?,?,?,?,?,?,?,?)'
+        )->execute([$cid, $email, $name, password_hash($password, PASSWORD_DEFAULT), $phone, 'owner', 'access', $theme === 'dark' ? 'dark' : 'light', $now]);
         session_regenerate_id(true);
         $_SESSION['user_id'] = (int) $this->db->lastInsertId();
         $_SESSION['totp_ok'] = 1;
+        $_SESSION['theme'] = $theme === 'dark' ? 'dark' : 'light';
         Http::flash('Welcome. Paste anything odd below, or invite family from the right.');
         Http::redirect('/home');
     }
@@ -752,18 +791,21 @@ final class App
             Http::flash('This circle is full.', 'error');
             Http::redirect('/');
         }
+        $theme = Layout::theme(null);
         $this->db->prepare(
-            'INSERT INTO users (circle_id, email, name, password_hash, phone, role, status, created_at)
-             VALUES (?,?,?,?,?,?,?,?)'
+            'INSERT INTO users (circle_id, email, name, password_hash, phone, role, status, theme, created_at)
+             VALUES (?,?,?,?,?,?,?,?,?)'
         )->execute([
             $inv['circle_id'], strtolower((string) $inv['email']), $name,
-            password_hash($password, PASSWORD_DEFAULT), $phone, 'member', 'accepted', Http::now(),
+            password_hash($password, PASSWORD_DEFAULT), $phone, 'member', 'accepted',
+            $theme === 'dark' ? 'dark' : 'light', Http::now(),
         ]);
         $uid = (int) $this->db->lastInsertId();
         $this->db->prepare("UPDATE invites SET status='accepted' WHERE id=?")->execute([$inv['id']]);
         session_regenerate_id(true);
         $_SESSION['user_id'] = $uid;
         $_SESSION['totp_ok'] = 1;
+        $_SESSION['theme'] = $theme === 'dark' ? 'dark' : 'light';
         Http::flash('You are in the circle. If someone asks you to look, pause with them — do not rush.');
         Http::redirect('/home');
     }

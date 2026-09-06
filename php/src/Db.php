@@ -6,7 +6,7 @@ final class Db
     public const DEMO_EMAIL = 'family@ourcircle.app';
     public const DEMO_NAME = 'Pat Foster';
     public const DEMO_PASSWORD = 'password123';
-    public const VERSION = '1.3.10';
+    public const VERSION = '1.3.11';
     public const RESET_NOTICE = 'If that email is on file, a one-hour reset link is on the way. When mail is not connected, the link is saved as password-reset.txt next to the database (blocked from the web).';
 
     private static ?string $path = null;
@@ -49,6 +49,7 @@ final class Db
                 totp_pending TEXT,
                 totp_enabled INTEGER NOT NULL DEFAULT 0,
                 recovery_codes TEXT,
+                theme TEXT NOT NULL DEFAULT '',
                 last_seen_at TEXT,
                 created_at TEXT NOT NULL
             );
@@ -129,11 +130,23 @@ final class Db
                 created_at TEXT NOT NULL
             );
         SQL);
+        self::ensureUserThemeColumn($db);
         $n = (int) $db->query('SELECT COUNT(*) FROM circles')->fetchColumn();
         if ($n === 0) {
             self::seedDemo($db);
         }
         self::ensureOperator($db);
+    }
+
+    public static function ensureUserThemeColumn(PDO $db): void
+    {
+        $cols = $db->query('PRAGMA table_info(users)')->fetchAll();
+        foreach ($cols as $c) {
+            if (($c['name'] ?? '') === 'theme') {
+                return;
+            }
+        }
+        $db->exec("ALTER TABLE users ADD COLUMN theme TEXT NOT NULL DEFAULT ''");
     }
 
     public static function operatorEmail(): string

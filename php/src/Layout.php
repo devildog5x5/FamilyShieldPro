@@ -22,17 +22,33 @@ final class Layout
         return $p;
     }
 
+    public static function theme(?array $user = null): string
+    {
+        $u = strtolower(trim((string) ($user['theme'] ?? '')));
+        if ($u === 'dark' || $u === 'light') {
+            return $u;
+        }
+        $s = strtolower(trim((string) ($_SESSION['theme'] ?? '')));
+        if ($s === 'dark' || $s === 'light') {
+            return $s;
+        }
+        return 'light';
+    }
+
     public static function start(string $title, ?array $user = null, string $bodyClass = ''): void
     {
         $title = $title !== '' ? $title : 'OurCircle';
         $v = self::asset();
         $base = Http::baseUrl();
-        echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" />';
+        $mode = self::theme($user);
+        $htmlClass = $mode === 'dark' ? ' class="dark"' : '';
+        echo '<!DOCTYPE html><html lang="en"' . $htmlClass . '><head><meta charset="UTF-8" />';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
         echo '<title>' . Http::e($title) . '</title>';
         echo '<link rel="canonical" href="' . Http::e($base . Http::path()) . '" />';
         echo '<link rel="icon" type="image/png" href="/static/img/logo.png" />';
-        echo '<meta name="color-scheme" content="light dark" />';
+        echo '<meta name="color-scheme" content="' . ($mode === 'dark' ? 'dark' : 'light') . '" />';
+        echo '<meta name="csrf-token" content="' . Http::e(Http::csrfToken()) . '" />';
         echo '<script src="/static/js/fsp-theme.js?v=' . Http::e($v) . '"></script>';
         echo '<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />';
         echo '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />';
