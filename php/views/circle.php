@@ -1,6 +1,7 @@
 <?php
 Layout::start('Family circle', $user);
 $isOwner = ($user['role'] ?? '') === 'owner';
+$canWrite = !empty($user['trial']['can_write']);
 ?>
 <div class="wrap app-main">
   <?php Layout::flash(); ?>
@@ -51,7 +52,9 @@ $isOwner = ($user['role'] ?? '') === 'owner';
               <?= Http::csrfField() ?>
               <input type="hidden" name="invite_id" value="<?= (int) $p['id'] ?>" />
             </form>
+            <?php if ($canWrite): ?>
             <button class="btn ghost resend-btn" type="submit" form="circle-resend-<?= (int) $p['id'] ?>">Resend invite</button>
+            <?php endif; ?>
             <?php if ($isOwner): ?>
               <form method="post" action="/circle/invite/<?= (int) $p['id'] ?>/cancel" style="display:inline">
                 <?= Http::csrfField() ?>
@@ -66,6 +69,7 @@ $isOwner = ($user['role'] ?? '') === 'owner';
     </table>
   </div>
 
+  <?php if ($canWrite): ?>
   <form class="panel" method="post" style="margin-top:16px">
     <?= Http::csrfField() ?>
     <h2>Invite someone</h2>
@@ -81,6 +85,7 @@ $isOwner = ($user['role'] ?? '') === 'owner';
     <p><button class="btn wide" type="submit">Send invite</button></p>
     <p class="disclaimer">We email a tap-to-open join link when mail is set up. Share the join link in a call you already trust — not inside a suspicious thread. Reply STOP on texts to opt out.</p>
   </form>
+  <?php endif; ?>
 
   <?php if (!empty($alert)): ?>
     <div class="flash error" style="margin-top:16px">

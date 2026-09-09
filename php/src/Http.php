@@ -109,6 +109,10 @@ final class Http
             $stay = true;
             $path = '/admin';
         }
+        if ($path === '/trial/continue') {
+            $stay = true;
+            $path = '/home';
+        }
         self::redirect($stay ? $path : '/home');
         }
     }

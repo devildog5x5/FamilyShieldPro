@@ -76,7 +76,8 @@ final class App
             || str_starts_with($path, '/account/')
             || str_starts_with($path, '/trusted/')
             || str_starts_with($path, '/billing/')
-            || str_starts_with($path, '/circle/')) {
+            || str_starts_with($path, '/circle/')
+            || str_starts_with($path, '/trial')) {
             $user = $this->requireUser($user);
             $this->authed($method, $path, $user);
         } else {
@@ -98,9 +99,10 @@ final class App
             unset($_SESSION['user_id']);
             return null;
         }
-        $this->db->prepare('UPDATE users SET last_seen_at = ?, status = ? WHERE id = ?')
+            $this->db->prepare('UPDATE users SET last_seen_at = ?, status = ? WHERE id = ?')
             ->execute([Http::now(), 'access', $row['id']]);
         $row['status'] = 'access';
+        $row['trial'] = Trial::state($this->db, $row);
         return $row;
     }
 
@@ -126,8 +128,65 @@ final class App
         }
     }
 
+    private function enforceTrial(string $method, string $path, array $user): void
+    {
+        if ($path === '/trial/continue') {
+            return;
+        }
+        $trial = $user['trial'] ?? Trial::state($this->db, $user);
+        if (!empty($trial['can_write'])) {
+            return;
+        }
+        if ($this->trialWritePath($method, $path)) {
+            Http::flash(Trial::writeBlockedMessage($trial), 'error');
+            Http::redirect(!empty($trial['is_owner']) ? '/billing' : '/home');
+        }
+        if ($method === 'GET' && $this->trialLimitedPath($path) && empty($_SESSION['trial_gate_ok'])) {
+            $this->view('trial-gate', [
+                'user' => $user,
+                'trial' => $trial,
+                'next' => $path,
+            ]);
+        }
+    }
+
+    private function trialWritePath(string $method, string $path): bool
+    {
+        if ($method !== 'POST') {
+            return false;
+        }
+        if (in_array($path, ['/check', '/circle', '/circle/resend', '/trusted'], true)) {
+            return true;
+        }
+        if (preg_match('#^/trusted/\d+/delete$#', $path)) {
+            return true;
+        }
+        if (preg_match('#^/checks/\d+/(alert|review)$#', $path)) {
+            return true;
+        }
+        if (preg_match('#^/checks/\d+/review/reply$#', $path)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function trialLimitedPath(string $path): bool
+    {
+        if (in_array($path, ['/home', '/circle', '/trusted', '/report'], true)) {
+            return true;
+        }
+        return (bool) preg_match('#^/checks/\d+$#', $path);
+    }
+
+    private function trialContinue(): never
+    {
+        $_SESSION['trial_gate_ok'] = 1;
+        Http::redirect(Http::safeNext($_POST['next'] ?? '/home'));
+    }
+
     private function authed(string $method, string $path, array $user): void
     {
+        $this->enforceTrial($method, $path, $user);
         if ($method === 'GET' && $path === '/home') {
             $this->home($user);
         } elseif ($method === 'POST' && $path === '/check') {
@@ -176,6 +235,9 @@ final class App
         } elseif ($path === '/billing/portal' && $method === 'POST') {
             Http::csrfCheck();
             $this->billingPortal($user);
+        } elseif ($path === '/trial/continue' && $method === 'POST') {
+            Http::csrfCheck();
+            $this->trialContinue();
         } elseif ($path === '/report' && $method === 'GET') {
             $this->report($user);
         } elseif ($path === '/account' && $method === 'GET') {
@@ -333,8 +395,8 @@ final class App
             Http::redirect('/login');
         }
         $now = Http::now();
-        $this->db->prepare('INSERT INTO circles (name, plan, created_at) VALUES (?,?,?)')
-            ->execute([$name . "'s circle", 'yearly', $now]);
+        $this->db->prepare('INSERT INTO circles (name, plan, trial_ends_at, created_at) VALUES (?,?,?,?)')
+            ->execute([$name . "'s circle", 'yearly', Trial::endsAt($now), $now]);
         $cid = (int) $this->db->lastInsertId();
         $theme = Layout::theme(null);
         $this->db->prepare(
@@ -354,7 +416,7 @@ final class App
                 $this->startStripeCheckout($owner, $pick);
             }
         }
-        Http::flash('Welcome. Paste anything odd below, or invite family from the right.');
+        Http::flash('Welcome. Your 14-day trial has started. Paste anything odd below, or invite family from the right.');
         Http::redirect('/home');
     }
 
@@ -793,6 +855,11 @@ final class App
             echo 'Not found';
             exit;
         }
+        $circleTrial = Trial::forCircle($this->db, (int) $inv['circle_id']);
+        if (!empty($circleTrial['expired'])) {
+            Http::flash('This circle’s 14-day trial has ended. Ask the owner to continue Family Shield Pro before new people join.', 'error');
+            $this->view('join', ['invite' => $inv, 'trialEnded' => true]);
+        }
         if (Http::method() !== 'POST') {
             $this->view('join', ['invite' => $inv]);
         }
@@ -890,6 +957,7 @@ final class App
             'testMode' => !empty($cfg['test_mode']),
             'hasCustomer' => trim((string) ($circle['stripe_customer_id'] ?? '')) !== '',
             'isOwner' => $user['role'] === 'owner',
+            'trial' => $user['trial'] ?? [],
         ]);
     }
 
@@ -944,6 +1012,7 @@ final class App
         $plan = (string) ($st->fetchColumn() ?: '');
         $label = isset(Billing::PLANS[$plan]) ? Billing::label($plan) : 'your chosen plan';
         Http::flash("Thank you. This circle is on {$label}.");
+        unset($_SESSION['trial_gate_ok']);
         Http::redirect('/billing');
     }
 
@@ -1077,6 +1146,9 @@ final class App
         $low = strtolower($msg);
         if (preg_match('/safe|legit|real|scam or not|snopes|ftc|ic3|bbb/', $low)) {
             return 'OurCircle cannot tell you that a request is safe. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. Official reports: ReportFraud.ftc.gov and IC3.gov. Then call someone in your circle.';
+        }
+        if (preg_match('/trial|14.day|paywall|expired/', $low)) {
+            return 'Every new circle includes a 14-day trial. After that the owner pays $14.99/month or $119.99/year to keep checking new requests. You can still view the trusted list and past checks. Pay on /billing. Paying does not make a request safe.';
         }
         if (preg_match('/year|annual|119/', $low)) {
             return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup. Paying does not make a request safe.';

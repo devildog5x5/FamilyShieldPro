@@ -80,6 +80,33 @@ final class Layout
         echo self::themeToggle();
         echo '</nav></header></div>';
         echo '<div class="wrap"><p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p></div>';
+        self::trialBanner($user);
+    }
+
+    public static function trialBanner(array $user): void
+    {
+        $t = $user['trial'] ?? [];
+        if ($t === [] || !empty($t['demo']) || !empty($t['paid'])) {
+            return;
+        }
+        if (!empty($t['active_trial'])) {
+            $left = !empty($t['ends_today'])
+                ? 'Your 14-day trial ends today (' . ($t['ends_label'] ?? '') . ').'
+                : '14-day trial · ' . (int) ($t['days_left'] ?? 0) . ' day'
+                    . ((int) ($t['days_left'] ?? 0) === 1 ? '' : 's')
+                    . ' left · ends ' . ($t['ends_label'] ?? '') . '.';
+            echo '<div class="wrap"><div class="trial-banner">' . Http::e($left)
+                . ' Then the circle owner pays to keep checking new requests. <a href="/billing">View plans</a></div></div>';
+            return;
+        }
+        if (empty($t['expired'])) {
+            return;
+        }
+        $msg = !empty($t['is_owner'])
+            ? 'Your 14-day trial has ended. You can still view the trusted list and past checks. Pay to check new requests, invite family, and use call-me.'
+            : 'This circle’s 14-day trial has ended. You can still view the trusted list and past checks. Ask the owner to continue Family Shield Pro.';
+        echo '<div class="wrap"><div class="trial-banner ended">' . Http::e($msg)
+            . ' <a href="/billing">Plans</a></div></div>';
     }
 
     public static function flash(): void
@@ -127,7 +154,7 @@ final class Layout
         echo '<a href="#lookup">Look it up</a>';
         echo '<a href="#contact">Contact</a>';
         echo '<a href="/login">Sign in</a>';
-        echo '<a class="btn sm" href="/signup">Start a circle</a>';
+        echo '<a class="btn sm" href="/signup">Start a 14-day trial</a>';
         echo self::themeToggle();
         echo '</nav></header></div>';
     }

@@ -470,7 +470,20 @@ input.otp { font-size: 1.4rem; letter-spacing: 0.3em; text-align: center; }
   padding: 14px 16px;
 }
 .stat strong { display: block; font-size: 1.6rem; line-height: 1.2; }
-.stat span { color: var(--muted); font-size: 0.85rem; }
+.trial-banner {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-weight: 650;
+}
+.trial-banner a { font-weight: 700; text-decoration: underline; }
+.trial-banner.ended {
+  border-color: var(--flash-error-line);
+  background: var(--flash-error-bg);
+}
+.trial-gate h1 { margin-top: 0; }
 details.more {
   margin: 8px 0 16px;
 }

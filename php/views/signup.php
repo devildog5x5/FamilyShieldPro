@@ -21,7 +21,8 @@ $plan = $plan ?? '';
     <label>Mobile number (optional)</label>
     <input name="phone" type="tel" inputmode="tel" autocomplete="tel" />
     <p class="muted">Password reset uses your email, not this number. We only text this number for circle invites and alerts if SMS is turned on.</p>
-    <p><button class="btn wide" type="submit">Start the family circle</button></p>
+    <p class="muted">Every new circle includes a <strong>14-day trial</strong>. Then the owner pays $14.99/month or $119.99/year to keep checking new requests. The trusted list and past checks stay readable if the trial ends.</p>
+    <p><button class="btn wide" type="submit">Start the 14-day trial</button></p>
   </form>
   <p><a href="/login">Already have a login</a></p>
 </div>

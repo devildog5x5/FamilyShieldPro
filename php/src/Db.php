@@ -6,7 +6,7 @@ final class Db
     public const DEMO_EMAIL = 'family@ourcircle.app';
     public const DEMO_NAME = 'Pat Foster';
     public const DEMO_PASSWORD = 'password123';
-    public const VERSION = '1.3.15';
+    public const VERSION = '1.3.16';
     public const RESET_NOTICE = 'If that email is on file, a one-hour reset link is on the way. When mail is not connected, the link is saved as password-reset.txt next to the database (blocked from the web).';
 
     private static ?string $path = null;
@@ -35,6 +35,7 @@ final class Db
                 plan TEXT NOT NULL DEFAULT 'yearly',
                 stripe_customer_id TEXT,
                 stripe_subscription_id TEXT,
+                trial_ends_at TEXT,
                 created_at TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS users (
@@ -134,6 +135,7 @@ final class Db
         SQL);
         self::ensureUserThemeColumn($db);
         self::ensureCircleStripeColumns($db);
+        self::ensureCircleTrialColumn($db);
         $n = (int) $db->query('SELECT COUNT(*) FROM circles')->fetchColumn();
         if ($n === 0) {
             self::seedDemo($db);
@@ -163,6 +165,25 @@ final class Db
         }
         if (empty($have['stripe_subscription_id'])) {
             $db->exec('ALTER TABLE circles ADD COLUMN stripe_subscription_id TEXT');
+        }
+    }
+
+    public static function ensureCircleTrialColumn(PDO $db): void
+    {
+        $have = [];
+        foreach ($db->query('PRAGMA table_info(circles)')->fetchAll() as $c) {
+            $have[(string) ($c['name'] ?? '')] = true;
+        }
+        if (empty($have['trial_ends_at'])) {
+            $db->exec('ALTER TABLE circles ADD COLUMN trial_ends_at TEXT');
+        }
+        $rows = $db->query('SELECT id, created_at, trial_ends_at FROM circles')->fetchAll();
+        $up = $db->prepare('UPDATE circles SET trial_ends_at=? WHERE id=?');
+        foreach ($rows as $row) {
+            if (trim((string) ($row['trial_ends_at'] ?? '')) !== '') {
+                continue;
+            }
+            $up->execute([Trial::endsAt((string) ($row['created_at'] ?? '')), (int) $row['id']]);
         }
     }
 
@@ -361,8 +382,8 @@ final class Db
     public static function seedDemo(PDO $db): void
     {
         $now = Http::now();
-        $db->prepare('INSERT INTO circles (name, plan, created_at) VALUES (?,?,?)')
-            ->execute(['Foster family', 'yearly', $now]);
+        $db->prepare('INSERT INTO circles (name, plan, trial_ends_at, created_at) VALUES (?,?,?,?)')
+            ->execute(['Foster family', 'yearly', Trial::endsAt($now), $now]);
         $cid = (int) $db->lastInsertId();
         $db->prepare(
             'INSERT INTO users (circle_id, email, name, password_hash, phone, role, status, created_at)

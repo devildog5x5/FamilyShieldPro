@@ -3,10 +3,12 @@ Layout::start('Check ' . (int) $check['id'], $user);
 $analysis = $analysis ?? [];
 $level = $analysis['level'] ?? 'unknown';
 $riskClass = $level === 'pause' ? 'pause' : ($level === 'caution' ? 'caution' : 'unknown');
+$canWrite = !empty($user['trial']['can_write']);
 ?>
 <div class="wrap app-main">
   <?php Layout::flash(); ?>
   <p class="risk <?= Http::e($riskClass) ?>"><?= Http::e($analysis['headline'] ?? $check['headline']) ?></p>
+  <?php if ($canWrite): ?>
   <form method="post" action="/checks/<?= (int) $check['id'] ?>/alert">
     <?= Http::csrfField() ?>
     <button class="btn danger wide" type="submit">Please call me before I pay</button>
@@ -15,6 +17,7 @@ $riskClass = $level === 'pause' ? 'pause' : ($level === 'caution' ? 'caution' : 
     <?= Http::csrfField() ?>
     <p><button class="btn gold wide" type="submit">Send to family circle</button></p>
   </form>
+  <?php endif; ?>
   <p class="disclaimer">This application offers guidance, not a guarantee.</p>
 
   <div class="panel" style="margin-top:16px">
@@ -58,12 +61,14 @@ $riskClass = $level === 'pause' ? 'pause' : ($level === 'caution' ? 'caution' : 
     <?php foreach ($notes ?? [] as $n): ?>
       <p><span class="pill"><?= Http::e($n['kind']) ?></span> <?= Http::e($n['name']) ?>: <?= Http::e($n['body']) ?></p>
     <?php endforeach; ?>
+    <?php if ($canWrite): ?>
     <form method="post" action="/checks/<?= (int) $check['id'] ?>/review/reply">
       <?= Http::csrfField() ?>
       <label>Leave a note for the circle</label>
       <textarea name="reply" placeholder="I looked — keep pausing."></textarea>
       <p><button class="btn" type="submit">Add note</button></p>
     </form>
+    <?php endif; ?>
   </div>
   <p><a href="/report">If money or passwords already went out → Report &amp; recover</a></p>
 </div>

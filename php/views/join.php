@@ -8,6 +8,9 @@ $inv = $invite;
   <p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p>
   <?php Layout::flash(); ?>
   <p>Invite for <?= Http::e($inv['email']) ?></p>
+  <?php if (!empty($trialEnded)): ?>
+    <p>This circle’s 14-day trial has ended. Ask the owner to continue Family Shield Pro before new people join.</p>
+  <?php else: ?>
   <form method="post" action="/join/<?= Http::e($inv['token']) ?>">
     <?= Http::csrfField() ?>
     <?php if (!empty($inv['name'])): ?>
@@ -26,5 +29,6 @@ $inv = $invite;
     </details>
     <p><button class="btn wide" type="submit">Join the circle</button></p>
   </form>
+  <?php endif; ?>
 </div>
 <?php Layout::end();

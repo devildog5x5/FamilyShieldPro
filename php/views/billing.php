@@ -9,6 +9,19 @@ $hasCustomer = !empty($hasCustomer);
 <div class="wrap app-main">
   <?php Layout::flash(); ?>
   <p>This household is on <strong><?= Http::e($plan) ?></strong>.</p>
+  <?php
+    $trial = $trial ?? [];
+    if (!empty($trial['active_trial'])):
+  ?>
+    <p><strong>14-day trial.</strong>
+      <?= !empty($trial['ends_today'])
+        ? 'It ends today.'
+        : ((int) ($trial['days_left'] ?? 0) . ' days left, through ' . Http::e((string) ($trial['ends_label'] ?? '')) . '.')
+      ?>
+      Then the owner pays to keep checking new requests.</p>
+  <?php elseif (!empty($trial['expired'])): ?>
+    <p><strong>The 14-day trial has ended.</strong> Pay below to check new requests, invite family, and use call-me. You can still view the trusted list and past checks.</p>
+  <?php endif; ?>
   <p class="disclaimer">Paying for a plan does not make a request safe.</p>
   <?php if ($testMode): ?>
     <p class="disclaimer">Test payments are on. Use Stripe card <strong>4242 4242 4242 4242</strong>, any future date, any CVC, any ZIP. No real charge.</p>

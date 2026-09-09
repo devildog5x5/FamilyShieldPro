@@ -6,6 +6,7 @@ $trusted = $trusted ?? [];
 $checks = $checks ?? [];
 $alert = $alert ?? null;
 $total = count($members) + count($pending);
+$canWrite = !empty($user['trial']['can_write']);
 ?>
 <div class="wrap app-main">
   <?php Layout::flash(); ?>
@@ -20,6 +21,7 @@ $total = count($members) + count($pending);
   <?php endif; ?>
 
   <div class="grid-2">
+    <?php if ($canWrite): ?>
     <form class="panel" method="post" action="/check" enctype="multipart/form-data">
       <?= Http::csrfField() ?>
       <h2>What landed in your lap?</h2>
@@ -38,6 +40,17 @@ $total = count($members) + count($pending);
       <p><button class="btn wide" type="submit">Check this with OurCircle</button></p>
       <p class="disclaimer">This will not say the request is safe. It will help you pause. This application offers guidance, not a guarantee.</p>
     </form>
+    <?php else: ?>
+    <div class="panel">
+      <h2>14-day trial ended</h2>
+      <p>New checks are paused until the circle owner pays. You can still open past checks and the trusted list after the 10-second reminder.</p>
+      <?php if (($user['role'] ?? '') === 'owner'): ?>
+        <p><a class="btn gold wide" href="/billing">Pay to keep checking requests</a></p>
+      <?php else: ?>
+        <p>Ask the owner to open Plans.</p>
+      <?php endif; ?>
+    </div>
+    <?php endif; ?>
 
     <div>
       <div class="panel">
@@ -49,6 +62,7 @@ $total = count($members) + count($pending);
         <?php foreach ($pending as $p): ?>
           <p><?= Http::e($p['name'] ?: $p['email']) ?> · <?= Http::e($p['email']) ?></p>
         <?php endforeach; ?>
+        <?php if ($canWrite): ?>
         <form method="post" action="/circle">
           <?= Http::csrfField() ?>
           <input type="hidden" name="return" value="home" />
@@ -56,6 +70,7 @@ $total = count($members) + count($pending);
           <input name="email" type="email" required placeholder="family@example.com" autocomplete="off" />
           <p><button class="btn wide" type="submit">Send invite</button></p>
         </form>
+        <?php endif; ?>
         <p><a href="/circle">Everyone in the circle</a></p>
       </div>
       <div class="panel" style="margin-top:16px">

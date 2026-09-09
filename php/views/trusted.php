@@ -1,11 +1,14 @@
 <?php
 Layout::start('Trusted list', $user);
+$canWrite = !empty($user['trial']['can_write']);
 ?>
 <div class="wrap app-main">
   <?php Layout::flash(); ?>
   <p>Save the legitimate banks, doctors, insurers, utilities, and family numbers before a scare. When a message arrives, we compare it to this list — not to a number the stranger provided.</p>
   <p><strong>Protected contacts</strong> <?= count($rows ?? []) ?> saved. Every contact you add stays here until you remove it.</p>
+  <?php if ($canWrite): ?>
   <form id="trusted-delete" method="post"><?= Http::csrfField() ?></form>
+  <?php endif; ?>
   <div class="table-wrap">
     <table class="table">
       <thead><tr><th>Kind</th><th>Name</th><th>Notes</th><th>Phone / site</th><th></th></tr></thead>
@@ -20,13 +23,16 @@ Layout::start('Trusted list', $user);
             <?= Http::e($r['website']) ?>
           </td>
           <td>
+            <?php if ($canWrite): ?>
             <button class="btn ghost" type="submit" form="trusted-delete" formaction="/trusted/<?= (int) $r['id'] ?>/delete" onclick="return confirm('Remove this contact?')">Remove</button>
+            <?php endif; ?>
           </td>
         </tr>
       <?php endforeach; ?>
       </tbody>
     </table>
   </div>
+  <?php if ($canWrite): ?>
   <form class="panel" method="post" style="margin-top:16px" autocomplete="off">
     <?= Http::csrfField() ?>
     <h2>Add a real contact</h2>
@@ -52,5 +58,6 @@ Layout::start('Trusted list', $user);
     </details>
     <p><button class="btn wide" type="submit">Save on trusted list</button></p>
   </form>
+  <?php endif; ?>
 </div>
 <?php Layout::end($user);
