@@ -3,6 +3,8 @@ php/data/*.db
 php/data/*.db-journal
 php/data/uploads/
 php/data/password-reset.txt
+php/data/stripe-check.txt
+stripe-check.log
 build/
 installers/
 .DS_Store

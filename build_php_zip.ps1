@@ -36,6 +36,7 @@ Build: $Version
 5. Open the site. Demo login (if SHOW_DEMO_LOGIN=1): family@ourcircle.app / password123
 6. Set OPERATOR_EMAIL and OPERATOR_PASSWORD. Forgot password for the circle (/forgot) and operator (/admin/forgot) emails a link, or writes data/password-reset.txt if mail is off.
 7. Back up any existing data/*.db before replacing files on a live site.
+8. Stripe test payments: see STRIPE.md. Webhook: https://yourdomain.com/billing/webhook
 
 SQLite is created at data/ourcircle.db (blocked from the web by .htaccess).
 "@

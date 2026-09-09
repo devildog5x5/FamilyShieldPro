@@ -6,9 +6,9 @@ Live sandbox: https://sandbox.familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.3.11**.
+Canonical PHP source for Hostinger (`public_html`). Version **1.3.15**.
 
-**Hostinger zip:** [FamilyShieldPro-PHP-1.3.11.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.11/FamilyShieldPro-PHP-1.3.11.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`).
+**Hostinger zip:** [FamilyShieldPro-PHP-1.3.15.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.15/FamilyShieldPro-PHP-1.3.15.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`).
 
 ## Local run
 
@@ -24,8 +24,8 @@ Open http://127.0.0.1:8080 — demo login `family@ourcircle.app` / `password123`
 
 ## Deploy (Hostinger)
 
-1. Download [FamilyShieldPro-PHP-1.3.11.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.11/FamilyShieldPro-PHP-1.3.11.zip) and unzip into `public_html` (not a nested folder).
-2. Copy `.env.example` to `.env`. Set `APP_SECRET`, `BASE_URL`, `OPERATOR_EMAIL`, and `OPERATOR_PASSWORD`.
+1. Download [FamilyShieldPro-PHP-1.3.15.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.15/FamilyShieldPro-PHP-1.3.15.zip) and unzip into `public_html` (not a nested folder).
+2. Copy `.env.example` to `.env`. Set `APP_SECRET`, `BASE_URL`, `OPERATOR_EMAIL`, and `OPERATOR_PASSWORD`. Stripe test keys: see `STRIPE.md`.
 3. PHP 8.2/8.3 with `pdo_sqlite`.
 4. Database file: `public_html/data/ourcircle.db` (blocked by `.htaccess`).
 
@@ -38,7 +38,7 @@ If you already have a live SQLite file, **back it up first**. This schema is not
 - Screenshots are served only to the same circle
 - Invites cannot duplicate an existing member or a waiting invite
 - Owner can cancel invites and remove members
-- Only the owner can change the household plan
+- Only the owner can change the household plan (Stripe Checkout when keys are set; otherwise the plan is saved with no charge)
 - Empty circle notes are rejected
 - Circle members reset passwords at `/forgot` (email, file fallback, or 2FA recovery code)
 - Operators reset at `/admin/forgot` (same email/file flow; new password is stored so it survives `.env`)

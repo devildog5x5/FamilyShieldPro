@@ -248,6 +248,14 @@ input, textarea, select {
 .pw-toggle:hover { color: var(--ink); }
 .pw-toggle svg { width: 22px; height: 22px; display: block; }
 textarea { min-height: 140px; }
+textarea.stripe-log {
+  min-height: 360px;
+  font-family: ui-monospace, Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre;
+  overflow: auto;
+}
 .muted { color: var(--muted); }
 .risk {
   padding: 16px 18px;

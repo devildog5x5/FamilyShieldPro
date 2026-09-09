@@ -22,7 +22,7 @@ final class App
         $path = Http::path();
 
         if ($method === 'GET' && $path === '/') {
-            $this->landing();
+            $this->landing($user);
         } elseif ($path === '/login') {
             $this->login($user);
         } elseif ($path === '/signup') {
@@ -55,6 +55,10 @@ final class App
             $this->adminForgot();
         } elseif ($method === 'POST' && $path === '/admin/factory-reset') {
             $this->adminFactoryReset();
+        } elseif ($method === 'POST' && $path === '/admin/stripe-setup') {
+            $this->adminStripeSetup();
+        } elseif ($method === 'POST' && $path === '/admin/stripe-check') {
+            $this->adminStripeCheck();
         } elseif ($path === '/admin/data' || str_starts_with($path, '/admin/data/')) {
             $this->adminData($path, $method);
         } elseif ($path === '/admin/sql' && $method === 'POST') {
@@ -65,6 +69,8 @@ final class App
             $this->join($m[1], $user);
         } elseif (preg_match('#^/uploads/([A-Za-z0-9_-]+)$#', $path, $m)) {
             $this->serveUpload($m[1], $user);
+        } elseif ($method === 'POST' && $path === '/billing/webhook') {
+            $this->stripeWebhook();
         } elseif (in_array($path, ['/home', '/circle', '/trusted', '/billing', '/report', '/account', '/account/2fa/setup'], true)
             || str_starts_with($path, '/check')
             || str_starts_with($path, '/account/')
@@ -165,6 +171,11 @@ final class App
         } elseif ($path === '/billing/choose' && $method === 'POST') {
             Http::csrfCheck();
             $this->choosePlan($user);
+        } elseif ($path === '/billing/success' && $method === 'GET') {
+            $this->billingSuccess($user);
+        } elseif ($path === '/billing/portal' && $method === 'POST') {
+            Http::csrfCheck();
+            $this->billingPortal($user);
         } elseif ($path === '/report' && $method === 'GET') {
             $this->report($user);
         } elseif ($path === '/account' && $method === 'GET') {
@@ -223,9 +234,10 @@ final class App
         }
     }
 
-    private function landing(): never
+    private function landing(?array $user): never
     {
         $this->view('landing', [
+            'user' => $user,
             'phone' => Layout::contactPhone(),
             'email' => Layout::supportEmail(),
         ]);
@@ -301,16 +313,18 @@ final class App
             Http::redirect('/home');
         }
         if (Http::method() !== 'POST') {
-            $this->view('signup');
+            $pick = (string) ($_GET['plan'] ?? '');
+            $this->view('signup', ['plan' => in_array($pick, ['monthly', 'yearly'], true) ? $pick : '']);
         }
         Http::csrfCheck();
         $name = trim((string) ($_POST['name'] ?? ''));
         $email = strtolower(trim((string) ($_POST['email'] ?? '')));
         $password = (string) ($_POST['password'] ?? '');
         $phone = trim((string) ($_POST['phone'] ?? ''));
+        $pick = (string) ($_POST['plan'] ?? '');
         if ($name === '' || $email === '' || !str_contains($email, '@') || strlen($password) < 8) {
             Http::flash('Name, email, and an 8+ character password are required.', 'error');
-            $this->view('signup');
+            $this->view('signup', ['plan' => in_array($pick, ['monthly', 'yearly'], true) ? $pick : '']);
         }
         $exists = $this->db->prepare('SELECT id FROM users WHERE lower(email)=?');
         $exists->execute([$email]);
@@ -328,9 +342,18 @@ final class App
              VALUES (?,?,?,?,?,?,?,?,?)'
         )->execute([$cid, $email, $name, password_hash($password, PASSWORD_DEFAULT), $phone, 'owner', 'access', $theme === 'dark' ? 'dark' : 'light', $now]);
         session_regenerate_id(true);
-        $_SESSION['user_id'] = (int) $this->db->lastInsertId();
+        $uid = (int) $this->db->lastInsertId();
+        $_SESSION['user_id'] = $uid;
         $_SESSION['totp_ok'] = 1;
         $_SESSION['theme'] = $theme === 'dark' ? 'dark' : 'light';
+        if (in_array($pick, ['monthly', 'yearly'], true) && Billing::ready()) {
+            $st = $this->db->prepare('SELECT * FROM users WHERE id=?');
+            $st->execute([$uid]);
+            $owner = $st->fetch();
+            if ($owner) {
+                $this->startStripeCheckout($owner, $pick);
+            }
+        }
         Http::flash('Welcome. Paste anything odd below, or invite family from the right.');
         Http::redirect('/home');
     }
@@ -854,29 +877,124 @@ final class App
 
     private function billing(array $user): never
     {
-        $st = $this->db->prepare('SELECT plan FROM circles WHERE id=?');
+        $st = $this->db->prepare(
+            'SELECT plan, stripe_customer_id, stripe_subscription_id FROM circles WHERE id=?'
+        );
         $st->execute([$user['circle_id']]);
-        $plan = (string) ($st->fetchColumn() ?: 'yearly');
-        $stripe = trim(Env::get('STRIPE_SECRET_KEY')) !== '';
-        $this->view('billing', ['user' => $user, 'plan' => $plan, 'stripe' => $stripe, 'isOwner' => $user['role'] === 'owner']);
+        $circle = $st->fetch() ?: [];
+        $cfg = Billing::config();
+        $this->view('billing', [
+            'user' => $user,
+            'plan' => (string) ($circle['plan'] ?? 'yearly'),
+            'stripe' => $cfg['ready'],
+            'testMode' => !empty($cfg['test_mode']),
+            'hasCustomer' => trim((string) ($circle['stripe_customer_id'] ?? '')) !== '',
+            'isOwner' => $user['role'] === 'owner',
+        ]);
     }
 
     private function choosePlan(array $user): void
     {
         $this->requireOwner($user);
         $plan = (string) ($_POST['plan'] ?? '');
-        if (!in_array($plan, ['monthly', 'yearly'], true)) {
+        if (!isset(Billing::PLANS[$plan])) {
             Http::flash('Choose Family monthly or Family yearly.', 'error');
             Http::redirect('/billing');
         }
-        $this->db->prepare('UPDATE circles SET plan=? WHERE id=?')->execute([$plan, $user['circle_id']]);
-        $label = $plan === 'monthly' ? 'Family monthly ($14.99/month)' : 'Family yearly ($119.99/year)';
-        if (trim(Env::get('STRIPE_SECRET_KEY')) === '') {
-            Http::flash("This circle is on {$label}. Card payments are not connected yet, so nothing was charged.");
-        } else {
-            Http::flash("This circle is on {$label}.");
+        $this->startStripeCheckout($user, $plan);
+    }
+
+    private function startStripeCheckout(array $user, string $plan): never
+    {
+        if (!Billing::ready()) {
+            $this->db->prepare('UPDATE circles SET plan=? WHERE id=?')->execute([$plan, $user['circle_id']]);
+            Http::flash(
+                'This circle is on ' . Billing::label($plan)
+                . '. Card payments are not connected yet, so nothing was charged.'
+            );
+            Http::redirect('/billing');
         }
+        try {
+            Http::redirect(Billing::startPayment($this->db, $user, $plan));
+        } catch (Throwable) {
+            Http::flash('Card checkout could not start. Try again in a minute.', 'error');
+            Http::redirect('/billing');
+        }
+    }
+
+    private function billingSuccess(array $user): never
+    {
+        $sessionId = trim((string) ($_GET['session_id'] ?? ''));
+        $cfg = Billing::config();
+        if ($sessionId !== '' && $cfg['checkout']) {
+            try {
+                $checkout = Billing::retrieveCheckout($sessionId);
+                $paid = ($checkout['payment_status'] ?? '') === 'paid'
+                    || ($checkout['status'] ?? '') === 'complete';
+                if ($paid) {
+                    Billing::applyCheckout($this->db, $checkout);
+                }
+            } catch (Throwable) {
+                Http::flash('Payment received. Your plan will update in a moment.');
+                Http::redirect('/billing');
+            }
+        }
+        $st = $this->db->prepare('SELECT plan FROM circles WHERE id=?');
+        $st->execute([$user['circle_id']]);
+        $plan = (string) ($st->fetchColumn() ?: '');
+        $label = isset(Billing::PLANS[$plan]) ? Billing::label($plan) : 'your chosen plan';
+        Http::flash("Thank you. This circle is on {$label}.");
         Http::redirect('/billing');
+    }
+
+    private function billingPortal(array $user): void
+    {
+        $this->requireOwner($user);
+        $st = $this->db->prepare('SELECT stripe_customer_id FROM circles WHERE id=?');
+        $st->execute([$user['circle_id']]);
+        $customerId = trim((string) ($st->fetchColumn() ?: ''));
+        if ($customerId === '' || !Billing::config()['checkout']) {
+            Http::flash('Card management is not available yet.', 'error');
+            Http::redirect('/billing');
+        }
+        try {
+            $portal = Billing::createPortal($customerId);
+            $url = (string) ($portal['url'] ?? '');
+            if ($url === '') {
+                throw new RuntimeException('No portal URL');
+            }
+            Http::redirect($url);
+        } catch (Throwable) {
+            Http::flash('Could not open card management. Try again in a minute.', 'error');
+            Http::redirect('/billing');
+        }
+    }
+
+    private function stripeWebhook(): never
+    {
+        $cfg = Billing::config();
+        $payload = file_get_contents('php://input') ?: '';
+        $sig = (string) ($_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '');
+        $wh = $cfg['webhook_secret'];
+        if (!Billing::configuredValue($cfg['secret_key'], 'sk_', 20)
+            || !Billing::configuredValue($wh, 'whsec_', 16)) {
+            Http::json(['error' => 'Stripe webhook is not configured'], 503);
+        }
+        try {
+            $event = Billing::constructEvent($payload, $sig, $wh);
+        } catch (Throwable $e) {
+            Http::json(['error' => $e->getMessage()], 400);
+        }
+        $etype = (string) ($event['type'] ?? '');
+        $obj = is_array($event['data']['object'] ?? null) ? $event['data']['object'] : [];
+        if ($etype === 'checkout.session.completed') {
+            Billing::applyCheckout($this->db, $obj);
+        } elseif (in_array($etype, ['customer.subscription.updated', 'customer.subscription.created'], true)) {
+            Billing::applySubscription($this->db, $obj);
+        } elseif ($etype === 'customer.subscription.deleted') {
+            Billing::applySubscription($this->db, $obj);
+        }
+        Http::json(['received' => true]);
     }
 
     private function report(array $user): never
@@ -1015,7 +1133,7 @@ final class App
         ];
         if (Env::truthy('HEALTHZ_DETAILS') || !empty($_SESSION['admin'])) {
             $payload['mail'] = Mailer::configured();
-            $payload['stripe'] = trim(Env::get('STRIPE_SECRET_KEY')) !== '';
+            $payload['stripe'] = Billing::ready();
             $payload['sms'] = trim(Env::get('TWILIO_AUTH_TOKEN')) !== '';
             $payload['admin'] = Db::operatorRow($this->db) !== null || trim(Env::get('OPERATOR_PASSWORD')) !== '';
         }
@@ -1032,7 +1150,14 @@ final class App
                 'SELECT c.id, c.name, c.plan, c.created_at, (SELECT COUNT(*) FROM users u WHERE u.circle_id=c.id) AS people
                  FROM circles c ORDER BY c.id DESC LIMIT 100'
             )->fetchAll();
-            $this->view('admin', ['circles' => $circles]);
+            $report = Billing::diagnose();
+            Db::writeStripeCheck($report['text']);
+            $this->view('admin', [
+                'circles' => $circles,
+                'stripe' => Billing::status(),
+                'stripeReport' => $report['text'],
+                'stripeReady' => !empty($report['ready']),
+            ]);
         }
         if ($method === 'POST') {
             Http::csrfCheck();
@@ -1272,6 +1397,42 @@ final class App
             Http::flash('SQL error: ' . $e->getMessage(), 'error');
         }
         Http::redirect('/admin/data');
+    }
+
+    private function adminStripeCheck(): void
+    {
+        $this->requireAdmin();
+        Http::csrfCheck();
+        $report = Billing::diagnose();
+        $path = Db::writeStripeCheck($report['text']);
+        $name = basename($path);
+        if ($report['ready']) {
+            Http::flash("Stripe check: ready. Log saved as data/{$name} (blocked from the web).");
+        } else {
+            $n = count($report['missing']);
+            Http::flash(
+                "Stripe check: {$n} missing. Log saved as data/{$name} (blocked from the web).",
+                'error'
+            );
+        }
+        Http::redirect('/admin');
+    }
+
+    private function adminStripeSetup(): void
+    {
+        $this->requireAdmin();
+        Http::csrfCheck();
+        try {
+            $r = Billing::provisionCatalog();
+            $msg = 'Family monthly and Family yearly are in Stripe. Plans can charge with test card 4242 4242 4242 4242.';
+            if (empty($r['webhook_secret_saved'])) {
+                $msg .= ' If the webhook already existed, copy its signing secret from Stripe → Developers → Webhooks into STRIPE_WEBHOOK_SECRET.';
+            }
+            Http::flash($msg);
+        } catch (Throwable $e) {
+            Http::flash($e->getMessage(), 'error');
+        }
+        Http::redirect('/admin');
     }
 
     private function adminFactoryReset(): void

@@ -105,6 +105,10 @@ final class Http
             $stay = true;
             $path = '/admin/data';
         }
+        if ($path === '/admin/stripe-setup' || $path === '/admin/stripe-check') {
+            $stay = true;
+            $path = '/admin';
+        }
         self::redirect($stay ? $path : '/home');
         }
     }

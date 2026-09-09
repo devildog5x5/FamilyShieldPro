@@ -57,13 +57,13 @@ $phone = $phone ?? Layout::contactPhone();
       <h3>Family monthly</h3>
       <p><strong>$14.99/month</strong></p>
       <p>Up to five people in one circle. Pause, trusted list, and call-me-before-I-pay.</p>
-      <p><a class="btn wide" href="/signup">Start a circle</a></p>
+      <p><a class="btn wide" href="<?= !empty($user) ? '/billing' : '/signup?plan=monthly' ?>"><?= !empty($user) ? 'Go to plans' : 'Start monthly' ?></a></p>
     </div>
     <div class="panel featured">
       <h3>Family yearly</h3>
       <p><strong>$119.99/year</strong></p>
       <p>Same circle. Pay once a year — about $10 a month.</p>
-      <p><a class="btn gold wide" href="/signup">Start a circle</a></p>
+      <p><a class="btn gold wide" href="<?= !empty($user) ? '/billing' : '/signup?plan=yearly' ?>"><?= !empty($user) ? 'Go to plans' : 'Start yearly' ?></a></p>
     </div>
   </div>
   <p class="disclaimer">This application offers guidance, not a guarantee. A paid plan is a family tool, not a stamp that a request is safe.</p>

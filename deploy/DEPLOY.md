@@ -2,7 +2,7 @@
 
 PHP app in `php/` → Hostinger `public_html`.
 
-**Easiest:** download [FamilyShieldPro-PHP-1.3.11.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.11/FamilyShieldPro-PHP-1.3.11.zip) and unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (the zip name includes the build number).
+**Easiest:** download [FamilyShieldPro-PHP-1.3.15.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.15/FamilyShieldPro-PHP-1.3.15.zip) and unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (the zip name includes the build number).
 
 Or by hand:
 
@@ -15,6 +15,7 @@ Or by hand:
    - `OPERATOR_EMAIL` — where operator password-reset mail goes (defaults to `SUPPORT_EMAIL`)
    - `OPERATOR_PASSWORD` for `/admin/login` (hashed into the database on first load so forgot-password can replace it)
    - Resend or SMTP when you want invite/reset mail. If mail is off, circle and operator reset links are written to `data/password-reset.txt` (blocked from the web).
+   - Stripe test keys when you want `/billing` to charge. See `STRIPE.md`. Webhook URL is `https://yourdomain.com/billing/webhook`.
 4. PHP 8.2 or 8.3. Enable `pdo_sqlite`.
 5. Backup `data/ourcircle.db` before replacing files on a live site.
 6. To wipe sandbox data: operator console → Factory reset (type `FACTORY` and the operator password). This reseeds the Foster demo and restores `OPERATOR_PASSWORD` from `.env`.

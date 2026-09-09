@@ -1,5 +1,6 @@
 <?php
 Layout::start('Start a circle · OurCircle', null, 'auth-page');
+$plan = $plan ?? '';
 ?>
 <div class="auth-card">
   <a class="brand" href="<?= Http::e(Http::baseUrl()) ?>"><img src="/static/img/logo.png" alt="" /><div><strong>OurCircle</strong><span>Start a circle</span></div></a>
@@ -7,6 +8,10 @@ Layout::start('Start a circle · OurCircle', null, 'auth-page');
   <?php Layout::flash(); ?>
   <form method="post">
     <?= Http::csrfField() ?>
+    <?php if (!empty($plan) && in_array($plan, ['monthly', 'yearly'], true)): ?>
+      <input type="hidden" name="plan" value="<?= Http::e($plan) ?>" />
+      <p class="muted">Next: <?= $plan === 'monthly' ? 'Family monthly ($14.99/month)' : 'Family yearly ($119.99/year)' ?>.</p>
+    <?php endif; ?>
     <label>Your name</label>
     <input name="name" required autocomplete="name" />
     <label>Email</label>

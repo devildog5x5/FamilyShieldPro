@@ -11,7 +11,7 @@ $email = $email ?? Layout::supportEmail();
   <h2>Accounts</h2>
   <p>You must be old enough to form a contract in your state. Keep your password and recovery codes private. Up to five people share one family circle. The owner can remove members and cancel unused invites.</p>
   <h2>Plans</h2>
-  <p>Family monthly is $14.99. Family yearly is $119.99. A paid plan is a family tool, not a stamp that a request is safe. If card payments are not connected, choosing a plan only records it on the circle.</p>
+  <p>Family monthly is $14.99. Family yearly is $119.99. A paid plan is a family tool, not a stamp that a request is safe. When card payments are connected, the circle owner pays through Stripe. If payments are not connected, choosing a plan only records it on the circle.</p>
   <h2>Acceptable use</h2>
   <p>Do not use the service to harass anyone, upload illegal content, or attack the site. We may suspend accounts that abuse invites, mail, or storage.</p>
   <h2>Limitation</h2>

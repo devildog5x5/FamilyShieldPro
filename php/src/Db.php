@@ -6,7 +6,7 @@ final class Db
     public const DEMO_EMAIL = 'family@ourcircle.app';
     public const DEMO_NAME = 'Pat Foster';
     public const DEMO_PASSWORD = 'password123';
-    public const VERSION = '1.3.11';
+    public const VERSION = '1.3.15';
     public const RESET_NOTICE = 'If that email is on file, a one-hour reset link is on the way. When mail is not connected, the link is saved as password-reset.txt next to the database (blocked from the web).';
 
     private static ?string $path = null;
@@ -33,6 +33,8 @@ final class Db
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 plan TEXT NOT NULL DEFAULT 'yearly',
+                stripe_customer_id TEXT,
+                stripe_subscription_id TEXT,
                 created_at TEXT NOT NULL
             );
             CREATE TABLE IF NOT EXISTS users (
@@ -131,6 +133,7 @@ final class Db
             );
         SQL);
         self::ensureUserThemeColumn($db);
+        self::ensureCircleStripeColumns($db);
         $n = (int) $db->query('SELECT COUNT(*) FROM circles')->fetchColumn();
         if ($n === 0) {
             self::seedDemo($db);
@@ -147,6 +150,20 @@ final class Db
             }
         }
         $db->exec("ALTER TABLE users ADD COLUMN theme TEXT NOT NULL DEFAULT ''");
+    }
+
+    public static function ensureCircleStripeColumns(PDO $db): void
+    {
+        $have = [];
+        foreach ($db->query('PRAGMA table_info(circles)')->fetchAll() as $c) {
+            $have[(string) ($c['name'] ?? '')] = true;
+        }
+        if (empty($have['stripe_customer_id'])) {
+            $db->exec('ALTER TABLE circles ADD COLUMN stripe_customer_id TEXT');
+        }
+        if (empty($have['stripe_subscription_id'])) {
+            $db->exec('ALTER TABLE circles ADD COLUMN stripe_subscription_id TEXT');
+        }
     }
 
     public static function operatorEmail(): string
@@ -240,6 +257,33 @@ final class Db
     {
         $dir = self::$path ? dirname(self::$path) : (dirname(__DIR__) . '/data');
         return $dir . DIRECTORY_SEPARATOR . 'password-reset.txt';
+    }
+
+    public static function stripeCheckPath(): string
+    {
+        $dir = self::$path ? dirname(self::$path) : (dirname(__DIR__) . '/data');
+        return $dir . DIRECTORY_SEPARATOR . 'stripe-check.txt';
+    }
+
+    public static function writeStripeCheck(string $body): string
+    {
+        $path = self::stripeCheckPath();
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        file_put_contents($path, $body);
+        return $path;
+    }
+
+    public static function readStripeCheck(): string
+    {
+        $path = self::stripeCheckPath();
+        if (!is_file($path)) {
+            return '';
+        }
+        $raw = file_get_contents($path);
+        return is_string($raw) ? $raw : '';
     }
 
     public static function writeResetFile(string $url, string $kind = 'circle'): void
