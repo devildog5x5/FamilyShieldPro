@@ -958,10 +958,6 @@ final class App
             'hasCustomer' => trim((string) ($circle['stripe_customer_id'] ?? '')) !== '',
             'isOwner' => $user['role'] === 'owner',
             'trial' => $user['trial'] ?? [],
-            'hasMonthlyPrice' => Billing::configuredValue($cfg['prices']['monthly'] ?? '', 'price_', 20),
-            'hasYearlyPrice' => Billing::configuredValue($cfg['prices']['yearly'] ?? '', 'price_', 20),
-            'notReadyReason' => Billing::notReadyReason(),
-            'payError' => Db::lastStripePayError(),
         ]);
     }
 
@@ -981,11 +977,7 @@ final class App
         if (!Billing::ready()) {
             $why = Billing::notReadyReason();
             Billing::logFailure('not-ready', $why);
-            Http::flash(
-                'Card checkout did not start. ' . $why
-                . '. Open /admin and read the Stripe log. This build must be v1.3.12 or newer.',
-                'error'
-            );
+            Http::flash('Card checkout could not start. Try again in a moment, or email ' . Layout::supportEmail() . '.', 'error');
             Http::redirect('/billing');
         }
         try {
@@ -993,7 +985,7 @@ final class App
         } catch (Throwable $e) {
             $safe = Billing::safeMessage($e->getMessage());
             Billing::logFailure('checkout', $safe);
-            Http::flash('Card checkout failed: ' . $safe, 'error');
+            Http::flash('Card checkout could not start. Try again in a moment, or email ' . Layout::supportEmail() . '.', 'error');
             Http::redirect('/billing');
         }
     }
@@ -1012,13 +1004,13 @@ final class App
                 } else {
                     $st = (string) ($checkout['status'] ?? 'unknown');
                     Billing::logFailure('success', 'Checkout session was not paid (status ' . $st . ')');
-                    Http::flash('Stripe did not mark that checkout as paid (status: ' . Billing::safeMessage($st) . ').', 'error');
+                    Http::flash('That payment could not be confirmed. Try Plans again, or email ' . Layout::supportEmail() . '.', 'error');
                     Http::redirect('/billing');
                 }
             } catch (Throwable $e) {
                 $safe = Billing::safeMessage($e->getMessage());
                 Billing::logFailure('success', $safe);
-                Http::flash('Payment return failed: ' . $safe, 'error');
+                Http::flash('That payment could not be confirmed. Try Plans again, or email ' . Layout::supportEmail() . '.', 'error');
                 Http::redirect('/billing');
             }
         }
@@ -1051,7 +1043,7 @@ final class App
         } catch (Throwable $e) {
             $safe = Billing::safeMessage($e->getMessage());
             Billing::logFailure('portal', $safe);
-            Http::flash('Could not open card management: ' . $safe, 'error');
+            Http::flash('Card management could not be opened. Try again in a moment, or email ' . Layout::supportEmail() . '.', 'error');
             Http::redirect('/billing');
         }
     }

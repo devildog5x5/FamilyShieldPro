@@ -8,22 +8,6 @@ $hasCustomer = !empty($hasCustomer);
 ?>
 <div class="wrap app-main">
   <?php Layout::flash(); ?>
-  <?php
-    $hasMonthlyPrice = !empty($hasMonthlyPrice);
-    $hasYearlyPrice = !empty($hasYearlyPrice);
-    $notReadyReason = trim((string) ($notReadyReason ?? ''));
-    $liveLabel = static function (bool $ok): string {
-        return $ok ? 'set' : 'not set';
-    };
-  ?>
-  <p class="muted">This page load: monthly price <strong><?= Http::e($liveLabel($hasMonthlyPrice)) ?></strong>
-    · yearly price <strong><?= Http::e($liveLabel($hasYearlyPrice)) ?></strong>
-    · checkout <strong><?= $stripe ? 'ready' : 'not ready' ?></strong></p>
-  <?php if (!$stripe && $notReadyReason !== ''): ?>
-    <div class="flash error">Checkout is not ready: <?= Http::e($notReadyReason) ?></div>
-  <?php elseif (!empty($payError)): ?>
-    <p class="disclaimer">Last Pay click (does not change until you click Pay again): <?= Http::e((string) $payError) ?></p>
-  <?php endif; ?>
   <p>This household is on <strong><?= Http::e($plan) ?></strong>.</p>
   <?php
     $trial = $trial ?? [];

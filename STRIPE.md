@@ -63,9 +63,9 @@ Landing **Start monthly** / **Start yearly** signs up a new owner and then sends
 
 ## Failures
 
-- **Plans still shows an old “Last checkout error”** — that line is from the last Pay click (`data/stripe-pay.txt`). Saving `.env` does not change it. Reload Plans: v1.3.20+ shows **This page load: monthly price set / not set**. Click Pay again only after both say **set**.
-- Footer / `/healthz` still on an older build — unzip **v1.3.20+** into `public_html` and **keep the existing `.env`**.
-- Buttons still say **Choose** (not **Pay**) — PHP is not seeing both `price_` IDs. Open `/admin` Stripe log: it reports whether `.env` is being read and whether those two lines are filled. Use `price_…` (open the $14.99 / $119.99 **price** row), not `prod_`.
+- Family **Plans** does not show Stripe env or checkout-debug lines. Open `/admin` → Stripe log and **Checkout errors**.
+- Footer / `/healthz` still on an older build — unzip **v1.3.22+** into `public_html` and **keep the existing `.env`**.
+- Buttons still say **Choose** (not **Pay**) — PHP is not seeing both `price_` IDs. `/admin` Stripe log reports whether `.env` is being read and whether those two lines are filled. Use `price_…` (open the $14.99 / $119.99 **price** row), not `prod_`.
 - Hostinger **PHP Configuration → Environment variables** used to hide `.env` when the same key was already set (including placeholders). v1.3.20 lets a non-empty `.env` line win.
 - Operator button says paste `sk_test_` — only a test secret key is used to create the catalog. If `.env` is writable, **Create Family Shield Pro prices in Stripe** writes the `price_` IDs for you.
 - Checkout starts, then the plan does not change — webhook URL or `STRIPE_WEBHOOK_SECRET` is wrong. A success return with `session_id` still updates the circle if the secret key is present.
