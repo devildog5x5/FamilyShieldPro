@@ -34,9 +34,9 @@ $hasCustomer = !empty($hasCustomer);
         ? 'It ends today.'
         : ((int) ($trial['days_left'] ?? 0) . ' days left, through ' . Http::e((string) ($trial['ends_label'] ?? '')) . '.')
       ?>
-      Then the owner pays to keep checking new requests.</p>
+      Then the owner pays to keep checking new requests. We do not lock you out of what you entered, and we do not sell people’s information.</p>
   <?php elseif (!empty($trial['expired'])): ?>
-    <p><strong>The 14-day trial has ended.</strong> Pay below to check new requests, invite family, and use call-me. You can still view the trusted list and past checks.</p>
+    <p><strong>The 14-day trial has ended.</strong> Pay below to check new requests, invite family, and use call-me. You can still view the trusted list, past checks, and other personal information you entered. We do not sell people’s information.</p>
   <?php endif; ?>
   <p class="disclaimer">Paying for a plan does not make a request safe.</p>
   <?php if ($testMode): ?>

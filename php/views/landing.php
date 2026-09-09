@@ -11,7 +11,7 @@ $phone = $phone ?? Layout::contactPhone();
       <h1>A family pause before you send a dime.</h1>
       <p class="lede">Family Shield Pro (OurCircle) is a trusted circle for the text, call, prize, or “urgent” payment that feels a little off. We are not an AI that stamps a request as safe. We help you stop, read the warning signs in plain language, and get someone you trust on the phone — then you decide.</p>
       <p><a class="btn" href="/signup">Start a 14-day trial</a></p>
-      <p class="muted">14-day trial, then Family yearly $119.99 or $14.99/month on <a href="#plans">Plans</a>.</p>
+      <p class="muted">14-day trial, then Family yearly $119.99 or $14.99/month on <a href="#plans">Plans</a>. If the trial ends, you still have everything you entered — we do not lock you out of your personal information, and we do not sell it.</p>
     </div>
     <div class="hero-card panel">
       <p>OurCircle cannot tell you that something is safe. We help you pause, look for warning signs, check your family's trusted list, and ask someone you trust before you act.</p>
@@ -56,13 +56,13 @@ $phone = $phone ?? Layout::contactPhone();
     <div class="panel">
       <h3>Family monthly</h3>
       <p><strong>$14.99/month</strong></p>
-      <p>Up to five people in one circle. Pause, trusted list, and call-me-before-I-pay. <strong>14-day trial</strong>, then this plan.</p>
+      <p>Up to five people in one circle. Pause, trusted list, and call-me-before-I-pay. <strong>14-day trial</strong>, then this plan. You keep what you entered. We do not sell people’s information.</p>
       <p><a class="btn wide" href="<?= !empty($user) ? '/billing' : '/signup?plan=monthly' ?>"><?= !empty($user) ? 'Go to plans' : 'Start monthly' ?></a></p>
     </div>
     <div class="panel featured">
       <h3>Family yearly</h3>
       <p><strong>$119.99/year</strong></p>
-      <p>Same circle. Pay once a year — about $10 a month. <strong>14-day trial</strong> first.</p>
+      <p>Same circle. Pay once a year — about $10 a month. <strong>14-day trial</strong> first. You keep what you entered. We do not sell people’s information.</p>
       <p><a class="btn gold wide" href="<?= !empty($user) ? '/billing' : '/signup?plan=yearly' ?>"><?= !empty($user) ? 'Go to plans' : 'Start yearly' ?></a></p>
     </div>
   </div>

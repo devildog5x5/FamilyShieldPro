@@ -1165,7 +1165,7 @@ final class App
             return 'OurCircle cannot tell you that a request is safe. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. Official reports: ReportFraud.ftc.gov and IC3.gov. Then call someone in your circle.';
         }
         if (preg_match('/trial|14.day|paywall|expired/', $low)) {
-            return 'Every new circle includes a 14-day trial. After that the owner pays $14.99/month or $119.99/year to keep checking new requests. You can still view the trusted list and past checks. Pay on /billing. Paying does not make a request safe.';
+            return 'Every new circle includes a 14-day trial. After that the owner pays $14.99/month or $119.99/year to keep checking new requests. We do not lock you out of what you entered, and we do not sell people’s information. You can still view the trusted list and past checks. Pay on /billing. Paying does not make a request safe.';
         }
         if (preg_match('/year|annual|119/', $low)) {
             return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup. Paying does not make a request safe.';

@@ -39,7 +39,7 @@ If you already have a live SQLite file, **back it up first**. This schema is not
 - Invites cannot duplicate an existing member or a waiting invite
 - Owner can cancel invites and remove members
 - Only the owner can change the household plan (Stripe Checkout when keys are set; otherwise the plan is saved with no charge)
-- Every new circle includes a 14-day trial; after that, new checks/invites/call-me need the owner to pay. Trusted list and past checks stay readable.
+- Every new circle includes a 14-day trial; after that, new checks/invites/call-me need the owner to pay. Trusted list, past checks, and other entered personal information stay readable. We do not sell people’s information.
 - Empty circle notes are rejected
 - Circle members reset passwords at `/forgot` (email, file fallback, or 2FA recovery code)
 - Operators reset at `/admin/forgot` (same email/file flow; new password is stored so it survives `.env`)

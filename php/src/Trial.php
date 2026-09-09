@@ -69,8 +69,8 @@ final class Trial
     public static function writeBlockedMessage(array $trial): string
     {
         if (!empty($trial['is_owner'])) {
-            return 'Your 14-day trial has ended. Pay on Plans to keep checking new requests, inviting family, and using call-me. You can still view the trusted list and past checks.';
+            return 'Your 14-day trial has ended. Pay on Plans to keep checking new requests, inviting family, and using call-me. You can still view the trusted list, past checks, and other personal information you entered. We do not sell people’s information.';
         }
-        return 'This circle’s 14-day trial has ended. Ask the owner to continue Family Shield Pro on Plans. You can still view the trusted list and past checks.';
+        return 'This circle’s 14-day trial has ended. Ask the owner to continue Family Shield Pro on Plans. You can still view the trusted list, past checks, and other personal information you entered. We do not sell people’s information.';
     }
 }

@@ -14,7 +14,7 @@ $email = $email ?? Layout::supportEmail();
     <li>Billing: which plan the circle chose. Card numbers are handled by the payment provider when connected — we do not store full card numbers.</li>
   </ul>
   <h2>How we use it</h2>
-  <p>To run your circle, show warning signs, email join links and “please call” alerts when mail is connected, and improve the product. We do not sell your family messages.</p>
+  <p>To run your circle, show warning signs, email join links and “please call” alerts when mail is connected, and improve the product. We do not sell people’s information. If a trial ends, you still have the personal information you entered — we do not lock you out of the trusted list, past checks, or account details.</p>
   <h2>Sharing</h2>
   <p>People you invite can see checks, notes, and the trusted list for that circle. We may use email and (when connected) SMS providers to deliver invites and alerts. We may disclose information if required by law.</p>
   <h2>Retention</h2>

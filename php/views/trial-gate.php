@@ -8,7 +8,7 @@ $isOwner = !empty($trial['is_owner']);
   <div class="panel trial-gate">
     <h1>Your 14-day trial has ended</h1>
     <p>Family Shield Pro is a 14-day trial. After that the circle owner pays so the family can keep checking new requests, inviting people, and using call-me.</p>
-    <p>You can still view the <strong>trusted list</strong> and <strong>past checks</strong>. This reminder pauses for 10 seconds, then you may continue with that limited access.</p>
+    <p>You can still view the <strong>trusted list</strong>, <strong>past checks</strong>, and other personal information you entered. We do not lock you out of that, and we do not sell people’s information. This reminder pauses for 10 seconds, then you may continue with that limited access.</p>
     <?php if ($isOwner): ?>
       <p><a class="btn gold wide" href="/billing">Pay now to keep the full circle</a></p>
     <?php else: ?>

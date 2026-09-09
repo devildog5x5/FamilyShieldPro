@@ -43,7 +43,7 @@ $canWrite = !empty($user['trial']['can_write']);
     <?php else: ?>
     <div class="panel">
       <h2>14-day trial ended</h2>
-      <p>New checks are paused until the circle owner pays. You can still open past checks and the trusted list after the 10-second reminder.</p>
+      <p>New checks are paused until the circle owner pays. You can still open past checks, the trusted list, and other personal information you entered. We do not sell people’s information.</p>
       <?php if (($user['role'] ?? '') === 'owner'): ?>
         <p><a class="btn gold wide" href="/billing">Pay to keep checking requests</a></p>
       <?php else: ?>
