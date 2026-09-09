@@ -958,6 +958,7 @@ final class App
             'hasCustomer' => trim((string) ($circle['stripe_customer_id'] ?? '')) !== '',
             'isOwner' => $user['role'] === 'owner',
             'trial' => $user['trial'] ?? [],
+            'payError' => Db::lastStripePayError(),
         ]);
     }
 
@@ -975,17 +976,21 @@ final class App
     private function startStripeCheckout(array $user, string $plan): never
     {
         if (!Billing::ready()) {
-            $this->db->prepare('UPDATE circles SET plan=? WHERE id=?')->execute([$plan, $user['circle_id']]);
+            $why = Billing::notReadyReason();
+            Billing::logFailure('not-ready', $why);
             Http::flash(
-                'This circle is on ' . Billing::label($plan)
-                . '. Card payments are not connected yet, so nothing was charged.'
+                'Card checkout did not start. ' . $why
+                . '. Open /admin and read the Stripe log. This build must be v1.3.12 or newer.',
+                'error'
             );
             Http::redirect('/billing');
         }
         try {
             Http::redirect(Billing::startPayment($this->db, $user, $plan));
-        } catch (Throwable) {
-            Http::flash('Card checkout could not start. Try again in a minute.', 'error');
+        } catch (Throwable $e) {
+            $safe = Billing::safeMessage($e->getMessage());
+            Billing::logFailure('checkout', $safe);
+            Http::flash('Card checkout failed: ' . $safe, 'error');
             Http::redirect('/billing');
         }
     }
@@ -1001,9 +1006,16 @@ final class App
                     || ($checkout['status'] ?? '') === 'complete';
                 if ($paid) {
                     Billing::applyCheckout($this->db, $checkout);
+                } else {
+                    $st = (string) ($checkout['status'] ?? 'unknown');
+                    Billing::logFailure('success', 'Checkout session was not paid (status ' . $st . ')');
+                    Http::flash('Stripe did not mark that checkout as paid (status: ' . Billing::safeMessage($st) . ').', 'error');
+                    Http::redirect('/billing');
                 }
-            } catch (Throwable) {
-                Http::flash('Payment received. Your plan will update in a moment.');
+            } catch (Throwable $e) {
+                $safe = Billing::safeMessage($e->getMessage());
+                Billing::logFailure('success', $safe);
+                Http::flash('Payment return failed: ' . $safe, 'error');
                 Http::redirect('/billing');
             }
         }
@@ -1033,8 +1045,10 @@ final class App
                 throw new RuntimeException('No portal URL');
             }
             Http::redirect($url);
-        } catch (Throwable) {
-            Http::flash('Could not open card management. Try again in a minute.', 'error');
+        } catch (Throwable $e) {
+            $safe = Billing::safeMessage($e->getMessage());
+            Billing::logFailure('portal', $safe);
+            Http::flash('Could not open card management: ' . $safe, 'error');
             Http::redirect('/billing');
         }
     }
@@ -1228,6 +1242,7 @@ final class App
                 'circles' => $circles,
                 'stripe' => Billing::status(),
                 'stripeReport' => $report['text'],
+                'stripePayLog' => Db::readStripePayLog(),
                 'stripeReady' => !empty($report['ready']),
             ]);
         }

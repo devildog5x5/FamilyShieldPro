@@ -40,6 +40,8 @@ Layout::start('Operator console · Family Shield Pro', null, 'app-bare');
     </p>
     <label for="stripe-log">Stripe log</label>
     <textarea id="stripe-log" class="stripe-log" readonly rows="22"><?= Http::e((string) ($stripeReport ?? '')) ?></textarea>
+    <label for="stripe-pay-log">Checkout errors</label>
+    <textarea id="stripe-pay-log" class="stripe-log" readonly rows="8"><?= Http::e(trim((string) ($stripePayLog ?? '')) !== '' ? (string) $stripePayLog : '(none yet — click Pay on Plans if checkout fails)') ?></textarea>
     <form method="post" action="/admin/stripe-check">
       <?= Http::csrfField() ?>
       <p><button class="btn" type="submit">Run Stripe check again</button></p>

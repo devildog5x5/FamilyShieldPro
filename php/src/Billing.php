@@ -202,17 +202,31 @@ final class Billing
             throw new InvalidArgumentException('Unknown plan');
         }
         $cfg = self::config();
+        if (!extension_loaded('curl')) {
+            throw new RuntimeException('PHP curl is off. Enable curl in Hostinger PHP configuration so Checkout can reach Stripe.');
+        }
         $st = $db->prepare('SELECT stripe_customer_id FROM circles WHERE id=?');
         $st->execute([(int) $user['circle_id']]);
         $customerId = trim((string) ($st->fetchColumn() ?: ''));
         if ($cfg['checkout']) {
-            $session = self::createCheckout([
+            $args = [
                 'plan' => $plan,
                 'circle_id' => (int) $user['circle_id'],
                 'user_id' => (int) $user['id'],
                 'customer_email' => (string) $user['email'],
                 'customer_id' => $customerId !== '' ? $customerId : null,
-            ]);
+            ];
+            try {
+                $session = self::createCheckout($args);
+            } catch (Throwable $e) {
+                $msg = $e->getMessage();
+                if ($customerId !== '' && stripos($msg, 'no such customer') !== false) {
+                    $args['customer_id'] = null;
+                    $session = self::createCheckout($args);
+                } else {
+                    throw $e;
+                }
+            }
             $url = (string) ($session['url'] ?? '');
             if ($url === '') {
                 throw new RuntimeException('Stripe did not return a checkout URL');
@@ -376,6 +390,48 @@ final class Billing
         ];
     }
 
+    public static function safeMessage(string $msg): string
+    {
+        $msg = trim($msg);
+        $msg = preg_replace('/sk_(?:live|test)_[A-Za-z0-9]+/', 'sk_***', $msg) ?? $msg;
+        $msg = preg_replace('/pk_(?:live|test)_[A-Za-z0-9]+/', 'pk_***', $msg) ?? $msg;
+        $msg = preg_replace('/whsec_[A-Za-z0-9]+/', 'whsec_***', $msg) ?? $msg;
+        if (strlen($msg) > 400) {
+            $msg = substr($msg, 0, 400) . '…';
+        }
+        return $msg;
+    }
+
+    public static function notReadyReason(): string
+    {
+        $cfg = self::config();
+        $bits = [];
+        if (!extension_loaded('curl')) {
+            $bits[] = 'PHP curl is off (Hostinger must enable curl)';
+        }
+        if (!self::configuredValue($cfg['secret_key'], 'sk_', 20)) {
+            $bits[] = 'STRIPE_SECRET_KEY is missing';
+        }
+        if (!self::configuredValue($cfg['prices']['monthly'] ?? '', 'price_', 20)) {
+            $bits[] = 'STRIPE_PRICE_MONTHLY is missing';
+        }
+        if (!self::configuredValue($cfg['prices']['yearly'] ?? '', 'price_', 20)) {
+            $bits[] = 'STRIPE_PRICE_YEARLY is missing';
+        }
+        if ($bits) {
+            return implode('; ', $bits);
+        }
+        if (!$cfg['ready']) {
+            return 'Stripe Checkout is not configured';
+        }
+        return '';
+    }
+
+    public static function logFailure(string $step, string $message): void
+    {
+        Db::writeStripePayLog($step . ': ' . self::safeMessage($message));
+    }
+
     /**
      * Operator diagnostic. Never includes secret values.
      *
@@ -511,6 +567,18 @@ final class Billing
         $lines[] = 'Webhook URL Stripe should call: ' . $webhookUrl;
         $lines[] = 'After deploy, Plans should say Pay Family monthly / yearly, not Choose.';
         $lines[] = 'Test card: 4242 4242 4242 4242, any future date, any CVC, any ZIP.';
+        $pay = trim(Db::readStripePayLog());
+        $lines[] = '';
+        $lines[] = 'LAST CHECKOUT ERRORS (no secrets)';
+        if ($pay === '') {
+            $lines[] = '- (none yet)';
+        } else {
+            foreach (preg_split("/\r\n|\n|\r/", $pay) ?: [] as $pl) {
+                if (trim($pl) !== '') {
+                    $lines[] = '- ' . $pl;
+                }
+            }
+        }
         $text = implode("\n", $lines) . "\n";
 
         return [

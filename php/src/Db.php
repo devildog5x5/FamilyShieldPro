@@ -6,7 +6,7 @@ final class Db
     public const DEMO_EMAIL = 'family@ourcircle.app';
     public const DEMO_NAME = 'Pat Foster';
     public const DEMO_PASSWORD = 'password123';
-    public const VERSION = '1.3.16';
+    public const VERSION = '1.3.17';
     public const RESET_NOTICE = 'If that email is on file, a one-hour reset link is on the way. When mail is not connected, the link is saved as password-reset.txt next to the database (blocked from the web).';
 
     private static ?string $path = null;
@@ -305,6 +305,48 @@ final class Db
         }
         $raw = file_get_contents($path);
         return is_string($raw) ? $raw : '';
+    }
+
+    public static function stripePayLogPath(): string
+    {
+        $dir = self::$path ? dirname(self::$path) : (dirname(__DIR__) . '/data');
+        return $dir . DIRECTORY_SEPARATOR . 'stripe-pay.txt';
+    }
+
+    public static function writeStripePayLog(string $line): void
+    {
+        $path = self::stripePayLogPath();
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $safe = Billing::safeMessage($line);
+        $body = Http::now() . ' ' . $safe . "\n";
+        $prev = is_file($path) ? (string) file_get_contents($path) : '';
+        $all = $body . $prev;
+        $lines = preg_split("/\r\n|\n|\r/", trim($all)) ?: [];
+        $lines = array_slice($lines, 0, 40);
+        file_put_contents($path, implode("\n", $lines) . "\n");
+    }
+
+    public static function readStripePayLog(): string
+    {
+        $path = self::stripePayLogPath();
+        if (!is_file($path)) {
+            return '';
+        }
+        $raw = file_get_contents($path);
+        return is_string($raw) ? $raw : '';
+    }
+
+    public static function lastStripePayError(): string
+    {
+        $raw = trim(self::readStripePayLog());
+        if ($raw === '') {
+            return '';
+        }
+        $lines = preg_split("/\r\n|\n|\r/", $raw) ?: [];
+        return trim((string) ($lines[0] ?? ''));
     }
 
     public static function writeResetFile(string $url, string $kind = 'circle'): void

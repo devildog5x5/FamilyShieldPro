@@ -8,6 +8,9 @@ $hasCustomer = !empty($hasCustomer);
 ?>
 <div class="wrap app-main">
   <?php Layout::flash(); ?>
+  <?php if (!empty($payError)): ?>
+    <div class="flash error">Last checkout error: <?= Http::e((string) $payError) ?></div>
+  <?php endif; ?>
   <p>This household is on <strong><?= Http::e($plan) ?></strong>.</p>
   <?php
     $trial = $trial ?? [];
