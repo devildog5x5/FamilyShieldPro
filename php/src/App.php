@@ -958,6 +958,9 @@ final class App
             'hasCustomer' => trim((string) ($circle['stripe_customer_id'] ?? '')) !== '',
             'isOwner' => $user['role'] === 'owner',
             'trial' => $user['trial'] ?? [],
+            'hasMonthlyPrice' => Billing::configuredValue($cfg['prices']['monthly'] ?? '', 'price_', 20),
+            'hasYearlyPrice' => Billing::configuredValue($cfg['prices']['yearly'] ?? '', 'price_', 20),
+            'notReadyReason' => Billing::notReadyReason(),
             'payError' => Db::lastStripePayError(),
         ]);
     }

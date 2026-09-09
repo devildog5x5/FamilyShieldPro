@@ -493,6 +493,22 @@ final class Billing
 
         $ok[] = 'App version ' . Db::VERSION;
 
+        $file = Env::fileStatus();
+        if (!$file['found']) {
+            $missing[] = '.env was not found next to the PHP files (Hostinger: public_html/.env — keep that file when unzipping a new build)';
+        } else {
+            $ok[] = '.env file is being read (' . $file['name'] . ')';
+            foreach (['STRIPE_PRICE_MONTHLY', 'STRIPE_PRICE_YEARLY'] as $k) {
+                if (!array_key_exists($k, $file['keys'])) {
+                    $warn[] = $k . ' is not a line in the .env file PHP is reading. Hostinger PHP environment variables are used only if the file has no value.';
+                } elseif ($file['keys'][$k] === false) {
+                    $warn[] = $k . ' is in .env but the value on that line is empty';
+                } else {
+                    $ok[] = $k . ' has a value in the .env file';
+                }
+            }
+        }
+
         if (!extension_loaded('curl')) {
             $missing[] = 'PHP curl extension (Checkout cannot call Stripe without it)';
         } else {
