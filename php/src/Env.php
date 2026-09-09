@@ -23,6 +23,12 @@ final class Env
             [$k, $v] = explode('=', $trim, 2);
             $k = trim($k);
             $v = trim($v);
+            if (
+                (strlen($v) >= 2 && str_starts_with($v, '"') && str_ends_with($v, '"'))
+                || (strlen($v) >= 2 && str_starts_with($v, "'") && str_ends_with($v, "'"))
+            ) {
+                $v = substr($v, 1, -1);
+            }
             if ($k === '') {
                 continue;
             }

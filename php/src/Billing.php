@@ -24,7 +24,7 @@ final class Billing
 
     public static function configuredValue(string $value, string $prefix = '', int $minLen = 16): bool
     {
-        $v = trim($value);
+        $v = self::unquote(trim($value));
         if ($v === '' || str_contains($v, '...')) {
             return false;
         }
@@ -34,15 +34,27 @@ final class Billing
         return strlen($v) >= $minLen;
     }
 
+    public static function unquote(string $v): string
+    {
+        $v = trim($v);
+        if (
+            (strlen($v) >= 2 && str_starts_with($v, '"') && str_ends_with($v, '"'))
+            || (strlen($v) >= 2 && str_starts_with($v, "'") && str_ends_with($v, "'"))
+        ) {
+            return substr($v, 1, -1);
+        }
+        return $v;
+    }
+
     public static function config(): array
     {
         $prices = [];
         $links = [];
         foreach (self::PLANS as $key => $meta) {
-            $prices[$key] = trim(Env::get($meta['env_price']));
-            $links[$key] = trim(Env::get($meta['env_link']));
+            $prices[$key] = self::unquote(trim(Env::get($meta['env_price'])));
+            $links[$key] = self::unquote(trim(Env::get($meta['env_link'])));
         }
-        $secret = trim(Env::get('STRIPE_SECRET_KEY'));
+        $secret = self::unquote(trim(Env::get('STRIPE_SECRET_KEY')));
         $hasSecret = self::configuredValue($secret, 'sk_', 20);
         $hasPrices = true;
         foreach ($prices as $pid) {
@@ -412,11 +424,13 @@ final class Billing
         if (!self::configuredValue($cfg['secret_key'], 'sk_', 20)) {
             $bits[] = 'STRIPE_SECRET_KEY is missing';
         }
-        if (!self::configuredValue($cfg['prices']['monthly'] ?? '', 'price_', 20)) {
-            $bits[] = 'STRIPE_PRICE_MONTHLY is missing';
+        $monthly = self::priceProblem('STRIPE_PRICE_MONTHLY', $cfg['prices']['monthly'] ?? '');
+        $yearly = self::priceProblem('STRIPE_PRICE_YEARLY', $cfg['prices']['yearly'] ?? '');
+        if ($monthly) {
+            $bits[] = $monthly;
         }
-        if (!self::configuredValue($cfg['prices']['yearly'] ?? '', 'price_', 20)) {
-            $bits[] = 'STRIPE_PRICE_YEARLY is missing';
+        if ($yearly) {
+            $bits[] = $yearly;
         }
         if ($bits) {
             return implode('; ', $bits);
@@ -425,6 +439,37 @@ final class Billing
             return 'Stripe Checkout is not configured';
         }
         return '';
+    }
+
+    /** Why a price env value is rejected. Never returns the raw secret/id. */
+    public static function priceProblem(string $name, string $raw): ?string
+    {
+        $v = trim($raw);
+        if (
+            (strlen($v) >= 2 && str_starts_with($v, '"') && str_ends_with($v, '"'))
+            || (strlen($v) >= 2 && str_starts_with($v, "'") && str_ends_with($v, "'"))
+        ) {
+            $v = substr($v, 1, -1);
+        }
+        if ($v === '') {
+            return $name . ' is empty';
+        }
+        if (str_contains($v, '...')) {
+            return $name . ' is still the placeholder (price_...) — paste the real price id from Stripe';
+        }
+        if (str_starts_with($v, 'prod_')) {
+            return $name . ' is a product id (prod_) — open the price and copy the id that starts with price_';
+        }
+        if (str_starts_with($v, 'https://') || str_starts_with($v, 'http://')) {
+            return $name . ' is a URL — buy.stripe.com links go in STRIPE_PAYMENT_LINK_MONTHLY / _YEARLY, not the price fields';
+        }
+        if (!str_starts_with($v, 'price_')) {
+            return $name . ' must start with price_ (API keys and product ids will not work here)';
+        }
+        if (strlen($v) < 20) {
+            return $name . ' is too short to be a Stripe price id';
+        }
+        return null;
     }
 
     public static function logFailure(string $step, string $message): void
@@ -489,12 +534,14 @@ final class Billing
         $monthly = $cfg['prices']['monthly'] ?? '';
         $yearly = $cfg['prices']['yearly'] ?? '';
         if (!self::configuredValue($monthly, 'price_', 20)) {
-            $missing[] = 'STRIPE_PRICE_MONTHLY (price_… for $14.99/month)';
+            $missing[] = self::priceProblem('STRIPE_PRICE_MONTHLY', $monthly)
+                ?? 'STRIPE_PRICE_MONTHLY (price_… for $14.99/month)';
         } else {
             $ok[] = 'STRIPE_PRICE_MONTHLY is set (' . self::maskId($monthly) . ')';
         }
         if (!self::configuredValue($yearly, 'price_', 20)) {
-            $missing[] = 'STRIPE_PRICE_YEARLY (price_… for $119.99/year)';
+            $missing[] = self::priceProblem('STRIPE_PRICE_YEARLY', $yearly)
+                ?? 'STRIPE_PRICE_YEARLY (price_… for $119.99/year)';
         } else {
             $ok[] = 'STRIPE_PRICE_YEARLY is set (' . self::maskId($yearly) . ')';
         }
