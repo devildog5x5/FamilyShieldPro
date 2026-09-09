@@ -45,6 +45,7 @@ final class Layout
         echo '<!DOCTYPE html><html lang="en"' . $htmlClass . '><head><meta charset="UTF-8" />';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
         echo '<title>' . Http::e($title) . '</title>';
+        echo '<meta name="application-name" content="Family Shield Pro ' . Http::e($v) . '" />';
         echo '<link rel="canonical" href="' . Http::e($base . Http::path()) . '" />';
         echo '<link rel="icon" type="image/png" href="/static/img/logo.png" />';
         echo '<meta name="color-scheme" content="' . ($mode === 'dark' ? 'dark' : 'light') . '" />';
@@ -121,7 +122,7 @@ final class Layout
 
     public static function end(?array $user = null): void
     {
-        echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee.<a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
+        echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee. <span class="build">Family Shield Pro ' . Http::e(self::asset()) . '</span><a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
         self::chat();
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '"></script>';
