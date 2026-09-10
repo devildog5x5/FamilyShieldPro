@@ -228,9 +228,8 @@ img { max-width: 100%; height: auto; }
 }
 .hero-video-play {
   position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 12px;
+  top: 12px;
   z-index: 1;
   display: inline-flex;
   align-items: center;
