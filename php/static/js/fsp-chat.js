@@ -87,7 +87,10 @@
     log.appendChild(wait);
     fetch("/support/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": (document.querySelector('meta[name="csrf-token"]') || {}).content || ""
+      },
       body: JSON.stringify({ message: msg, history: history.slice(-8) })
     }).then(function (r) { return r.json(); }).then(function (data) {
       wait.remove();

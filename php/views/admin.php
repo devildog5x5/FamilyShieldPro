@@ -59,6 +59,14 @@ Layout::start('Operator console · Family Shield Pro', null, 'app-bare');
       </form>
     <?php endif; ?>
   </div>
+  <div class="panel" style="margin-top:32px">
+    <h2>Help chat (Grok)</h2>
+    <p>The Help button calls xAI Grok when <code>XAI_API_KEY</code> is in server <code>.env</code> (from <a href="https://console.x.ai" rel="noopener" target="_blank">console.x.ai</a> — not the Cursor app login). Without a key, Help uses the built-in short answers. Chat text is not stored. Failures below never include visitor messages or the API key.</p>
+    <p>Grok key: <strong><?= !empty($helpGrok) ? 'Yes' : 'Missing' ?></strong>
+      · Model: <strong><?= Http::e(HelpChat::model()) ?></strong></p>
+    <label for="help-log">Help errors</label>
+    <textarea id="help-log" class="stripe-log" readonly rows="6"><?= Http::e(trim((string) ($helpLog ?? '')) !== '' ? (string) $helpLog : '(none yet)') ?></textarea>
+  </div>
   <form class="panel" method="post" action="/admin/factory-reset" style="margin-top:32px" onsubmit="return confirm('This permanently deletes all circles, checks, and screenshots, then reseeds the demo. Continue?');">
     <?= Http::csrfField() ?>
     <h2>Factory reset</h2>

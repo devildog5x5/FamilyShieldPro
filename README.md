@@ -40,6 +40,7 @@ If you already have a live SQLite file, **back it up first**. This schema is not
 - Owner can cancel invites and remove members
 - Only the owner can change the household plan (Stripe Checkout when keys are set; otherwise the plan is saved with no charge)
 - Signup and join require agreement to the Terms & Conditions (`/terms`) and Privacy Policy (`/privacy`)
+- Help button uses xAI Grok when `XAI_API_KEY` is set (https://console.x.ai); otherwise short built-in answers. Cursor login is not that key.
 - Every new circle includes a 14-day trial; after that, new checks/invites/call-me need the owner to pay. Trusted list, past checks, and other entered personal information stay readable. We do not sell people’s information.
 - Empty circle notes are rejected
 - Circle members reset passwords at `/forgot` (email, file fallback, or 2FA recovery code)

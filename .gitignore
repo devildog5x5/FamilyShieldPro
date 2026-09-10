@@ -5,6 +5,8 @@ php/data/uploads/
 php/data/password-reset.txt
 php/data/stripe-check.txt
 php/data/stripe-pay.txt
+php/data/help-chat.txt
+php/data/help-rate.json
 stripe-check.log
 build/
 installers/

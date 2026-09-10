@@ -1148,41 +1148,18 @@ final class App
 
     private function chat(): never
     {
+        $token = (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+        $need = Http::csrfToken();
+        if ($token === '' || strlen($token) !== strlen($need) || !hash_equals($need, $token)) {
+            Http::json(['reply' => 'That help session expired. Refresh the page, or email ' . Layout::supportEmail() . '.'], 403);
+        }
         $body = Http::bodyJson();
         $msg = trim((string) ($body['message'] ?? ''));
-        $reply = $this->chatReply($msg);
-        Http::json(['reply' => $reply]);
-    }
-
-    private function chatReply(string $msg): string
-    {
-        $em = Layout::supportEmail();
-        if ($msg === '') {
-            return 'Ask me about plans, login, or how the circle works. For a person, email ' . $em . '.';
+        $history = $body['history'] ?? [];
+        if (!is_array($history)) {
+            $history = [];
         }
-        $low = strtolower($msg);
-        if (preg_match('/terms|privacy|legal|conditions|t&c|\bt and c\b|t\'s and c/', $low)) {
-            return 'The Terms & Conditions are at /terms. Privacy is at /privacy. Starting or joining a circle means you agree to both. We do not sell people’s information, and we do not lock you out of what you entered if a trial ends.';
-        }
-        if (preg_match('/safe|legit|real|scam or not|snopes|ftc|ic3|bbb/', $low)) {
-            return 'OurCircle cannot tell you that a request is safe. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. Official reports: ReportFraud.ftc.gov and IC3.gov. Then call someone in your circle.';
-        }
-        if (preg_match('/trial|14.day|paywall|expired/', $low)) {
-            return 'Every new circle includes a 14-day trial. After that the owner pays $14.99/month or $119.99/year to keep checking new requests. We do not lock you out of what you entered, and we do not sell people’s information. You can still view the trusted list and past checks. Pay on /billing. Paying does not make a request safe.';
-        }
-        if (preg_match('/year|annual|119/', $low)) {
-            return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup. Paying does not make a request safe.';
-        }
-        if (preg_match('/price|cost|plan|month|14\.99/', $low)) {
-            return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup.';
-        }
-        if (preg_match('/login|password|forgot|sign in/', $low)) {
-            return 'Use /login with the email on your circle. Forgot password sends a one-hour link, or saves it next to the database if mail is not connected. 2FA recovery codes also work. Operator console: /admin/login has its own forgot-password link. Demo circle (sandbox): family@ourcircle.app / password123.';
-        }
-        if (preg_match('/sms|text|twilio|forward/', $low)) {
-            return 'Save your mobile on Account. When texting is connected, invites and “Please call me before I pay” can go by SMS. Reply STOP to opt out. This is not a customer-service hotline.';
-        }
-        return 'Family Shield Pro (OurCircle) is a trusted family circle for sketchy texts, calls, prizes, and urgent payment asks. It is not an AI stamp of safety. Paste the request, read the warning signs, and call someone you trust. For a person, email ' . $em . '.';
+        Http::json(['reply' => HelpChat::reply($msg, $history)]);
     }
 
     private function legal(string $which): never
@@ -1226,6 +1203,7 @@ final class App
         if (Env::truthy('HEALTHZ_DETAILS') || !empty($_SESSION['admin'])) {
             $payload['mail'] = Mailer::configured();
             $payload['stripe'] = Billing::ready();
+            $payload['help'] = HelpChat::configured();
             $payload['sms'] = trim(Env::get('TWILIO_AUTH_TOKEN')) !== '';
             $payload['admin'] = Db::operatorRow($this->db) !== null || trim(Env::get('OPERATOR_PASSWORD')) !== '';
         }
@@ -1250,6 +1228,8 @@ final class App
                 'stripeReport' => $report['text'],
                 'stripePayLog' => Db::readStripePayLog(),
                 'stripeReady' => !empty($report['ready']),
+                'helpGrok' => HelpChat::configured(),
+                'helpLog' => HelpChat::readLog(),
             ]);
         }
         if ($method === 'POST') {
