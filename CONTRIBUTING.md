@@ -2,6 +2,8 @@
 
 Canonical clone: `C:\Users\rober\Documents\GitHub\FamilyShieldPro`
 
+If a chat opens in any other folder, switch here. Do not edit InPmnt for this product.
+
 1. `git checkout main` and `git pull`.
 2. Branch: `feature/…`, `fix/…`, or `chore/…` — one concern.
 3. Commit with a short “why” message. Push the branch (`git push -u origin HEAD`).
