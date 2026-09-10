@@ -22,8 +22,8 @@ $phone = $phone ?? Layout::contactPhone();
           <img class="hero-video-poster" src="/static/video/ourcircle-pause.jpg" width="1280" height="720" alt="" />
           <span class="hero-video-cue">
             <img class="hero-video-who" src="/static/video/grandma-still.jpg" width="160" height="160" alt="" />
-            <span class="hero-video-play"><span class="hero-video-play-icon" aria-hidden="true"></span> Watch the story</span>
           </span>
+          <span class="hero-video-play"><span class="hero-video-play-icon" aria-hidden="true"></span> Watch the story</span>
         </button>
       </div>
       <figcaption>This short story is about a grandma who pauses and calls family before she pays. Click the picture to watch. OurCircle never stamps a request as safe or fake.</figcaption>
