@@ -13,4 +13,4 @@ alwaysApply: true
 - Hostinger zip is the contents of `php/` at the public_html root, never a nested folder.
 - Demo login is `family@ourcircle.app` / `password123` when `SHOW_DEMO_LOGIN=1`.
 - Help chat uses `XAI_API_KEY` from server `.env` (console.x.ai), not the Cursor login.
-- If the open Cursor window is InPmnt, still edit only this repo.
+- If you come up in any folder but this repo, go to the repo created for the product and work there. For OurCircle, that is this folder — never InPmnt.

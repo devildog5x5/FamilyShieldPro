@@ -10,8 +10,13 @@ GitHub: `https://github.com/devildog5x5/FamilyShieldPro` (`main`)
 
 Do all OurCircle / Family Shield Pro file work in that folder.
 
+If this chat, cwd, or git remote is anything else (InPmnt, ERP, an empty window), stop. Do not edit the open folder. Switch to the repo created for the product:
+
+- Family Shield Pro / OurCircle / familyshieldpro.com → `C:\Users\rober\Documents\GitHub\FamilyShieldPro`
+- InPmnt → the InPmnt repo only
+
 Never create, edit, or delete files under:
 - `C:\Users\rober\AppData\Local\InPmnt`
 - `C:\Users\rober\Documents\GitHub\InPmnt`
 
-Those are a different product. If this Cursor window is opened on InPmnt, still read and write Family Shield Pro only in the GitHub path above.
+Those are a different product. Leave them alone.
