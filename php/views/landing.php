@@ -32,7 +32,7 @@ $phone = $phone ?? Layout::contactPhone();
 
   <div class="too-good">
     <h2>If it sounds too good to be true, it usually is.</h2>
-    <p class="really">Really?!?</p>
+    <p class="really">Really!!!</p>
   </div>
 
   <h2>Three steps before anyone pays</h2>
