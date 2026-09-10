@@ -1,0 +1,17 @@
+---
+description: Family Shield Pro lives in its own GitHub folder — never edit InPmnt for this product.
+alwaysApply: true
+---
+
+# Workspace
+
+Canonical source: `C:\Users\rober\Documents\GitHub\FamilyShieldPro`
+GitHub: `https://github.com/devildog5x5/FamilyShieldPro` (`main`)
+
+Do all OurCircle / Family Shield Pro file work in that folder.
+
+Never create, edit, or delete files under:
+- `C:\Users\rober\AppData\Local\InPmnt`
+- `C:\Users\rober\Documents\GitHub\InPmnt`
+
+Those are a different product. If this Cursor window is opened on InPmnt, still read and write Family Shield Pro only in the GitHub path above.
