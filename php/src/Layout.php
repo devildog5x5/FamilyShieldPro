@@ -122,12 +122,31 @@ final class Layout
 
     public static function end(?array $user = null): void
     {
-        echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee. <span class="build">Family Shield Pro ' . Http::e(self::asset()) . '</span><a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
+        echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee. '
+            . self::legalLinks()
+            . ' <span class="build">Family Shield Pro ' . Http::e(self::asset()) . '</span><a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
         self::chat();
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-focus.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '</body></html>';
+    }
+
+    public static function legalLinks(): string
+    {
+        return '<a href="/privacy">Privacy</a> · <a href="/terms">Terms &amp; Conditions</a>';
+    }
+
+    public static function agreeCheckbox(): void
+    {
+        echo '<label class="check-row agree-row"><input type="checkbox" name="agree" value="1" required />';
+        echo '<span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms &amp; Conditions</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>';
+    }
+
+    public static function agreed(): bool
+    {
+        $v = strtolower(trim((string) ($_POST['agree'] ?? '')));
+        return in_array($v, ['1', 'on', 'true', 'yes'], true);
     }
 
     public static function chat(): void

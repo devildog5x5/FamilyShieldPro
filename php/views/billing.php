@@ -64,5 +64,6 @@ $hasCustomer = !empty($hasCustomer);
     <p class="disclaimer">Card payments are not connected yet, so a plan choice is only saved on this circle. Nothing is charged until payments are turned on.</p>
   <?php endif; ?>
   <p>Churches, senior centers, and veterans groups: ask us about a shared license.</p>
+  <p class="muted">Plans and the 14-day trial are part of the <a href="/terms">Terms &amp; Conditions</a>. Privacy is at <a href="/privacy">/privacy</a>.</p>
 </div>
 <?php Layout::end($user);

@@ -388,6 +388,10 @@ final class App
             Http::flash('Name, email, and an 8+ character password are required.', 'error');
             $this->view('signup', ['plan' => in_array($pick, ['monthly', 'yearly'], true) ? $pick : '']);
         }
+        if (!Layout::agreed()) {
+            Http::flash('Please agree to the Terms & Conditions and Privacy Policy to start a circle.', 'error');
+            $this->view('signup', ['plan' => in_array($pick, ['monthly', 'yearly'], true) ? $pick : '']);
+        }
         $exists = $this->db->prepare('SELECT id FROM users WHERE lower(email)=?');
         $exists->execute([$email]);
         if ($exists->fetch()) {
@@ -871,6 +875,10 @@ final class App
             Http::flash('Name and an 8+ character password are required.', 'error');
             $this->view('join', ['invite' => $inv]);
         }
+        if (!Layout::agreed()) {
+            Http::flash('Please agree to the Terms & Conditions and Privacy Policy to join this circle.', 'error');
+            $this->view('join', ['invite' => $inv]);
+        }
         $exists = $this->db->prepare('SELECT id, circle_id FROM users WHERE lower(email)=?');
         $exists->execute([strtolower((string) $inv['email'])]);
         if ($exists->fetch()) {
@@ -1153,6 +1161,9 @@ final class App
             return 'Ask me about plans, login, or how the circle works. For a person, email ' . $em . '.';
         }
         $low = strtolower($msg);
+        if (preg_match('/terms|privacy|legal|conditions|t&c|\bt and c\b|t\'s and c/', $low)) {
+            return 'The Terms & Conditions are at /terms. Privacy is at /privacy. Starting or joining a circle means you agree to both. We do not sell people’s information, and we do not lock you out of what you entered if a trial ends.';
+        }
         if (preg_match('/safe|legit|real|scam or not|snopes|ftc|ic3|bbb/', $low)) {
             return 'OurCircle cannot tell you that a request is safe. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. Official reports: ReportFraud.ftc.gov and IC3.gov. Then call someone in your circle.';
         }

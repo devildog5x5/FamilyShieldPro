@@ -77,7 +77,7 @@ $phone = $phone ?? Layout::contactPhone();
       <p class="support-phone"><a href="tel:<?= Http::e(preg_replace('/\D+/', '', $phone) ?? '') ?>"><?= Http::e($phone) ?></a></p>
     <?php endif; ?>
     <p class="muted">OurCircle is built for families — including parents, adult children, and grandparents — who want a second set of eyes.</p>
-    <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+    <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms &amp; Conditions</a></p>
   </section>
 </div>
 <?php Layout::end();

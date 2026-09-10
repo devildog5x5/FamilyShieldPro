@@ -27,6 +27,7 @@ $inv = $invite;
       <input name="phone" type="tel" inputmode="tel" placeholder="(555) 010-1234" autocomplete="tel" value="<?= Http::e($inv['phone'] ?? '') ?>" />
       <p class="muted">Password reset uses your email. Texts are only for circle invites and alerts if SMS is on.</p>
     </details>
+    <?php Layout::agreeCheckbox(); ?>
     <p><button class="btn wide" type="submit">Join the circle</button></p>
   </form>
   <?php endif; ?>

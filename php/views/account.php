@@ -34,5 +34,6 @@ Layout::start('Account', $user);
     <?php endif; ?>
     <p>Password reset: email link, a file next to the database when mail is off, or a 2FA recovery code on the <a href="/forgot">forgot-password page</a>.</p>
   </div>
+  <p class="muted" style="margin-top:16px"><?php echo Layout::legalLinks(); ?></p>
 </div>
 <?php Layout::end($user);

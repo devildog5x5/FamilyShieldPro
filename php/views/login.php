@@ -27,5 +27,6 @@ $needOtp = !empty($needOtp);
   <?php endif; ?>
   <p class="disclaimer">This application offers guidance, not a guarantee.</p>
   <p><a href="/forgot">Forgot password</a> · <a href="/signup">Start a circle</a></p>
+  <p class="muted"><?php echo Layout::legalLinks(); ?></p>
 </div>
 <?php Layout::end();

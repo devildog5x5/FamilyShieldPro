@@ -1,11 +1,11 @@
 <?php
-Layout::start('Privacy · OurCircle');
+Layout::start('Privacy Policy · OurCircle');
 Layout::publicNav();
 $email = $email ?? Layout::supportEmail();
 ?>
 <div class="wrap app-main">
-  <h1>Privacy</h1>
-  <p>Family Shield Pro (OurCircle) is a family pause tool. This page explains what we store and why. It is not legal advice.</p>
+  <h1>Privacy Policy</h1>
+  <p>Family Shield Pro (OurCircle) is a family pause tool. This page explains what we store and why. It is not legal advice. Using the service is also covered by the <a href="/terms">Terms &amp; Conditions</a>.</p>
   <h2>What we collect</h2>
   <ul class="list">
     <li>Account details: name, email, optional mobile number, password hash, and optional authenticator secret.</li>
@@ -21,6 +21,6 @@ $email = $email ?? Layout::supportEmail();
   <p>We keep circle data while the account is open. You can ask us to delete a circle by emailing <a href="mailto:<?= Http::e($email) ?>"><?= Http::e($email) ?></a>.</p>
   <h2>Contact</h2>
   <p><a href="mailto:<?= Http::e($email) ?>"><?= Http::e($email) ?></a></p>
-  <p><a href="/terms">Terms</a> · <a href="/">Home</a></p>
+  <p><a href="/terms">Terms &amp; Conditions</a> · <a href="/">Home</a></p>
 </div>
 <?php Layout::end();

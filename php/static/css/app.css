@@ -287,6 +287,10 @@ textarea.stripe-log {
 .resend-btn { margin-top: 8px; font-size: 0.85rem; padding: 6px 12px; }
 .check-row { display: flex; align-items: center; gap: 8px; font-weight: 600; margin: 12px 0; }
 .check-row input { width: auto; margin: 0; }
+.agree-row { align-items: flex-start; font-weight: 500; }
+.agree-row span { font-weight: 500; line-height: 1.4; }
+.legal-doc { max-width: 42rem; }
+.legal-doc h2 { margin-top: 1.5rem; }
 .footer { padding: 28px 0 48px; color: var(--muted); font-size: 0.95rem; }
 .auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; position: relative; }
 .app-bare { position: relative; min-height: 100vh; }
