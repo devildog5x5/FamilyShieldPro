@@ -1,0 +1,16 @@
+---
+description: How a Family Shield Pro developer should work day to day.
+alwaysApply: true
+---
+
+# Developer practice
+
+- Pull `main` before branching. Keep the PR small and about one thing.
+- Match existing PHP style. Do not add comments or docs the user did not need.
+- Family-readable copy. Guidance, not a guarantee. Never a fake/safe stamp.
+- Login, billing, and privacy changes stay conservative: no user enumeration, no autoplay video, keep trial personal data readable, do not sell it.
+- After UI changes, verify the flow (browser if possible). Check other pages that share the same state.
+- Hostinger zip is the contents of `php/` at the public_html root, never a nested folder.
+- Demo login is `family@ourcircle.app` / `password123` when `SHOW_DEMO_LOGIN=1`.
+- Help chat uses `XAI_API_KEY` from server `.env` (console.x.ai), not the Cursor login.
+- If the open Cursor window is InPmnt, still edit only this repo.

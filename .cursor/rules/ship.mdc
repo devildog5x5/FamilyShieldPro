@@ -1,15 +1,30 @@
 ---
-description: Always commit, push, and publish a Hostinger zip after Family Shield Pro changes.
+description: Branch for the work, then always commit, push, PR, and ship from main.
 alwaysApply: true
 ---
 
-# Ship to GitHub
+# Git and ship
 
-After product work, do not wait to be asked:
+Do this without being asked. Work in `C:\Users\rober\Documents\GitHub\FamilyShieldPro` only.
 
-1. Commit on `main` (do not commit `.env`, SQLite, `media/build`, or `installers/`).
-2. `git push origin HEAD`.
-3. Bump `Db::VERSION`, run `build_php_zip.ps1`, and create a GitHub Release with that zip.
-4. Return the zip download URL. Unzip into `public_html`; keep the live `.env`.
+## Branch
+
+Do not commit product work straight to `main`. From latest `origin/main`:
+
+- `feature/short-name` — new behavior
+- `fix/short-name` — a bug
+- `chore/short-name` — rules, docs, tooling
+
+One concern per branch. Push with `git push -u origin HEAD`. Open a PR into `main` with `gh pr create`. Merge it, then delete the branch.
+
+## Commit and push
+
+Every finished slice: commit, then push. Do not leave work only on the machine.
+
+Never commit `.env`, `*.db`, `media/build`, `installers/`, or secrets. No force-push to `main`. No `--no-verify`.
+
+## Release (PHP/product changes only)
+
+After the PR is on `main`: bump `Db::VERSION`, run `build_php_zip.ps1`, `gh release create`, return the zip URL. Unzip into `public_html`; keep the live `.env`.
 
 Do not print live `.env` secrets. Never stamp a request as safe.
