@@ -18,12 +18,15 @@ $phone = $phone ?? Layout::contactPhone();
         <video playsinline preload="none" poster="/static/video/ourcircle-pause.jpg" width="1280" height="720">
           <source src="/static/video/ourcircle-pause.mp4" type="video/mp4">
         </video>
-        <button type="button" class="hero-video-start" aria-label="Play the pause story">
-          <img src="/static/video/ourcircle-pause.jpg" width="1280" height="720" alt="A grandmother at her kitchen table, ready to pause and ask family." />
-          <span class="hero-video-play" aria-hidden="true"></span>
+        <button type="button" class="hero-video-start">
+          <img class="hero-video-poster" src="/static/video/ourcircle-pause.jpg" width="1280" height="720" alt="" />
+          <span class="hero-video-cue">
+            <img class="hero-video-who" src="/static/video/grandma-still.jpg" width="160" height="160" alt="" />
+            <span class="hero-video-play"><span class="hero-video-play-icon" aria-hidden="true"></span> Watch the story</span>
+          </span>
         </button>
       </div>
-      <figcaption>Pause, look at the warning signs, call family. OurCircle never stamps a request as safe or fake.</figcaption>
+      <figcaption>This short story is about a grandma who pauses and calls family before she pays. Click the picture to watch. OurCircle never stamps a request as safe or fake.</figcaption>
     </figure>
   </section>
 
