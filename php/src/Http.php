@@ -150,6 +150,12 @@ final class Http
         return gmdate('Y-m-d\TH:i:s\Z');
     }
 
+    public static function clientIp(): string
+    {
+        $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+        return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
+    }
+
     public static function baseUrl(): string
     {
         $b = rtrim(Env::get('BASE_URL'), '/');

@@ -24,5 +24,6 @@ Layout::start('Forgot password · OurCircle', null, 'auth-page');
     <p><button class="btn ghost wide" type="submit">Reset with recovery code</button></p>
   </form>
   <p><a href="/login">Back to sign in</a></p>
+  <p class="muted">Reset requests pause after several tries from the same place.</p>
 </div>
 <?php Layout::end();

@@ -214,7 +214,7 @@ TXT;
             return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup. Paying does not make a request safe.';
         }
         if (preg_match('/login|password|forgot|sign in/', $low)) {
-            return 'Use /login with the email on your circle. Forgot password sends a one-hour link, or saves it next to the database if mail is not connected. 2FA recovery codes also work. For a person, email ' . $em . '.';
+            return 'Use /login with the email on your circle. After several wrong tries, sign-in pauses for 15 minutes. Forgot password sends a one-hour link, or saves it next to the database if mail is not connected. 2FA recovery codes also work. For a person, email ' . $em . '.';
         }
         if (preg_match('/sms|text|twilio|forward/', $low)) {
             return 'Save your mobile on Account. When texting is connected, invites and “Please call me before I pay” can go by SMS. Reply STOP to opt out. This is not a customer-service hotline.';

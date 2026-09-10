@@ -25,6 +25,7 @@ $needOtp = !empty($needOtp);
   <?php if ($showDemo): ?>
     <p class="muted">Demo circle: family@ourcircle.app / password123</p>
   <?php endif; ?>
+  <p class="muted">After several wrong tries, sign-in pauses for 15 minutes.</p>
   <p class="disclaimer">This application offers guidance, not a guarantee.</p>
   <p><a href="/forgot">Forgot password</a> · <a href="/signup">Start a circle</a></p>
   <p class="muted"><?php echo Layout::legalLinks(); ?></p>

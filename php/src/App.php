@@ -320,13 +320,21 @@ final class App
                 $st->execute([(int) $_SESSION['pending_user_id']]);
                 $pending = $st->fetch();
                 if ($pending) {
-                    $email = (string) $pending['email'];
+                    $email = strtolower((string) $pending['email']);
                     $row = $pending;
+                    $lock = AuthLimit::blocked($this->db, 'totp', $email);
+                    if ($lock !== null) {
+                        Http::flash($lock, 'error');
+                        $this->view('login', ['next' => $next, 'needOtp' => true, 'email' => $email, 'showDemo' => false]);
+                    }
                     $code = preg_replace('/\s+/', '', (string) ($_POST['otp'] ?? '')) ?? '';
                     if (!Totp::verify((string) $row['totp_secret'], $code)) {
+                        AuthLimit::fail($this->db, 'totp', $email);
                         Http::flash('That sign-in code did not match.', 'error');
                         $this->view('login', ['next' => $next, 'needOtp' => true, 'email' => $email, 'showDemo' => false]);
                     }
+                    AuthLimit::clear($this->db, 'totp', $email);
+                    AuthLimit::clear($this->db, 'family', $email);
                     unset($_SESSION['pending_user_id'], $_SESSION['pending_email']);
                     session_regenerate_id(true);
                     $_SESSION['user_id'] = $row['id'];
@@ -337,10 +345,16 @@ final class App
                     Http::redirect($next);
                 }
             }
+            $lock = AuthLimit::blocked($this->db, 'family', $email);
+            if ($lock !== null) {
+                Http::flash($lock, 'error');
+                $this->view('login', ['next' => $next, 'showDemo' => Env::truthy('SHOW_DEMO_LOGIN')]);
+            }
             $st = $this->db->prepare('SELECT * FROM users WHERE lower(email) = ?');
             $st->execute([$email]);
             $row = $st->fetch();
             if (!$row || !password_verify($password, $row['password_hash'])) {
+                AuthLimit::fail($this->db, 'family', $email !== '' ? $email : 'unknown');
                 Http::flash('Email or password did not match.', 'error');
                 $this->view('login', ['next' => $next, 'showDemo' => Env::truthy('SHOW_DEMO_LOGIN')]);
             }
@@ -351,12 +365,20 @@ final class App
                     $_SESSION['pending_email'] = $email;
                     $this->view('login', ['next' => $next, 'needOtp' => true, 'email' => $email, 'showDemo' => false]);
                 }
+                $otpLock = AuthLimit::blocked($this->db, 'totp', $email);
+                if ($otpLock !== null) {
+                    Http::flash($otpLock, 'error');
+                    $this->view('login', ['next' => $next, 'needOtp' => true, 'email' => $email, 'showDemo' => false]);
+                }
                 if (!Totp::verify((string) $row['totp_secret'], $code)) {
+                    AuthLimit::fail($this->db, 'totp', $email);
                     Http::flash('That sign-in code did not match.', 'error');
                     $this->view('login', ['next' => $next, 'needOtp' => true, 'email' => $email, 'showDemo' => false]);
                 }
+                AuthLimit::clear($this->db, 'totp', $email);
                 $_SESSION['totp_ok'] = 1;
             }
+            AuthLimit::clear($this->db, 'family', $email);
             session_regenerate_id(true);
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['totp_ok'] = 1;
@@ -433,6 +455,12 @@ final class App
         if (Http::method() === 'POST') {
             Http::csrfCheck();
             $email = strtolower(trim((string) ($_POST['email'] ?? '')));
+            $lock = AuthLimit::blocked($this->db, 'forgot', $email !== '' ? $email : 'unknown');
+            if ($lock !== null) {
+                Http::flash($lock, 'error');
+                Http::redirect('/forgot');
+            }
+            AuthLimit::fail($this->db, 'forgot', $email !== '' ? $email : 'unknown');
             if ($email !== '' && str_contains($email, '@')) {
                 $st = $this->db->prepare('SELECT * FROM users WHERE lower(email)=?');
                 $st->execute([$email]);
@@ -455,9 +483,16 @@ final class App
         $email = strtolower(trim((string) ($_POST['email'] ?? '')));
         $code = strtolower(trim((string) ($_POST['recovery_code'] ?? '')));
         $password = (string) ($_POST['password'] ?? '');
+        $who = $email !== '' ? $email : 'unknown';
+        $lock = AuthLimit::blocked($this->db, 'recovery', $who);
+        if ($lock !== null) {
+            Http::flash($lock, 'error');
+            Http::redirect('/forgot');
+        }
         $st = $this->db->prepare('SELECT * FROM users WHERE lower(email)=?');
         $st->execute([$email]);
         $row = $st->fetch();
+        $matched = false;
         if ($row && strlen($password) >= 8 && $code !== '') {
             $codes = json_decode((string) $row['recovery_codes'], true) ?: [];
             foreach ($codes as $i => $stored) {
@@ -465,9 +500,16 @@ final class App
                     unset($codes[$i]);
                     $this->db->prepare('UPDATE users SET password_hash=?, recovery_codes=? WHERE id=?')
                         ->execute([password_hash($password, PASSWORD_DEFAULT), json_encode(array_values($codes)), $row['id']]);
+                    $matched = true;
                     break;
                 }
             }
+        }
+        if ($matched) {
+            AuthLimit::clear($this->db, 'recovery', $who);
+            AuthLimit::clear($this->db, 'family', $who);
+        } else {
+            AuthLimit::fail($this->db, 'recovery', $who);
         }
         Http::flash('If that email and recovery code matched, the password is updated. Sign in.');
         Http::redirect('/login');
@@ -537,6 +579,13 @@ final class App
         if (Http::method() === 'POST') {
             Http::csrfCheck();
             $email = strtolower(trim((string) ($_POST['email'] ?? '')));
+            $who = $email !== '' ? $email : 'unknown';
+            $lock = AuthLimit::blocked($this->db, 'admin-forgot', $who);
+            if ($lock !== null) {
+                Http::flash($lock, 'error');
+                Http::redirect('/admin/forgot');
+            }
+            AuthLimit::fail($this->db, 'admin-forgot', $who);
             $op = Db::operatorRow($this->db);
             if ($op && $email !== '' && hash_equals(strtolower((string) $op['email']), $email)) {
                 $token = Db::issueResetToken($this->db, 'operator', (int) $op['id']);
@@ -1097,10 +1146,18 @@ final class App
     {
         $cur = (string) ($_POST['current_password'] ?? '');
         $new = (string) ($_POST['password'] ?? '');
+        $email = strtolower((string) $user['email']);
+        $lock = AuthLimit::blocked($this->db, 'account', $email);
+        if ($lock !== null) {
+            Http::flash($lock, 'error');
+            Http::redirect('/account');
+        }
         if (!password_verify($cur, $user['password_hash'])) {
+            AuthLimit::fail($this->db, 'account', $email);
             Http::flash('Current password did not match.', 'error');
             Http::redirect('/account');
         }
+        AuthLimit::clear($this->db, 'account', $email);
         if (strlen($new) < 8) {
             Http::flash('Use at least 8 characters.', 'error');
             Http::redirect('/account');
@@ -1126,10 +1183,18 @@ final class App
             Http::csrfCheck();
             $code = (string) ($_POST['otp'] ?? '');
             $secret = (string) ($user['totp_pending'] ?: $user['totp_secret']);
+            $email = strtolower((string) $user['email']);
+            $lock = AuthLimit::blocked($this->db, 'totp-setup', $email);
+            if ($lock !== null) {
+                Http::flash($lock, 'error');
+                Http::redirect('/account/2fa/setup');
+            }
             if (!Totp::verify($secret, $code)) {
+                AuthLimit::fail($this->db, 'totp-setup', $email);
                 Http::flash('That 6-digit code did not match. Try again.', 'error');
                 Http::redirect('/account/2fa/setup');
             }
+            AuthLimit::clear($this->db, 'totp-setup', $email);
             $codes = Totp::recoveryCodes();
             $this->db->prepare(
                 'UPDATE users SET totp_secret=?, totp_pending=NULL, totp_enabled=1, recovery_codes=? WHERE id=?'
@@ -1230,15 +1295,24 @@ final class App
                 'stripeReady' => !empty($report['ready']),
                 'helpGrok' => HelpChat::configured(),
                 'helpLog' => HelpChat::readLog(),
+                'authLimit' => AuthLimit::snapshot($this->db),
             ]);
         }
         if ($method === 'POST') {
             Http::csrfCheck();
+            $lock = AuthLimit::blocked($this->db, 'operator', 'operator');
+            if ($lock !== null) {
+                Http::flash($lock, 'error');
+                $this->view('admin-login');
+            }
             $pw = (string) ($_POST['password'] ?? '');
             if (!$this->operatorPasswordOk($pw)) {
+                AuthLimit::fail($this->db, 'operator', 'operator');
                 Http::flash('Operator password did not match.', 'error');
                 $this->view('admin-login');
             }
+            AuthLimit::clear($this->db, 'operator', 'operator');
+            AuthLimit::clear($this->db, 'operator-step', 'operator');
             $_SESSION['admin'] = 1;
             Http::redirect('/admin');
         }
@@ -1256,6 +1330,7 @@ final class App
         'uploads',
         'operators',
         'password_resets',
+        'auth_events',
     ];
 
     private const ADMIN_SECRET_COLS = [
@@ -1264,6 +1339,8 @@ final class App
         'totp_pending',
         'recovery_codes',
         'token_hash',
+        'ip_hash',
+        'id_hash',
     ];
 
     private function requireAdmin(): void
@@ -1441,10 +1518,17 @@ final class App
             Http::flash('Enter a SQL statement.', 'error');
             Http::redirect('/admin/data');
         }
+        $lock = AuthLimit::blocked($this->db, 'operator-step', 'operator');
+        if ($lock !== null) {
+            Http::flash($lock, 'error');
+            Http::redirect('/admin/data');
+        }
         if (!$this->operatorPasswordOk($pw)) {
+            AuthLimit::fail($this->db, 'operator-step', 'operator');
             Http::flash('Operator password did not match. SQL was not run.', 'error');
             Http::redirect('/admin/data');
         }
+        AuthLimit::clear($this->db, 'operator-step', 'operator');
         $one = rtrim($sql, "; \t\n\r");
         if (str_contains($one, ';')) {
             Http::flash('Run one statement at a time.', 'error');
@@ -1516,10 +1600,20 @@ final class App
         Http::csrfCheck();
         $confirm = strtoupper(trim((string) ($_POST['confirm'] ?? '')));
         $pw = (string) ($_POST['password'] ?? '');
-        if ($confirm !== 'FACTORY' || !$this->operatorPasswordOk($pw)) {
+        $lock = AuthLimit::blocked($this->db, 'operator-step', 'operator');
+        if ($lock !== null) {
+            Http::flash($lock, 'error');
+            Http::redirect('/admin');
+        }
+        $pwOk = $this->operatorPasswordOk($pw);
+        if ($confirm !== 'FACTORY' || !$pwOk) {
+            if (!$pwOk) {
+                AuthLimit::fail($this->db, 'operator-step', 'operator');
+            }
             Http::flash('Factory reset was not run. Type FACTORY and enter the operator password.', 'error');
             Http::redirect('/admin');
         }
+        AuthLimit::clear($this->db, 'operator-step', 'operator');
         Db::factoryReset($this->db);
         unset($_SESSION['user_id'], $_SESSION['totp_ok']);
         Http::flash('Database restored to factory settings. Demo circle: family@ourcircle.app / password123.');

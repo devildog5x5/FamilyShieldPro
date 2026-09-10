@@ -6,7 +6,7 @@ final class Db
     public const DEMO_EMAIL = 'family@ourcircle.app';
     public const DEMO_NAME = 'Pat Foster';
     public const DEMO_PASSWORD = 'password123';
-    public const VERSION = '1.3.26';
+    public const VERSION = '1.3.27';
     public const RESET_NOTICE = 'If that email is on file, a one-hour reset link is on the way. When mail is not connected, the link is saved as password-reset.txt next to the database (blocked from the web).';
 
     private static ?string $path = null;
@@ -133,6 +133,7 @@ final class Db
                 created_at TEXT NOT NULL
             );
         SQL);
+        AuthLimit::ensure($db);
         self::ensureUserThemeColumn($db);
         self::ensureCircleStripeColumns($db);
         self::ensureCircleTrialColumn($db);
@@ -234,6 +235,7 @@ final class Db
             'circles',
             'password_resets',
             'operators',
+            'auth_events',
         ];
         $db->exec('PRAGMA foreign_keys = OFF');
         foreach ($tables as $table) {
