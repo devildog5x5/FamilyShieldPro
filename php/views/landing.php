@@ -15,11 +15,11 @@ $phone = $phone ?? Layout::contactPhone();
     </div>
     <figure class="hero-video">
       <div class="hero-video-box">
-        <video playsinline preload="none" poster="/static/video/ourcircle-pause.jpg" width="1280" height="720">
-          <source src="/static/video/ourcircle-pause.mp4" type="video/mp4">
+        <video playsinline preload="metadata" poster="/static/video/ourcircle-pause.jpg?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720">
+          <source src="/static/video/ourcircle-pause.mp4?v=<?= Http::e(Layout::asset()) ?>" type="video/mp4">
         </video>
         <button type="button" class="hero-video-start">
-          <img class="hero-video-poster" src="/static/video/ourcircle-pause.jpg" width="1280" height="720" alt="" />
+          <img class="hero-video-poster" src="/static/video/ourcircle-pause.jpg?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720" alt="" />
           <span class="hero-video-cue">
             <img class="hero-video-who" src="/static/video/grandma-still.jpg" width="160" height="160" alt="" />
           </span>
