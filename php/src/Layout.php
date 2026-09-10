@@ -143,6 +143,7 @@ final class Layout
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-focus.js?v=' . Http::e(self::asset()) . '"></script>';
+        echo '<script src="/static/js/fsp-video.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '</body></html>';
     }
 

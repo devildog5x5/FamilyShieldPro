@@ -14,9 +14,15 @@ $phone = $phone ?? Layout::contactPhone();
       <p class="muted">Then Family yearly $119.99 or $14.99/month. You keep what you entered. We do not sell it.</p>
     </div>
     <figure class="hero-video">
-      <video controls playsinline preload="metadata" poster="/static/video/ourcircle-pause.jpg" width="1280" height="720">
-        <source src="/static/video/ourcircle-pause.mp4" type="video/mp4">
-      </video>
+      <div class="hero-video-box">
+        <video playsinline preload="none" poster="/static/video/ourcircle-pause.jpg" width="1280" height="720">
+          <source src="/static/video/ourcircle-pause.mp4" type="video/mp4">
+        </video>
+        <button type="button" class="hero-video-start" aria-label="Play the pause story">
+          <img src="/static/video/ourcircle-pause.jpg" width="1280" height="720" alt="A grandmother at her kitchen table, ready to pause and ask family." />
+          <span class="hero-video-play" aria-hidden="true"></span>
+        </button>
+      </div>
       <figcaption>Pause, look at the warning signs, call family. OurCircle never stamps a request as safe or fake.</figcaption>
     </figure>
   </section>

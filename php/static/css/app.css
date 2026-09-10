@@ -168,15 +168,64 @@ img { max-width: 100%; height: auto; }
 .hero-video {
   margin: 0;
 }
-.hero-video video {
-  width: 100%;
-  height: auto;
-  display: block;
+.hero-video-box {
+  position: relative;
   border-radius: var(--radius);
-  background: #1c2a2a;
+  overflow: hidden;
+  background: #243030;
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
+  aspect-ratio: 16 / 9;
 }
+.hero-video video,
+.hero-video-start img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.hero-video video {
+  background: #243030;
+}
+.hero-video-start {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+}
+.hero-video-start:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: -3px;
+}
+.hero-video-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 76px;
+  height: 76px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(15, 111, 106, 0.94);
+  box-shadow: 0 10px 28px rgba(28, 42, 42, 0.28);
+}
+.hero-video-play::after {
+  content: "";
+  position: absolute;
+  left: 30px;
+  top: 24px;
+  border-style: solid;
+  border-width: 14px 0 14px 24px;
+  border-color: transparent transparent transparent #fff;
+}
+.hero-video-start:hover .hero-video-play {
+  background: var(--teal-hover);
+  transform: translate(-50%, -50%) scale(1.04);
+}
+.hero-video.is-playing .hero-video-start { display: none; }
 .hero-video figcaption {
   margin: 10px 4px 0;
   font-size: 0.95rem;
