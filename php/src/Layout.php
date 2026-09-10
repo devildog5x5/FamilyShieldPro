@@ -62,10 +62,24 @@ final class Layout
         }
     }
 
+    public static function brand(): void
+    {
+        echo '<a class="brand" href="/">';
+        echo '<img src="/static/img/logo.png" alt="OurCircle" />';
+        echo '<strong>OurCircle</strong>';
+        echo '</a>';
+    }
+
     public static function appHeader(array $user): void
     {
         echo '<div class="wrap"><header class="app-header">';
-        echo '<a class="brand" href="' . Http::e(Http::baseUrl()) . '"><img src="/static/img/logo.png" alt="Family Shield Pro" /><div><strong>OurCircle</strong><span>' . Http::e($user['name'] ?? '') . '</span></div></a>';
+        echo '<div class="brand-lockup">';
+        self::brand();
+        $who = trim((string) ($user['name'] ?? ''));
+        if ($who !== '') {
+            echo '<span class="brand-who">' . Http::e($who) . '</span>';
+        }
+        echo '</div>';
         echo '<nav class="nav">';
         foreach ([
             '/home' => 'Check',
@@ -122,9 +136,9 @@ final class Layout
 
     public static function end(?array $user = null): void
     {
-        echo '<div class="wrap"><p class="disclaimer">This application offers guidance, not a guarantee. '
+        echo '<div class="wrap"><p class="disclaimer"><span class="copy">© 2026 Family Shield Pro. All rights reserved.</span> This application offers guidance, not a guarantee. '
             . self::legalLinks()
-            . ' <span class="build">Family Shield Pro ' . Http::e(self::asset()) . '</span><a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
+            . ' <span class="build">' . Http::e(self::asset()) . '</span><a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
         self::chat();
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '"></script>';
@@ -169,7 +183,7 @@ final class Layout
     public static function publicNav(): void
     {
         echo '<div class="wrap"><header class="site-header">';
-        echo '<a class="brand" href="' . Http::e(Http::baseUrl()) . '"><img src="/static/img/logo.png" alt="Family Shield Pro" /><div><strong>OurCircle</strong><span>Family Shield Pro</span></div></a>';
+        self::brand();
         echo '<nav class="nav">';
         echo '<a href="#lookup">Look it up</a>';
         echo '<a href="#contact">Contact</a>';

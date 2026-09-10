@@ -50,3 +50,5 @@ If you already have a live SQLite file, **back it up first**. This schema is not
 ## Support
 
 CustomerService@FamilyShieldPro.com
+
+Copyright © 2026 Family Shield Pro. All rights reserved.

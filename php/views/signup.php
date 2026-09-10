@@ -3,7 +3,7 @@ Layout::start('Start a circle · OurCircle', null, 'auth-page');
 $plan = $plan ?? '';
 ?>
 <div class="auth-card">
-  <a class="brand" href="<?= Http::e(Http::baseUrl()) ?>"><img src="/static/img/logo.png" alt="" /><div><strong>OurCircle</strong><span>Start a circle</span></div></a>
+  <?php Layout::brand(); ?>
   <p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p>
   <?php Layout::flash(); ?>
   <form method="post">

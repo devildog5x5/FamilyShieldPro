@@ -86,9 +86,10 @@ img { max-width: 100%; height: auto; }
   padding: 16px 0;
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-.brand img { width: 56px; height: 56px; border-radius: 50%; background: var(--brand-img-bg); }
-.brand strong { display: block; font-size: 1.25rem; }
-.brand span { color: var(--muted); font-size: 0.9rem; }
+.brand img { width: 56px; height: 56px; border-radius: 50%; background: var(--brand-img-bg); flex-shrink: 0; }
+.brand strong { display: block; font-size: 2rem; line-height: 1.1; letter-spacing: -0.03em; }
+.brand-lockup { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand-who { color: var(--muted); font-size: 0.95rem; }
 .nav { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .btn {
   display: inline-flex;
@@ -295,6 +296,7 @@ textarea.stripe-log {
 .auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; position: relative; }
 .app-bare { position: relative; min-height: 100vh; }
 .auth-card { width: min(440px, 100%); padding: 28px; }
+.auth-card .brand { margin-bottom: 16px; }
 .disclaimer { font-size: 0.95rem; color: var(--muted); }
 .build { white-space: nowrap; }
 .op-hatch {
@@ -502,5 +504,6 @@ details.more label { margin-top: 8px; }
 @media (max-width: 860px) {
   .hero, .grid-3, .grid-2 { grid-template-columns: 1fr; }
   .brand img { width: 48px; height: 48px; }
+  .brand strong { font-size: 1.65rem; }
   .stat-grid { grid-template-columns: 1fr 1fr; }
 }

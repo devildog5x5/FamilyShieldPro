@@ -3,7 +3,7 @@ Layout::start('Join a circle · OurCircle', null, 'auth-page');
 $inv = $invite;
 ?>
 <div class="auth-card">
-  <a class="brand" href="<?= Http::e(Http::baseUrl()) ?>"><img src="/static/img/logo.png" alt="" /><div><strong>OurCircle</strong><span>Join a circle</span></div></a>
+  <?php Layout::brand(); ?>
   <h1>Join this family circle</h1>
   <p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p>
   <?php Layout::flash(); ?>

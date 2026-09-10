@@ -5,7 +5,7 @@ $showDemo = !empty($showDemo);
 $needOtp = !empty($needOtp);
 ?>
 <div class="auth-card">
-  <a class="brand" href="<?= Http::e(Http::baseUrl()) ?>"><img src="/static/img/logo.png" alt="" /><div><strong>OurCircle</strong><span>Sign in</span></div></a>
+  <?php Layout::brand(); ?>
   <?php Layout::flash(); ?>
   <form method="post">
     <?= Http::csrfField() ?>
