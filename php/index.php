@@ -28,6 +28,7 @@ if (str_starts_with($path, '/static/')) {
             'webp' => 'image/webp',
             'ico' => 'image/x-icon',
             'svg' => 'image/svg+xml',
+            'mp4' => 'video/mp4',
         ];
         header('Content-Type: ' . ($types[$ext] ?? 'application/octet-stream'));
         header('Cache-Control: public, max-age=86400');
