@@ -138,7 +138,7 @@ final class Layout
     {
         echo '<div class="wrap"><p class="disclaimer"><span class="copy">© 2026 Family Shield Pro. All rights reserved.</span> This application offers guidance, not a guarantee. '
             . self::legalLinks()
-            . ' <span class="build">' . Http::e(self::asset()) . '</span><a class="op-hatch" href="/admin/login" tabindex="-1" aria-hidden="true"></a></p></div>';
+            . ' <span class="build">' . Http::e(self::asset()) . '</span></p></div>';
         self::chat();
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
         echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '"></script>';
