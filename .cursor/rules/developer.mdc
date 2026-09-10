@@ -8,6 +8,7 @@ alwaysApply: true
 - Pull `main` before branching. Keep the PR small and about one thing.
 - Match existing PHP style. Do not add comments or docs the user did not need.
 - Family-readable copy. Guidance, not a guarantee. Never a fake/safe stamp.
+- Families may not be tech-savvy. Every control should be simple and obvious: say what it does in plain words, show a picture when it helps, never hide the next step.
 - Login, billing, and privacy changes stay conservative: no user enumeration, no autoplay video, keep trial personal data readable, do not sell it.
 - After UI changes, verify the flow (browser if possible). Check other pages that share the same state.
 - Hostinger zip is the contents of `php/` at the public_html root, never a nested folder.
