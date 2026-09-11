@@ -24,23 +24,7 @@ Get-ChildItem -Path (Join-Path $Stage "data") -Filter "*.db" -ErrorAction Silent
 Get-ChildItem -Path (Join-Path $Stage "data") -Filter "*.db-*" -ErrorAction SilentlyContinue | Remove-Item -Force
 $uploads = Join-Path $Stage "data\uploads"
 if (Test-Path $uploads) { Remove-Item -Recurse -Force $uploads }
-
-$readme = @"
-Family Shield Pro (OurCircle) — Hostinger
-Build: $Version
-=========================================
-1. Unzip ALL of these files into public_html (not a subfolder).
-2. Copy .env.example to .env
-3. Set APP_SECRET (long random string) and BASE_URL=https://yourdomain.com
-4. hPanel → PHP Configuration: PHP 8.2 or 8.3, enable pdo_sqlite
-5. Open the site. Demo login (if SHOW_DEMO_LOGIN=1): family@ourcircle.app / password123
-6. Set OPERATOR_EMAIL and OPERATOR_PASSWORD. Forgot password for the circle (/forgot) and operator (/admin/forgot) emails a link, or writes data/password-reset.txt if mail is off.
-7. Back up any existing data/*.db before replacing files on a live site.
-8. Stripe test payments: see STRIPE.md. Webhook: https://yourdomain.com/billing/webhook
-
-SQLite is created at data/ourcircle.db (blocked from the web by .htaccess).
-"@
-Set-Content -Path (Join-Path $Stage "HOSTINGER.txt") -Value $readme -Encoding UTF8
+Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $Stage "HOSTINGER.txt")
 
 Get-ChildItem -Path $Out -Filter "FamilyShieldPro-PHP*.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
 Get-ChildItem -Path $Stage -Force | Compress-Archive -DestinationPath $Zip -Force
@@ -48,3 +32,4 @@ Get-ChildItem -Path $Stage -Force | Compress-Archive -DestinationPath $Zip -Forc
 Write-Host "Built v$Version"
 Write-Host "  $Zip"
 Write-Host ("Size {0:N1} KB" -f ((Get-Item $Zip).Length / 1KB))
+Write-Host "Hostinger steps: deploy\HOSTINGER.txt (not in the zip)"
