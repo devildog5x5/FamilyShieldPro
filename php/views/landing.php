@@ -26,7 +26,7 @@ $phone = $phone ?? Layout::contactPhone();
           <span class="hero-video-play"><span class="hero-video-play-icon" aria-hidden="true"></span> Watch the story</span>
         </button>
       </div>
-      <figcaption>This short story is about a grandma who pauses and calls family before she pays. Click the picture to watch. A calm voice tells the story. OurCircle never stamps a request as safe or fake.</figcaption>
+      <figcaption>This short story is about a grandma who pauses and calls family before she pays. Click the picture to watch. She tells it in her own words. OurCircle never stamps a request as safe or fake.</figcaption>
     </figure>
   </section>
 
