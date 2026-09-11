@@ -222,7 +222,7 @@ img { max-width: 100%; height: auto; }
   flex: 0 0 88px;
   border-radius: 50%;
   object-fit: cover;
-  object-position: center 18%;
+  object-position: center center;
   border: 3px solid #fff;
   box-shadow: 0 8px 20px rgba(16, 22, 22, 0.28);
   background: #d7cfc4;
