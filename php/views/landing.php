@@ -21,7 +21,7 @@ $phone = $phone ?? Layout::contactPhone();
         <button type="button" class="hero-video-start">
           <img class="hero-video-poster" src="/static/video/ourcircle-pause.jpg?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720" alt="" />
           <span class="hero-video-cue">
-            <img class="hero-video-who" src="/static/video/grandma-still.jpg" width="160" height="160" alt="" />
+            <img class="hero-video-who" src="/static/video/grandma-still.jpg?v=<?= Http::e(Layout::asset()) ?>" width="160" height="160" alt="" />
           </span>
           <span class="hero-video-play"><span class="hero-video-play-icon" aria-hidden="true"></span> Watch the story</span>
         </button>
