@@ -212,8 +212,9 @@ img { max-width: 100%; height: auto; }
 }
 .hero-video-cue {
   position: absolute;
-  left: 12px;
-  top: 12px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
 }
 .hero-video-who {
@@ -222,6 +223,7 @@ img { max-width: 100%; height: auto; }
   flex: 0 0 88px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: 42% 18%;
   border: 3px solid #fff;
   box-shadow: 0 8px 20px rgba(16, 22, 22, 0.28);
   background: #d7cfc4;
