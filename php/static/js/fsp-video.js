@@ -9,7 +9,7 @@
     wrap.classList.add("is-playing");
     video.muted = false;
     video.defaultMuted = false;
-    video.volume = 1;
+    video.volume = 0.5;
     video.setAttribute("controls", "controls");
     var p = video.play();
     if (p && typeof p.catch === "function") {
