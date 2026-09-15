@@ -38,16 +38,38 @@ final class Layout
     public static function start(string $title, ?array $user = null, string $bodyClass = ''): void
     {
         $title = $title !== '' ? $title : 'OurCircle';
+        if (!str_contains($title, 'OurCircle') && !str_contains($title, 'Family Shield Pro')) {
+            $title .= ' · OurCircle';
+        }
         $v = self::asset();
         $base = Http::baseUrl();
+        $url = $base . Http::path();
         $mode = self::theme($user);
         $htmlClass = $mode === 'dark' ? ' class="dark"' : '';
+        $seo = self::seo();
+        $img = $base . '/static/video/ourcircle-pause.jpg';
         echo '<!DOCTYPE html><html lang="en"' . $htmlClass . '><head><meta charset="UTF-8" />';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
         echo '<title>' . Http::e($title) . '</title>';
+        echo '<meta name="description" content="' . Http::e($seo['description']) . '" />';
+        echo '<meta name="robots" content="' . Http::e($seo['robots']) . '" />';
+        echo '<meta name="author" content="Family Shield Pro" />';
         echo '<meta name="application-name" content="Family Shield Pro ' . Http::e($v) . '" />';
-        echo '<link rel="canonical" href="' . Http::e($base . Http::path()) . '" />';
+        echo '<meta name="theme-color" content="#0f6f6a" />';
+        echo '<link rel="canonical" href="' . Http::e($url) . '" />';
         echo '<link rel="icon" type="image/png" href="/static/img/logo.png" />';
+        echo '<meta property="og:site_name" content="OurCircle" />';
+        echo '<meta property="og:type" content="' . Http::e($seo['og_type']) . '" />';
+        echo '<meta property="og:locale" content="en_US" />';
+        echo '<meta property="og:title" content="' . Http::e($title) . '" />';
+        echo '<meta property="og:description" content="' . Http::e($seo['description']) . '" />';
+        echo '<meta property="og:url" content="' . Http::e($url) . '" />';
+        echo '<meta property="og:image" content="' . Http::e($img) . '" />';
+        echo '<meta property="og:image:alt" content="OurCircle — Pause. Ask family. Then pay." />';
+        echo '<meta name="twitter:card" content="summary_large_image" />';
+        echo '<meta name="twitter:title" content="' . Http::e($title) . '" />';
+        echo '<meta name="twitter:description" content="' . Http::e($seo['description']) . '" />';
+        echo '<meta name="twitter:image" content="' . Http::e($img) . '" />';
         echo '<meta name="color-scheme" content="' . ($mode === 'dark' ? 'dark' : 'light') . '" />';
         echo '<meta name="csrf-token" content="' . Http::e(Http::csrfToken()) . '" />';
         echo '<script src="/static/js/fsp-theme.js?v=' . Http::e($v) . '"></script>';
@@ -96,6 +118,59 @@ final class Layout
         echo '</nav></header></div>';
         echo '<div class="wrap"><p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p></div>';
         self::trialBanner($user);
+    }
+
+    private static function seo(): array
+    {
+        $path = Http::path();
+        $key = '/';
+        if ($path !== '/' && $path !== '') {
+            $key = $path;
+            if (str_starts_with($path, '/join/')) {
+                $key = '/join';
+            } elseif (str_starts_with($path, '/check')) {
+                $key = '/check';
+            } elseif (str_starts_with($path, '/admin')) {
+                $key = '/admin';
+            } elseif (str_starts_with($path, '/reset')) {
+                $key = '/reset';
+            } elseif (str_starts_with($path, '/account')) {
+                $key = '/account';
+            } elseif (str_starts_with($path, '/trusted')) {
+                $key = '/trusted';
+            } elseif (str_starts_with($path, '/billing')) {
+                $key = '/billing';
+            } elseif (str_starts_with($path, '/circle')) {
+                $key = '/circle';
+            } elseif (str_starts_with($path, '/trial')) {
+                $key = '/trial';
+            }
+        }
+        $index = in_array($key, ['/', '/signup', '/login', '/forgot', '/privacy', '/terms'], true);
+        $copy = [
+            '/' => 'OurCircle is a family pause before you send money, gift cards, or crypto. Paste a sketchy text, read warning signs, and call someone you trust. Guidance, not a guarantee.',
+            '/signup' => 'Start a 14-day OurCircle trial for your household. Up to five people, a trusted list, and call-me-before-I-pay. We do not stamp a request as safe.',
+            '/login' => 'Sign in to your OurCircle family. Pause together and look at warning signs before anyone pays. Guidance, not a guarantee.',
+            '/forgot' => 'Reset your OurCircle password. If that email is on file, we send a one-hour link. We never say whether the email matches.',
+            '/privacy' => 'Privacy Policy for Family Shield Pro (OurCircle). We do not sell people’s information. You keep what you entered if a trial ends.',
+            '/terms' => 'Terms & Conditions for OurCircle. This application offers guidance, not a guarantee. We never stamp a request as safe.',
+            '/join' => 'Join a family circle on OurCircle. Pause, look at warning signs, and call someone you trust before anyone pays.',
+            '/reset' => 'Choose a new OurCircle password. Use the one-hour link from email, or the file next to the database if mail is off.',
+            '/home' => 'Paste a text, call, or prize ask into OurCircle. Read warning signs with your family. Not a stamp that it is safe or fake.',
+            '/check' => 'Look at this request with your OurCircle family. Warning signs, notes, and call-me — never a safe stamp.',
+            '/circle' => 'Your OurCircle household: invite up to five people, send a call-me, and pause together before anyone pays.',
+            '/trusted' => 'Save the real numbers and websites for banks, doctors, and family. OurCircle compares a message to this list, not to a stranger in the text.',
+            '/report' => 'Calm next steps if money or passwords already went out: report fraud, freeze cards, and tell the people who can stop a payment.',
+            '/billing' => 'Family monthly $14.99 or yearly $119.99 after a 14-day trial. Paying does not make a request safe. You keep what you entered.',
+            '/account' => 'Your OurCircle account: name, email, mobile for call-me, appearance, and optional 2FA.',
+            '/trial' => 'Your 14-day OurCircle trial has ended. You can still view the trusted list and past checks. Pay to check new requests.',
+            '/admin' => 'Family Shield Pro operator console. Sign-in is for site operators only.',
+        ];
+        return [
+            'description' => $copy[$key] ?? 'OurCircle is a trusted family circle: pause, read warning signs, call someone you trust. Guidance, not a guarantee. Never a safe stamp.',
+            'robots' => $index ? 'index, follow' : 'noindex, nofollow',
+            'og_type' => $key === '/' ? 'website' : 'article',
+        ];
     }
 
     public static function trialBanner(array $user): void
