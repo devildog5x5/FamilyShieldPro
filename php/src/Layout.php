@@ -24,10 +24,6 @@ final class Layout
 
     public static function theme(?array $user = null): string
     {
-        $u = strtolower(trim((string) ($user['theme'] ?? '')));
-        if ($u === 'dark' || $u === 'light') {
-            return $u;
-        }
         $s = strtolower(trim((string) ($_SESSION['theme'] ?? '')));
         if ($s === 'dark' || $s === 'light') {
             return $s;

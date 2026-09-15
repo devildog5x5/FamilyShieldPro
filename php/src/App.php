@@ -274,26 +274,10 @@ final class App
             Http::redirect('/');
         }
         $_SESSION['theme'] = $mode;
-        if ($user) {
-            $this->db->prepare('UPDATE users SET theme=? WHERE id=?')->execute([$mode, $user['id']]);
-        }
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
             Http::json(['ok' => true, 'theme' => $mode]);
         }
         Http::redirect('/');
-    }
-
-    private function rememberTheme(array $user): void
-    {
-        $saved = strtolower(trim((string) ($user['theme'] ?? '')));
-        if ($saved === 'dark' || $saved === 'light') {
-            $_SESSION['theme'] = $saved;
-            return;
-        }
-        $session = strtolower(trim((string) ($_SESSION['theme'] ?? '')));
-        if ($session === 'dark' || $session === 'light') {
-            $this->db->prepare('UPDATE users SET theme=? WHERE id=?')->execute([$session, $user['id']]);
-        }
     }
 
     private function landing(?array $user): never
@@ -339,7 +323,6 @@ final class App
                     session_regenerate_id(true);
                     $_SESSION['user_id'] = $row['id'];
                     $_SESSION['totp_ok'] = 1;
-                    $this->rememberTheme($row);
                     $this->db->prepare('UPDATE users SET status=?, last_seen_at=? WHERE id=?')
                         ->execute(['access', Http::now(), $row['id']]);
                     Http::redirect($next);
@@ -382,7 +365,6 @@ final class App
             session_regenerate_id(true);
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['totp_ok'] = 1;
-            $this->rememberTheme($row);
             $this->db->prepare('UPDATE users SET status=?, last_seen_at=? WHERE id=?')
                 ->execute(['access', Http::now(), $row['id']]);
             Http::redirect($next);
