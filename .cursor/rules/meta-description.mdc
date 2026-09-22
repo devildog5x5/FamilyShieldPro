@@ -9,14 +9,16 @@ Every shippable HTML page must include in `<head>`:
 
 ```html
 <meta name="description" content="Descriptive, keyword-rich text that talks about the page content goes here.">
+<meta name="keywords" content="comma, separated, keywords, for, this, page">
 ```
 
 Rules:
 
-- Write real page-specific copy (product name + what this page does + plain keywords).
-- Prefer ~120–160 characters; never leave the placeholder text.
-- Public marketing pages: indexable copy. Signed-in /admin/console pages: still include a description (often with `noindex`).
-- If the app uses a shared layout/`seo()` helper, put the descriptions there — do not skip pages that go through that layout.
-- When adding a new view or route, add its description in the same change.
+- Write real page-specific **description** copy (product name + what this page does).
+- Always include a visible **`meta name="keywords"`** tag with comma-separated terms (product, features, page topic).
+- Prefer description ~120–160 characters; never leave placeholder text.
+- Public marketing pages: indexable. Signed-in /admin pages: still include both tags (often with `noindex`).
+- Shared layout/`seo()` helpers must supply both `description` and `keywords` per route.
+- When adding a new view or route, add description + keywords in the same change.
 
 Family Shield Pro: keep the “guidance, not a guarantee / never a safe stamp” voice in public descriptions.

@@ -48,6 +48,7 @@ final class Layout
         echo '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
         echo '<title>' . Http::e($title) . '</title>';
         echo '<meta name="description" content="' . Http::e($seo['description']) . '" />';
+        echo '<meta name="keywords" content="' . Http::e($seo['keywords']) . '" />';
         echo '<meta name="robots" content="' . Http::e($seo['robots']) . '" />';
         echo '<meta name="author" content="Family Shield Pro" />';
         echo '<meta name="application-name" content="Family Shield Pro ' . Http::e($v) . '" />';
@@ -143,6 +144,7 @@ final class Layout
             }
         }
         $index = in_array($key, ['/', '/signup', '/login', '/forgot', '/privacy', '/terms'], true);
+        $baseKw = 'Family Shield Pro, OurCircle, family scam protection, scam text pause, gift card scam, crypto scam, trusted list, call me before I pay';
         $copy = [
             '/' => 'Family Shield Pro OurCircle: family scam pause before money, gift cards, or crypto. Paste a sketchy text, read warning signs, check your trusted list, and call someone you trust. Guidance, not a guarantee.',
             '/signup' => 'Start a Family Shield Pro OurCircle 14-day trial. Family circle of up to five, trusted contacts list, and call-me-before-I-pay for scam texts and urgent payment asks. Not a safe stamp.',
@@ -162,8 +164,28 @@ final class Layout
             '/trial' => 'Your Family Shield Pro 14-day OurCircle trial ended. Trusted list and past checks stay readable. Pay to check new scam texts, invite family, and use call-me.',
             '/admin' => 'Family Shield Pro operator console for site owners: manage circles, billing overrides, and help tools. Not a public family login.',
         ];
+        $keywords = [
+            '/' => $baseKw . ', elder fraud prevention, family circle app, pause before you pay',
+            '/signup' => $baseKw . ', OurCircle signup, 14-day trial, start a family circle',
+            '/login' => $baseKw . ', OurCircle login, sign in, family account',
+            '/forgot' => $baseKw . ', password reset, forgot password',
+            '/privacy' => $baseKw . ', privacy policy, data protection',
+            '/terms' => $baseKw . ', terms and conditions, terms of use',
+            '/join' => $baseKw . ', join family circle, invite link',
+            '/reset' => $baseKw . ', reset password, new password',
+            '/home' => $baseKw . ', check a text, scam warning signs, paste suspicious message',
+            '/check' => $baseKw . ', review request, warning signs, call-me alert',
+            '/circle' => $baseKw . ', family members, household invite, call-me',
+            '/trusted' => $baseKw . ', trusted contacts, verified numbers, bank phone list',
+            '/report' => $baseKw . ', report fraud, recover from scam, freeze cards',
+            '/billing' => $baseKw . ', pricing, Family monthly, Family yearly, subscribe',
+            '/account' => $baseKw . ', account settings, 2FA, profile',
+            '/trial' => $baseKw . ', trial ended, subscribe, continue OurCircle',
+            '/admin' => 'Family Shield Pro, operator console, admin, site owner',
+        ];
         return [
             'description' => $copy[$key] ?? 'Family Shield Pro OurCircle is a trusted family circle for scam texts, prizes, and urgent payment asks: pause, read warning signs, call someone you trust. Guidance, not a guarantee.',
+            'keywords' => $keywords[$key] ?? $baseKw,
             'robots' => $index ? 'index, follow' : 'noindex, nofollow',
             'og_type' => $key === '/' ? 'website' : 'article',
         ];
