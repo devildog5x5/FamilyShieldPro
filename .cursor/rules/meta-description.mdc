@@ -1,0 +1,22 @@
+---
+description: Every HTML page must include a keyword-rich meta description in head.
+alwaysApply: true
+---
+
+# Meta description (required)
+
+Every shippable HTML page must include in `<head>`:
+
+```html
+<meta name="description" content="Descriptive, keyword-rich text that talks about the page content goes here.">
+```
+
+Rules:
+
+- Write real page-specific copy (product name + what this page does + plain keywords).
+- Prefer ~120–160 characters; never leave the placeholder text.
+- Public marketing pages: indexable copy. Signed-in /admin/console pages: still include a description (often with `noindex`).
+- If the app uses a shared layout/`seo()` helper, put the descriptions there — do not skip pages that go through that layout.
+- When adding a new view or route, add its description in the same change.
+
+Family Shield Pro: keep the “guidance, not a guarantee / never a safe stamp” voice in public descriptions.
