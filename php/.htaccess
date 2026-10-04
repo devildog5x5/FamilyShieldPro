@@ -1,6 +1,23 @@
 RewriteEngine On
 RewriteBase /
+AddType application/manifest+json .webmanifest
+AddType image/x-icon .ico
+AddType text/plain .txt
 
+# Never serve source archives, build scripts, secrets, or dev files.
+<FilesMatch "(?i)\.(zip|ps1|sql|bak|log|sh|sqlite|db|md|ya?ml|ini|dist|apk|exe|msi|dmg|7z|phar|tgz|gz)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^\.(env|git|gitignore|gitattributes|htpasswd)">
+  Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^(composer\.(json|lock)|package(-lock)?\.json|Dockerfile|Makefile)$">
+  Require all denied
+</FilesMatch>
+
+RewriteRule "(^|/)\.(env|git)" - [F,L]
+RewriteRule "(^|/)(composer\.(json|lock)|package(-lock)?\.json|Dockerfile|Makefile)$" - [F,L]
+RewriteRule \.(zip|ps1|sql|bak|log|sh|sqlite|db|md|ya?ml|ini|dist|apk|exe|msi|dmg|7z|phar|tgz|gz)$ - [F,L]
 RewriteRule ^(\.env|bootstrap\.php)$ - [F,L]
 RewriteRule ^(src|views|data)(/|$) - [F,L]
 RewriteRule \.db$ - [F,L]

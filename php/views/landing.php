@@ -1,11 +1,9 @@
 <?php
 Layout::start('OurCircle — Pause. Ask family. Then pay.');
-Layout::publicNav();
 $email = $email ?? Layout::supportEmail();
 $phone = $phone ?? Layout::contactPhone();
 ?>
 <div class="wrap home">
-  <p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p>
   <section class="hero">
     <div>
       <h1>A family pause before you send a dime.</h1>

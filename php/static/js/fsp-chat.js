@@ -15,7 +15,12 @@
     var div = document.createElement("div");
     div.textContent = text == null ? "" : String(text);
     var html = div.innerHTML;
-    html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
+    html = html.replace(/(https?:\/\/[^\s<]+)/g, function (url) {
+      if (/github\.com|gitlab\.com|bitbucket\.org|sourceforge|\.zip\b|\.apk\b|\.exe\b|\.msi\b|\.ps1\b|releases\/download/i.test(url)) {
+        return "";
+      }
+      return '<a href="' + url + '">' + url + "</a>";
+    });
     html = html.replace(
       /(^|[\s>])([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})/g,
       '$1<a href="mailto:$2">$2</a>'

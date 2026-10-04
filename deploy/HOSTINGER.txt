@@ -4,7 +4,11 @@ This file is for you. It is not put in the public_html zip.
 
 1. Unzip ALL files from FamilyShieldPro-PHP-<version>.zip into public_html (not a subfolder).
 2. Copy .env.example to .env
-3. Set APP_SECRET (long random string) and BASE_URL=https://yourdomain.com
+3. Set APP_SECRET (long random string) and BASE_URL=https://familyshieldpro.com
+   Optional search tags (paste the code only, or the whole meta tag; leave blank to omit):
+   GOOGLE_SITE_VERIFICATION=
+   BING_SITE_VERIFICATION=
+   sandbox.familyshieldpro.com now returns 404. Do not set BASE_URL to it.
 4. hPanel → PHP Configuration: PHP 8.2 or 8.3, enable pdo_sqlite
 5. Open the site. Demo login (if SHOW_DEMO_LOGIN=1): family@ourcircle.app / password123
 6. Set OPERATOR_EMAIL and OPERATOR_PASSWORD. Forgot password for the circle (/forgot) and operator (/admin/forgot) emails a link, or writes data/password-reset.txt if mail is off.

@@ -3,9 +3,7 @@ Layout::start('Join a circle · OurCircle', null, 'auth-page');
 $inv = $invite;
 ?>
 <div class="auth-card">
-  <?php Layout::brand(); ?>
   <h1>Join this family circle</h1>
-  <p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p>
   <?php Layout::flash(); ?>
   <p>Invite for <?= Http::e($inv['email']) ?></p>
   <?php if (!empty($trialEnded)): ?>

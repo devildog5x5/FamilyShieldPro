@@ -518,7 +518,7 @@ final class Billing
         if ($base === '') {
             $missing[] = 'BASE_URL in .env';
         } elseif (str_contains($base, '127.0.0.1') || str_contains($base, 'localhost')) {
-            $warn[] = 'BASE_URL is localhost. Stripe cannot send webhooks here. Sandbox should be https://sandbox.familyshieldpro.com';
+            $warn[] = 'BASE_URL is localhost. Stripe cannot send webhooks here. Use https://familyshieldpro.com (sandbox.familyshieldpro.com now returns 404).';
         } elseif (!str_starts_with(strtolower($base), 'https://')) {
             $warn[] = 'BASE_URL is not https. Checkout return URLs should be https.';
         } else {
@@ -728,7 +728,7 @@ final class Billing
         }
         $base = $cfg['base_url'];
         if ($base === '' || str_contains($base, '127.0.0.1') || str_contains($base, 'localhost')) {
-            $base = 'https://sandbox.familyshieldpro.com';
+            $base = 'https://familyshieldpro.com';
         }
         $success = $base . '/billing/success?session_id={CHECKOUT_SESSION_ID}';
         $webhookUrl = $base . '/billing/webhook';

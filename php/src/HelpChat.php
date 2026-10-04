@@ -162,6 +162,9 @@ final class HelpChat
         if ($text === '') {
             return '';
         }
+        if (preg_match('/github\.com|gitlab\.com|bitbucket\.org|sourceforge|source code|releases\/download|\.zip\b|\.apk\b|\.exe\b|\.msi\b|installer/i', $text)) {
+            return 'Family Shield Pro does not offer a code or app download on this site. For a person, email ' . Layout::supportEmail() . '.';
+        }
         if (preg_match('/\b(this is safe|that is safe|it is safe|not a scam|isn\'t a scam|is legitimate|is legit|go ahead and (pay|send)|you (can|should) (pay|send|wire))\b/i', $text)) {
             $em = Layout::supportEmail();
             return 'OurCircle cannot tell you that a request is safe. Pause. Check your trusted list. Call someone in your circle. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. For a person, email ' . $em . '.';
@@ -181,6 +184,7 @@ Hard rules:
 - Never tell someone to send money, crypto, gift cards, passwords, or account information.
 - The pause rule: never send those until the request is independently verified through a number or site the family already trusts — not a number or link inside the suspicious message.
 - Paying for a plan does not make a request safe. This application offers guidance, not a guarantee.
+- Never mention GitHub, a repository, source code, an APK, an installer, or a release download. This site does not offer those.
 
 Product facts (do not invent others):
 - New circles get a 14-day trial. Then Family monthly is \$14.99 or Family yearly is \$119.99 for up to five people.

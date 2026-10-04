@@ -8,6 +8,7 @@ require $root . '/src/Db.php';
 require $root . '/src/Mail.php';
 require $root . '/src/Analyzer.php';
 require $root . '/src/Totp.php';
+require $root . '/src/Guides.php';
 require $root . '/src/Layout.php';
 require $root . '/src/Billing.php';
 require $root . '/src/Trial.php';

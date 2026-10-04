@@ -43,7 +43,9 @@ final class Layout
         $mode = self::theme($user);
         $htmlClass = $mode === 'dark' ? ' class="dark"' : '';
         $seo = self::seo();
-        $img = $base . '/static/video/ourcircle-pause.jpg';
+        $img = $base . '/static/img/og-card.jpg';
+        $alt = 'OurCircle — Pause. Ask family. Then pay.';
+        $nonce = Http::cspNonce();
         echo '<!DOCTYPE html><html lang="en"' . $htmlClass . '><head><meta charset="UTF-8" />';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
         echo '<title>' . Http::e($title) . '</title>';
@@ -53,8 +55,13 @@ final class Layout
         echo '<meta name="author" content="Family Shield Pro" />';
         echo '<meta name="application-name" content="Family Shield Pro ' . Http::e($v) . '" />';
         echo '<meta name="theme-color" content="#0f6f6a" />';
+        self::verificationTags();
         echo '<link rel="canonical" href="' . Http::e($url) . '" />';
-        echo '<link rel="icon" type="image/png" href="/static/img/logo.png" />';
+        echo '<link rel="icon" href="/favicon.ico" sizes="any" />';
+        echo '<link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32.png" />';
+        echo '<link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16.png" />';
+        echo '<link rel="apple-touch-icon" href="/apple-touch-icon.png" />';
+        echo '<link rel="manifest" href="/site.webmanifest" />';
         echo '<meta property="og:site_name" content="OurCircle" />';
         echo '<meta property="og:type" content="' . Http::e($seo['og_type']) . '" />';
         echo '<meta property="og:locale" content="en_US" />';
@@ -62,23 +69,109 @@ final class Layout
         echo '<meta property="og:description" content="' . Http::e($seo['description']) . '" />';
         echo '<meta property="og:url" content="' . Http::e($url) . '" />';
         echo '<meta property="og:image" content="' . Http::e($img) . '" />';
-        echo '<meta property="og:image:alt" content="OurCircle — Pause. Ask family. Then pay." />';
+        if (str_starts_with(strtolower($base), 'https://')) {
+            echo '<meta property="og:image:secure_url" content="' . Http::e($img) . '" />';
+        }
+        echo '<meta property="og:image:type" content="image/jpeg" />';
+        echo '<meta property="og:image:width" content="1200" />';
+        echo '<meta property="og:image:height" content="630" />';
+        echo '<meta property="og:image:alt" content="' . Http::e($alt) . '" />';
         echo '<meta name="twitter:card" content="summary_large_image" />';
         echo '<meta name="twitter:title" content="' . Http::e($title) . '" />';
         echo '<meta name="twitter:description" content="' . Http::e($seo['description']) . '" />';
         echo '<meta name="twitter:image" content="' . Http::e($img) . '" />';
+        echo '<meta name="twitter:image:alt" content="' . Http::e($alt) . '" />';
         echo '<meta name="color-scheme" content="' . ($mode === 'dark' ? 'dark' : 'light') . '" />';
         echo '<meta name="csrf-token" content="' . Http::e(Http::csrfToken()) . '" />';
+        if (!empty($seo['jsonld'])) {
+            echo '<script type="application/ld+json" nonce="' . Http::e($nonce) . '">' . self::jsonLd($base) . '</script>';
+        }
         echo '<script src="/static/js/fsp-theme.js?v=' . Http::e($v) . '"></script>';
         echo '<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />';
         echo '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />';
         echo '<link rel="stylesheet" href="/static/css/app.css?v=' . Http::e($v) . '" />';
         echo '</head><body class="' . Http::e($bodyClass) . '">';
-        if ($user) {
-            self::appHeader($user);
-        } elseif ($bodyClass === 'auth-page' || $bodyClass === 'app-bare') {
-            echo '<div class="theme-toggle-wrap">' . self::themeToggle() . '</div>';
+        self::mainNav($user);
+    }
+
+    /** Same activity links on every page. See SOP.md. */
+    public static function activities(): array
+    {
+        return [
+            '/' => 'Home',
+            '/home' => 'Check',
+            '/circle' => 'Circle',
+            '/trusted' => 'Trusted list',
+            '/report' => 'Report',
+            '/billing' => 'Plans',
+            '/account' => 'Account',
+            '/#lookup' => 'Look it up',
+            '/#contact' => 'Contact',
+        ];
+    }
+
+    /** @return list<string> */
+    public static function publicPaths(): array
+    {
+        return array_merge(['/', '/signup', '/privacy', '/terms'], Guides::paths());
+    }
+
+    public static function mainNav(?array $user = null): void
+    {
+        echo '<div class="wrap"><header class="site-header">';
+        echo '<div class="brand-lockup">';
+        self::brand();
+        $who = trim((string) ($user['name'] ?? ''));
+        if ($user && $who !== '') {
+            echo '<span class="brand-who">' . Http::e($who) . '</span>';
         }
+        echo '</div>';
+        echo '<nav class="nav" aria-label="Main">';
+        foreach (self::activities() as $href => $label) {
+            $current = self::navCurrent($href) ? ' aria-current="page"' : '';
+            echo '<a href="' . Http::e($href) . '"' . $current . '>' . Http::e($label) . '</a>';
+        }
+        if ($user || !empty($_SESSION['user_id'])) {
+            echo '<a href="/logout">Sign out</a>';
+        } else {
+            $sign = self::navCurrent('/login') ? ' aria-current="page"' : '';
+            $trial = self::navCurrent('/signup') ? ' aria-current="page"' : '';
+            echo '<a href="/login"' . $sign . '>Sign in</a>';
+            echo '<a class="btn sm" href="/signup"' . $trial . '>Start a 14-day trial</a>';
+        }
+        echo self::themeToggle();
+        echo '</nav></header></div>';
+        echo '<div class="wrap"><p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p></div>';
+        if ($user) {
+            self::trialBanner($user);
+        }
+    }
+
+    private static function navCurrent(string $href): bool
+    {
+        $path = Http::path();
+        if ($href === '/') {
+            return $path === '/';
+        }
+        if (str_contains($href, '#')) {
+            return false;
+        }
+        $prefixes = [
+            '/home' => ['/home', '/check', '/checks'],
+            '/account' => ['/account'],
+            '/circle' => ['/circle'],
+            '/trusted' => ['/trusted'],
+            '/billing' => ['/billing'],
+            '/report' => ['/report'],
+            '/login' => ['/login'],
+            '/signup' => ['/signup'],
+        ];
+        foreach ($prefixes[$href] ?? [$href] as $prefix) {
+            if ($path === $prefix || str_starts_with($path, $prefix . '/')) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static function brand(): void
@@ -89,42 +182,26 @@ final class Layout
         echo '</a>';
     }
 
-    public static function appHeader(array $user): void
-    {
-        echo '<div class="wrap"><header class="app-header">';
-        echo '<div class="brand-lockup">';
-        self::brand();
-        $who = trim((string) ($user['name'] ?? ''));
-        if ($who !== '') {
-            echo '<span class="brand-who">' . Http::e($who) . '</span>';
-        }
-        echo '</div>';
-        echo '<nav class="nav">';
-        foreach ([
-            '/home' => 'Check',
-            '/circle' => 'Circle',
-            '/trusted' => 'Trusted list',
-            '/report' => 'Report',
-            '/billing' => 'Plans',
-            '/account' => 'Account',
-            '/logout' => 'Sign out',
-        ] as $href => $label) {
-            echo '<a href="' . $href . '">' . $label . '</a>';
-        }
-        echo self::themeToggle();
-        echo '</nav></header></div>';
-        echo '<div class="wrap"><p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p></div>';
-        self::trialBanner($user);
-    }
-
     private static function seo(): array
     {
         $path = Http::path();
+        $guide = Guides::byPath($path);
+        if ($guide) {
+            return [
+                'description' => (string) $guide['description'],
+                'keywords' => (string) $guide['keywords'],
+                'robots' => 'index, follow',
+                'og_type' => 'article',
+                'jsonld' => true,
+            ];
+        }
         $key = '/';
         if ($path !== '/' && $path !== '') {
             $key = $path;
             if (str_starts_with($path, '/join/')) {
                 $key = '/join';
+            } elseif (str_starts_with($path, '/guides/')) {
+                $key = '/guides';
             } elseif (str_starts_with($path, '/check')) {
                 $key = '/check';
             } elseif (str_starts_with($path, '/admin')) {
@@ -143,21 +220,21 @@ final class Layout
                 $key = '/trial';
             }
         }
-        $index = in_array($key, ['/', '/signup', '/login', '/forgot', '/privacy', '/terms'], true);
+        $index = in_array($key, self::publicPaths(), true);
         $baseKw = 'Family Shield Pro, OurCircle, family scam protection, scam text pause, gift card scam, crypto scam, trusted list, call me before I pay';
         $copy = [
-            '/' => 'Family Shield Pro OurCircle: family scam pause before money, gift cards, or crypto. Paste a sketchy text, read warning signs, check your trusted list, and call someone you trust. Guidance, not a guarantee.',
-            '/signup' => 'Start a Family Shield Pro OurCircle 14-day trial. Family circle of up to five, trusted contacts list, and call-me-before-I-pay for scam texts and urgent payment asks. Not a safe stamp.',
-            '/login' => 'Sign in to Family Shield Pro OurCircle. Pause with your household, review scam warning signs, and call trusted family before anyone pays. Guidance, not a guarantee.',
-            '/forgot' => 'Forgot password for Family Shield Pro OurCircle. Request a one-hour reset link by email. We never confirm whether that address is on file.',
-            '/privacy' => 'Privacy Policy for Family Shield Pro (OurCircle). How we handle family circle data, trusted lists, and checks. We do not sell people’s information.',
-            '/terms' => 'Terms & Conditions for Family Shield Pro OurCircle. Family pause tool for scam texts and payment asks. Guidance, not a guarantee. Never a stamp that a request is safe.',
-            '/join' => 'Join a Family Shield Pro OurCircle household. Pause together on sketchy texts, prizes, and payment requests before anyone sends money or gift cards.',
-            '/reset' => 'Choose a new Family Shield Pro OurCircle password with your one-hour reset link, or the local reset file when email is not connected.',
+            '/' => 'OurCircle by Family Shield Pro: a household pause before money, gift cards, or crypto. Call someone you trust. Not a guarantee.',
+            '/signup' => 'Start a 14-day OurCircle trial for up to five people. Trusted numbers, warning signs, and call-me-before-I-pay. Not a safe stamp.',
+            '/login' => 'Sign in to Family Shield Pro OurCircle to pause with your household before anyone sends money. Guidance, not a guarantee.',
+            '/forgot' => 'Request a one-hour Family Shield Pro OurCircle reset link by email. We never say whether that address is already on a circle.',
+            '/privacy' => 'Privacy Policy for Family Shield Pro (OurCircle). How circle data, trusted lists, and checks are handled. We do not sell it.',
+            '/terms' => 'Terms for Family Shield Pro OurCircle, a family pause tool. Guidance, not a guarantee. Never a stamp that a request is safe.',
+            '/join' => 'Join a Family Shield Pro OurCircle household. Pause together on texts, prizes, and payment asks before anyone sends money.',
+            '/reset' => 'Choose a new Family Shield Pro OurCircle password with your one-hour reset link, or the saved file when email is not connected.',
             '/home' => 'Family Shield Pro check inbox: paste a scam text, call, prize, or urgent payment ask. Read warning signs with your OurCircle family. Not a safe-or-fake stamp.',
             '/check' => 'Review this Family Shield Pro OurCircle check with your family: warning signs, trusted-list compare, notes, and call-me. Never a verdict that it is safe.',
             '/circle' => 'Manage your Family Shield Pro OurCircle household: invite up to five people, send call-me alerts, and pause together before anyone pays.',
-            '/trusted' => 'Family Shield Pro trusted list: save real bank, doctor, and family numbers and websites. OurCircle compares sketchy messages to this list, not to links in the text.',
+            '/trusted' => 'Family Shield Pro trusted list: save real bank, doctor, and family numbers. OurCircle compares messages to this list, not to links in the text.',
             '/report' => 'Family Shield Pro report and recover: next steps if money, gift cards, or passwords already went out — freeze cards, report fraud, and stop further payments.',
             '/billing' => 'Family Shield Pro plans: Family monthly $14.99 or yearly $119.99 after a 14-day OurCircle trial. Paying does not make a request safe. You keep what you entered.',
             '/account' => 'Family Shield Pro OurCircle account settings: name, email, mobile for call-me SMS, appearance, password, and optional two-factor authentication.',
@@ -184,11 +261,121 @@ final class Layout
             '/admin' => 'Family Shield Pro, operator console, admin, site owner',
         ];
         return [
-            'description' => $copy[$key] ?? 'Family Shield Pro OurCircle is a trusted family circle for scam texts, prizes, and urgent payment asks: pause, read warning signs, call someone you trust. Guidance, not a guarantee.',
+            'description' => $copy[$key] ?? 'That Family Shield Pro page is not here. Use the menu to open Home, Check, Circle, or another OurCircle activity. Guidance, not a guarantee.',
             'keywords' => $keywords[$key] ?? $baseKw,
             'robots' => $index ? 'index, follow' : 'noindex, nofollow',
-            'og_type' => $key === '/' ? 'website' : 'article',
+            'og_type' => 'website',
+            'jsonld' => $index,
         ];
+    }
+
+    private static function verificationTags(): void
+    {
+        $google = self::verificationCode('GOOGLE_SITE_VERIFICATION');
+        $bing = self::verificationCode('BING_SITE_VERIFICATION');
+        if ($google !== '') {
+            echo '<meta name="google-site-verification" content="' . Http::e($google) . '" />';
+        }
+        if ($bing !== '') {
+            echo '<meta name="msvalidate.01" content="' . Http::e($bing) . '" />';
+        }
+    }
+
+    private static function verificationCode(string $key): string
+    {
+        $v = trim(Env::get($key));
+        if (preg_match('/content\s*=\s*["\']([^"\']+)["\']/i', $v, $m)) {
+            $v = trim($m[1]);
+        }
+        if ($v === '' || strlen($v) > 128 || !preg_match('/^[A-Za-z0-9_-]+$/', $v)) {
+            return '';
+        }
+        return $v;
+    }
+
+    private static function jsonLd(string $base): string
+    {
+        $org = $base . '/#organization';
+        $email = self::supportEmail();
+        $organization = [
+            '@type' => 'Organization',
+            '@id' => $org,
+            'name' => 'Family Shield Pro',
+            'alternateName' => 'OurCircle',
+            'url' => $base . '/',
+            'logo' => $base . '/static/img/logo.png',
+            'email' => $email,
+            'description' => 'Family pause tool for scam texts, prizes, and urgent payment asks. Guidance, not a guarantee.',
+        ];
+        $phone = self::contactPhone();
+        if ($phone !== '') {
+            $organization['telephone'] = $phone;
+        }
+        $graph = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                $organization,
+                [
+                    '@type' => 'WebSite',
+                    '@id' => $base . '/#website',
+                    'name' => 'OurCircle',
+                    'alternateName' => 'Family Shield Pro',
+                    'url' => $base . '/',
+                    'description' => 'A household pause before money, gift cards, or crypto. Guidance, not a guarantee.',
+                    'inLanguage' => 'en-US',
+                    'publisher' => ['@id' => $org],
+                ],
+                [
+                    '@type' => 'SoftwareApplication',
+                    'name' => 'OurCircle',
+                    'alternateName' => 'Family Shield Pro',
+                    'applicationCategory' => 'LifestyleApplication',
+                    'operatingSystem' => 'Web',
+                    'url' => $base . '/',
+                    'description' => 'A family circle to pause on a text, call, prize, or urgent payment ask, read warning signs, and call someone you trust. It does not stamp a request as safe.',
+                    'publisher' => ['@id' => $org],
+                    'offers' => [
+                        [
+                            '@type' => 'Offer',
+                            'name' => 'Family monthly',
+                            'price' => '14.99',
+                            'priceCurrency' => 'USD',
+                            'url' => $base . '/signup?plan=monthly',
+                            'description' => 'Up to five people. 14-day trial, then $14.99 per month.',
+                            'priceSpecification' => [
+                                '@type' => 'UnitPriceSpecification',
+                                'price' => '14.99',
+                                'priceCurrency' => 'USD',
+                                'referenceQuantity' => [
+                                    '@type' => 'QuantitativeValue',
+                                    'value' => 1,
+                                    'unitCode' => 'MON',
+                                ],
+                            ],
+                        ],
+                        [
+                            '@type' => 'Offer',
+                            'name' => 'Family yearly',
+                            'price' => '119.99',
+                            'priceCurrency' => 'USD',
+                            'url' => $base . '/signup?plan=yearly',
+                            'description' => 'Up to five people. 14-day trial, then $119.99 per year.',
+                            'priceSpecification' => [
+                                '@type' => 'UnitPriceSpecification',
+                                'price' => '119.99',
+                                'priceCurrency' => 'USD',
+                                'referenceQuantity' => [
+                                    '@type' => 'QuantitativeValue',
+                                    'value' => 1,
+                                    'unitCode' => 'ANN',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        return json_encode($graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?: '{}';
     }
 
     public static function trialBanner(array $user): void
@@ -229,7 +416,14 @@ final class Layout
 
     public static function end(?array $user = null): void
     {
-        echo '<div class="wrap"><p class="disclaimer"><span class="copy">© 2026 Family Shield Pro. All rights reserved.</span> This application offers guidance, not a guarantee. '
+        echo '<div class="wrap site-foot">';
+        echo '<nav class="guide-links" aria-label="Guides">';
+        foreach (Guides::all() as $guide) {
+            $current = Http::path() === $guide['path'] ? ' aria-current="page"' : '';
+            echo '<a href="' . Http::e((string) $guide['path']) . '"' . $current . '>' . Http::e((string) $guide['nav']) . '</a>';
+        }
+        echo '</nav>';
+        echo '<p class="disclaimer"><span class="copy">© 2026 Family Shield Pro. All rights reserved.</span> This application offers guidance, not a guarantee. '
             . self::legalLinks()
             . ' <span class="build">' . Http::e(self::asset()) . '</span></p></div>';
         self::chat();
@@ -272,19 +466,6 @@ final class Layout
         echo '<button class="btn" type="submit">Send</button></form>';
         echo '<p class="fsp-chat-mail">Email <a href="mailto:' . Http::e($em) . '">' . Http::e($em) . '</a></p>';
         echo '</div></div>';
-    }
-
-    public static function publicNav(): void
-    {
-        echo '<div class="wrap"><header class="site-header">';
-        self::brand();
-        echo '<nav class="nav">';
-        echo '<a href="#lookup">Look it up</a>';
-        echo '<a href="#contact">Contact</a>';
-        echo '<a href="/login">Sign in</a>';
-        echo '<a class="btn sm" href="/signup">Start a 14-day trial</a>';
-        echo self::themeToggle();
-        echo '</nav></header></div>';
     }
 
     public static function themeToggle(): string

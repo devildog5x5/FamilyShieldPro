@@ -2,13 +2,15 @@
 
 Trusted family circle: pause, read warning signs, call someone you trust. **Guidance, not a guarantee.** Never a “this is safe” stamp.
 
-Live sandbox: https://sandbox.familyshieldpro.com/
+Live site: https://familyshieldpro.com/
+
+`sandbox.familyshieldpro.com` now returns 404. Do not use it for `BASE_URL`, Stripe return URLs, or webhooks. Point those at `https://familyshieldpro.com`.
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.3.46**.
+Canonical PHP source for Hostinger (`public_html`). Version **1.3.48**.
 
-**Hostinger zip:** [FamilyShieldPro-PHP-1.3.46.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.46/FamilyShieldPro-PHP-1.3.46.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`).
+**Hostinger zip:** [FamilyShieldPro-PHP-1.3.48.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.48/FamilyShieldPro-PHP-1.3.48.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`.
 
 ## Local run
 
@@ -47,6 +49,29 @@ If you already have a live SQLite file, **back it up first**. This schema is not
 - Operators reset at `/admin/forgot` (same email/file flow; new password is stored so it survives `.env`)
 - Operators can restore factory data from `/admin` (type FACTORY, re-enter operator password)
 - Operators can browse, edit, delete, insert, and run SQL from `/admin/data`
+
+## Search consoles
+
+Paste verification codes into `public_html/.env`. Leave a line blank to omit that tag. Paste the code only, or the whole meta tag — the site reads the `content` value either way. No code edit.
+
+```
+GOOGLE_SITE_VERIFICATION=
+BING_SITE_VERIFICATION=
+```
+
+- Google Search Console → Ownership verification → HTML tag → the `content` value of `google-site-verification`.
+- Bing Webmaster Tools → HTML meta tag → the `content` value of `msvalidate.01`.
+
+IndexNow key file (the file name is the key, and the file body is the same key):
+
+https://familyshieldpro.com/f05145da9377e3bf6466de8db09bede7.txt
+
+Sitemap: https://familyshieldpro.com/sitemap.xml  
+Robots: https://familyshieldpro.com/robots.txt
+
+Sign-in, forgot password, reset, join, and signed-in app pages send `noindex` and are left out of the sitemap. Home, trial signup, privacy, terms, and the public guides stay indexable.
+
+The same main menu is on every page. See `SOP.md`.
 
 ## Support
 
