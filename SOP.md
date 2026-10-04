@@ -17,12 +17,15 @@ The menu always links to every site activity, in this order:
 7. Account
 8. Look it up
 9. Contact
+10. Guides (the index at `/guides`)
+
+The same menu then has Guide topics. That control lists each public guide by its short name. It is part of this menu, not a second menu. It stays closed until someone opens it, so the trial headline is not pushed down.
 
 When nobody is signed in, the same menu also links to Sign in and Start a 14-day trial. When someone is signed in, that slot is Sign out. Do not add a second, shorter menu on a “simple” screen.
 
 No dead ends. From any page a person can open every activity without the browser back button. New pages use `Layout::start()`, which prints this menu. Do not build a page that omits it.
 
-Public guides are linked from the footer on every page and from each other. They are not a substitute for the activity menu.
+`/guides` is a real index of every public guide. Do not leave that address as a missing page. The footer repeats the same guide links.
 
 ## Source and releases
 

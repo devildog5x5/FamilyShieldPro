@@ -8,9 +8,9 @@ Live site: https://familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.3.48**.
+Canonical PHP source for Hostinger (`public_html`). Version **1.4.0**.
 
-**Hostinger zip:** [FamilyShieldPro-PHP-1.3.48.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.48/FamilyShieldPro-PHP-1.3.48.zip) — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`.
+**Hostinger zip:** `FamilyShieldPro-PHP-1.4.0.zip` — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`. Keep the live `.env` and database. Do not overwrite them.
 
 ## Local run
 
@@ -22,7 +22,7 @@ copy .env.example .env
 php -S 127.0.0.1:8080
 ```
 
-Open http://127.0.0.1:8080 — demo login `family@ourcircle.app` / `password123` when `SHOW_DEMO_LOGIN=1`.
+Open http://127.0.0.1:8080 — demo login `family@ourcircle.app` / `password123` only when `SHOW_DEMO_LOGIN=1` on a host other than familyshieldpro.com. That demo circle can change data. The public site never prints the password. If the live `.env` still has `SHOW_DEMO_LOGIN=1`, set it to `0` when you next edit that file. Do not replace the live `.env` with `.env.example`.
 
 ## Deploy (Hostinger)
 
@@ -69,7 +69,7 @@ https://familyshieldpro.com/f05145da9377e3bf6466de8db09bede7.txt
 Sitemap: https://familyshieldpro.com/sitemap.xml  
 Robots: https://familyshieldpro.com/robots.txt
 
-Sign-in, forgot password, reset, join, and signed-in app pages send `noindex` and are left out of the sitemap. Home, trial signup, privacy, terms, and the public guides stay indexable.
+Sign-in, forgot password, reset, join, and signed-in app pages send `noindex` and are left out of the sitemap. Home, trial signup, privacy, terms, `/guides`, and each public guide stay indexable. `www`, `/index.php`, and a trailing slash 301 to `https://familyshieldpro.com` with no trailing slash. `http` is already redirected by the host.
 
 The same main menu is on every page. See `SOP.md`.
 

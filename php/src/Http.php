@@ -178,4 +178,34 @@ final class Http
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         return ($https ? 'https://' : 'http://') . $host;
     }
+
+    /** 301 www, /index.php, and trailing slashes to one path. Local hosts are left alone except the path rules. */
+    public static function canonicalRedirect(): void
+    {
+        $method = self::method();
+        if ($method !== 'GET' && $method !== 'HEAD') {
+            return;
+        }
+        $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        $host = preg_replace('/:\d+$/', '', $host) ?? $host;
+        $uri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+        $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        $query = parse_url($uri, PHP_URL_QUERY);
+        $qs = is_string($query) && $query !== '' ? '?' . $query : '';
+        if ($path === '' || str_contains($path, '\\') || str_contains($path, "\n") || str_contains($path, "\r") || str_contains($path, '//')) {
+            return;
+        }
+        $clean = $path;
+        if ($clean === '/index.php' || $clean === '/index.php/') {
+            $clean = '/';
+        } elseif (strlen($clean) > 1 && str_ends_with($clean, '/')) {
+            $clean = rtrim($clean, '/');
+        }
+        if ($host === 'www.familyshieldpro.com') {
+            self::redirect('https://familyshieldpro.com' . $clean . $qs, 301);
+        }
+        if ($clean !== $path) {
+            self::redirect($clean . $qs, 301);
+        }
+    }
 }

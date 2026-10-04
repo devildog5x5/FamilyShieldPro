@@ -41,6 +41,8 @@ final class App
             $this->legal('privacy');
         } elseif ($method === 'GET' && $path === '/terms') {
             $this->legal('terms');
+        } elseif ($method === 'GET' && $path === '/guides') {
+            $this->guides($user);
         } elseif ($method === 'GET' && preg_match('#^/guides/([a-z0-9-]+)$#', $path, $m)) {
             $this->guide($m[1], $user);
         } elseif ($method === 'GET' && $path === '/robots.txt') {
@@ -85,6 +87,21 @@ final class App
         } else {
             $this->missing($user);
         }
+    }
+
+    private function showDemoLogin(): bool
+    {
+        if (!Env::truthy('SHOW_DEMO_LOGIN')) {
+            return false;
+        }
+        $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        $host = preg_replace('/:\d+$/', '', $host) ?? $host;
+        return $host !== 'familyshieldpro.com' && $host !== 'www.familyshieldpro.com';
+    }
+
+    private function guides(?array $user): never
+    {
+        $this->view('guides', ['user' => $user, 'pages' => Guides::all()]);
     }
 
     private function guide(string $slug, ?array $user): never
@@ -346,7 +363,7 @@ final class App
             $lock = AuthLimit::blocked($this->db, 'family', $email);
             if ($lock !== null) {
                 Http::flash($lock, 'error');
-                $this->view('login', ['next' => $next, 'showDemo' => Env::truthy('SHOW_DEMO_LOGIN')]);
+                $this->view('login', ['next' => $next, 'showDemo' => $this->showDemoLogin()]);
             }
             $st = $this->db->prepare('SELECT * FROM users WHERE lower(email) = ?');
             $st->execute([$email]);
@@ -354,7 +371,7 @@ final class App
             if (!$row || !password_verify($password, $row['password_hash'])) {
                 AuthLimit::fail($this->db, 'family', $email !== '' ? $email : 'unknown');
                 Http::flash('Email or password did not match.', 'error');
-                $this->view('login', ['next' => $next, 'showDemo' => Env::truthy('SHOW_DEMO_LOGIN')]);
+                $this->view('login', ['next' => $next, 'showDemo' => $this->showDemoLogin()]);
             }
             if (!empty($row['totp_enabled'])) {
                 $code = preg_replace('/\s+/', '', (string) ($_POST['otp'] ?? '')) ?? '';
@@ -385,7 +402,7 @@ final class App
             Http::redirect($next);
         }
         $next = Http::safeNext($_GET['next'] ?? '/home');
-        $this->view('login', ['next' => $next, 'showDemo' => Env::truthy('SHOW_DEMO_LOGIN')]);
+        $this->view('login', ['next' => $next, 'showDemo' => $this->showDemoLogin()]);
     }
 
     private function signup(?array $user): void
@@ -1242,8 +1259,11 @@ final class App
         $b = Http::baseUrl();
         echo '<?xml version="1.0" encoding="UTF-8"?>';
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        $stamp = filemtime(__DIR__ . '/Guides.php') ?: time();
+        $landing = filemtime(__DIR__ . '/../views/landing.php') ?: 0;
+        $lastmod = gmdate('Y-m-d', max($stamp, $landing));
         foreach (Layout::publicPaths() as $p) {
-            echo '<url><loc>' . Http::e($b . $p) . '</loc><changefreq>weekly</changefreq></url>';
+            echo '<url><loc>' . Http::e($b . $p) . '</loc><lastmod>' . $lastmod . '</lastmod><changefreq>weekly</changefreq></url>';
         }
         echo '</urlset>';
         exit;

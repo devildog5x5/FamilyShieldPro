@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 $db = require __DIR__ . '/bootstrap.php';
+Http::canonicalRedirect();
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $rel = ltrim($path, '/');
@@ -26,7 +27,7 @@ if ($rel !== '' && !str_contains($rel, '/') && !str_contains($rel, '\\') && !str
     if (isset($rootTypes[$ext]) && is_file($rootFile)) {
         header('Content-Type: ' . $rootTypes[$ext]);
         header('X-Content-Type-Options: nosniff');
-        header('Cache-Control: public, max-age=86400');
+        header('Cache-Control: public, max-age=31536000');
         readfile($rootFile);
         exit;
     }
@@ -62,7 +63,7 @@ if (str_starts_with($path, '/static/')) {
             exit;
         }
         header('Content-Type: ' . $types[$ext]);
-        header('Cache-Control: public, max-age=86400');
+        header('Cache-Control: public, max-age=31536000');
         readfile($file);
         exit;
     }
