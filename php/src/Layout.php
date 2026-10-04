@@ -86,7 +86,10 @@ final class Layout
         if (!empty($seo['jsonld'])) {
             echo '<script type="application/ld+json" nonce="' . Http::e($nonce) . '">' . self::jsonLd($base) . '</script>';
         }
-        echo '<script src="/static/js/fsp-theme.js?v=' . Http::e($v) . '"></script>';
+        if (Http::path() === '/') {
+            echo '<link rel="preload" as="image" href="/static/video/ourcircle-pause.webp?v=' . Http::e($v) . '" />';
+        }
+        echo '<script src="/static/js/fsp-theme.js?v=' . Http::e($v) . '" defer></script>';
         echo '<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />';
         echo '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet" />';
         echo '<link rel="stylesheet" href="/static/css/app.css?v=' . Http::e($v) . '" />';
@@ -107,13 +110,37 @@ final class Layout
             '/account' => 'Account',
             '/#lookup' => 'Look it up',
             '/#contact' => 'Contact',
+            '/guides' => 'Guides',
         ];
     }
 
     /** @return list<string> */
     public static function publicPaths(): array
     {
-        return array_merge(['/', '/signup', '/privacy', '/terms'], Guides::paths());
+        return array_merge(['/', '/signup', '/privacy', '/terms', '/guides'], Guides::paths());
+    }
+
+    /** @return list<array{q:string,a:string}> */
+    public static function faqItems(): array
+    {
+        return [
+            [
+                'q' => 'What is OurCircle?',
+                'a' => 'A family pause before you send money, a gift card, or crypto. You bring in the text, call, or screenshot. You read the warning signs with up to five people. You call someone you trust. We do not stamp a request as safe.',
+            ],
+            [
+                'q' => 'How much does it cost?',
+                'a' => 'Start with a 14-day trial. Then Family yearly is $119.99 or $14.99 a month. The circle owner pays. You keep what you entered. We do not sell people’s information.',
+            ],
+            [
+                'q' => 'What is included?',
+                'a' => 'A household of up to five people, a trusted list of real phone numbers and sites, warning signs on a pasted message, and “Please call me before I pay.” It does not watch a phone by itself, freeze a card, or reverse a payment.',
+            ],
+            [
+                'q' => 'What if the trial ends?',
+                'a' => 'The trusted list and past checks stay readable. New checks, invites, and call-me wait until the owner pays. Paying is a family tool, not a stamp that a request is safe.',
+            ],
+        ];
     }
 
     public static function mainNav(?array $user = null): void
@@ -130,6 +157,11 @@ final class Layout
         foreach (self::activities() as $href => $label) {
             $current = self::navCurrent($href) ? ' aria-current="page"' : '';
             echo '<a href="' . Http::e($href) . '"' . $current . '>' . Http::e($label) . '</a>';
+        }
+        foreach (Guides::all() as $guide) {
+            $href = (string) $guide['path'];
+            $current = Http::path() === $href ? ' aria-current="page"' : '';
+            echo '<a class="nav-guide" href="' . Http::e($href) . '"' . $current . '>' . Http::e((string) $guide['nav']) . '</a>';
         }
         if ($user || !empty($_SESSION['user_id'])) {
             echo '<a href="/logout">Sign out</a>';
@@ -150,8 +182,8 @@ final class Layout
     private static function navCurrent(string $href): bool
     {
         $path = Http::path();
-        if ($href === '/') {
-            return $path === '/';
+        if ($href === '/' || $href === '/guides') {
+            return $path === $href;
         }
         if (str_contains($href, '#')) {
             return false;
@@ -177,7 +209,7 @@ final class Layout
     public static function brand(): void
     {
         echo '<a class="brand" href="/">';
-        echo '<img src="/static/img/logo.png" alt="OurCircle" />';
+        echo '<img src="/static/img/logo-mark.webp?v=' . Http::e(self::asset()) . '" width="56" height="56" alt="OurCircle" />';
         echo '<strong>OurCircle</strong>';
         echo '</a>';
     }
@@ -200,8 +232,6 @@ final class Layout
             $key = $path;
             if (str_starts_with($path, '/join/')) {
                 $key = '/join';
-            } elseif (str_starts_with($path, '/guides/')) {
-                $key = '/guides';
             } elseif (str_starts_with($path, '/check')) {
                 $key = '/check';
             } elseif (str_starts_with($path, '/admin')) {
@@ -224,6 +254,7 @@ final class Layout
         $baseKw = 'Family Shield Pro, OurCircle, family scam protection, scam text pause, gift card scam, crypto scam, trusted list, call me before I pay';
         $copy = [
             '/' => 'OurCircle by Family Shield Pro: a household pause before money, gift cards, or crypto. Call someone you trust. Not a guarantee.',
+            '/guides' => 'OurCircle guides: older parents, asking family before you pay, gift cards, trusted numbers, and emergency texts. Not a guarantee.',
             '/signup' => 'Start a 14-day OurCircle trial for up to five people. Trusted numbers, warning signs, and call-me-before-I-pay. Not a safe stamp.',
             '/login' => 'Sign in to Family Shield Pro OurCircle to pause with your household before anyone sends money. Guidance, not a guarantee.',
             '/forgot' => 'Request a one-hour Family Shield Pro OurCircle reset link by email. We never say whether that address is already on a circle.',
@@ -243,6 +274,7 @@ final class Layout
         ];
         $keywords = [
             '/' => $baseKw . ', elder fraud prevention, family circle app, pause before you pay',
+            '/guides' => $baseKw . ', family guides, older parents, gift card scam, emergency text, Cybersecurity Awareness Month',
             '/signup' => $baseKw . ', OurCircle signup, 14-day trial, start a family circle',
             '/login' => $baseKw . ', OurCircle login, sign in, family account',
             '/forgot' => $baseKw . ', password reset, forgot password',
@@ -303,7 +335,7 @@ final class Layout
             'name' => 'Family Shield Pro',
             'alternateName' => 'OurCircle',
             'url' => $base . '/',
-            'logo' => $base . '/static/img/logo.png',
+            'logo' => $base . '/static/img/logo-mark.webp',
             'email' => $email,
             'description' => 'Family pause tool for scam texts, prizes, and urgent payment asks. Guidance, not a guarantee.',
         ];
@@ -375,6 +407,25 @@ final class Layout
                 ],
             ],
         ];
+        if (Http::path() === '/') {
+            $entities = [];
+            foreach (self::faqItems() as $item) {
+                $entities[] = [
+                    '@type' => 'Question',
+                    'name' => $item['q'],
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => $item['a'],
+                    ],
+                ];
+            }
+            $graph['@graph'][] = [
+                '@type' => 'FAQPage',
+                '@id' => $base . '/#faq',
+                'url' => $base . '/',
+                'mainEntity' => $entities,
+            ];
+        }
         return json_encode($graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?: '{}';
     }
 
@@ -418,6 +469,8 @@ final class Layout
     {
         echo '<div class="wrap site-foot">';
         echo '<nav class="guide-links" aria-label="Guides">';
+        $guideIndex = Http::path() === '/guides' ? ' aria-current="page"' : '';
+        echo '<a href="/guides"' . $guideIndex . '>All guides</a>';
         foreach (Guides::all() as $guide) {
             $current = Http::path() === $guide['path'] ? ' aria-current="page"' : '';
             echo '<a href="' . Http::e((string) $guide['path']) . '"' . $current . '>' . Http::e((string) $guide['nav']) . '</a>';
@@ -427,11 +480,21 @@ final class Layout
             . self::legalLinks()
             . ' <span class="build">' . Http::e(self::asset()) . '</span></p></div>';
         self::chat();
-        echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '"></script>';
-        echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '"></script>';
-        echo '<script src="/static/js/fsp-focus.js?v=' . Http::e(self::asset()) . '"></script>';
-        echo '<script src="/static/js/fsp-video.js?v=' . Http::e(self::asset()) . '"></script>';
+        echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '" defer></script>';
+        echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '" defer></script>';
+        echo '<script src="/static/js/fsp-focus.js?v=' . Http::e(self::asset()) . '" defer></script>';
+        echo '<script src="/static/js/fsp-video.js?v=' . Http::e(self::asset()) . '" defer></script>';
         echo '</body></html>';
+    }
+
+    public static function faq(): void
+    {
+        echo '<section class="faq" id="faq"><h2>Questions families ask</h2>';
+        foreach (self::faqItems() as $item) {
+            echo '<details class="faq-item"><summary>' . Http::e($item['q']) . '</summary>';
+            echo '<p>' . Http::e($item['a']) . '</p></details>';
+        }
+        echo '</section>';
     }
 
     public static function legalLinks(): string

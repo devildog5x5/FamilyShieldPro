@@ -11,13 +11,13 @@ $needOtp = !empty($needOtp);
     <input type="hidden" name="next" value="<?= Http::e($next) ?>" />
     <?php if ($needOtp): ?>
       <p>Enter the 6-digit code from your authenticator app.</p>
-      <label>6-digit code</label>
-      <input class="otp" name="otp" inputmode="numeric" autocomplete="one-time-code" required />
+      <label for="otp">6-digit code</label>
+      <input id="otp" class="otp" name="otp" inputmode="numeric" autocomplete="one-time-code" required />
     <?php else: ?>
-      <label>Email</label>
-      <input name="email" type="email" required autocomplete="username" />
-      <label>Password</label>
-      <input name="password" type="password" required autocomplete="current-password" />
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="username" />
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password" />
     <?php endif; ?>
     <p><button class="btn wide" type="submit">Sign in</button></p>
   </form>

@@ -9,17 +9,17 @@ $phone = $phone ?? Layout::contactPhone();
       <h1>A family pause before you send a dime.</h1>
       <p class="lede">OurCircle is a trusted circle for the text, call, prize, or “urgent” payment that feels off. We do not stamp a request as safe. We help you stop, read the warning signs, and get someone you trust on the phone — then you decide.</p>
       <p class="hero-cta"><a class="btn" href="/signup">Start a 14-day trial</a></p>
-      <p class="muted">Then Family yearly $119.99 or $14.99/month. You keep what you entered. We do not sell it.</p>
+      <p class="muted">Start with a 14-day trial. Then Family yearly is $119.99 or $14.99/month. You keep what you entered. We do not sell it.</p>
     </div>
     <figure class="hero-video">
       <div class="hero-video-box">
-        <video playsinline preload="metadata" poster="/static/video/ourcircle-pause.jpg?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720">
+        <video playsinline preload="none" poster="/static/video/ourcircle-pause.webp?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720">
           <source src="/static/video/ourcircle-pause.mp4?v=<?= Http::e(Layout::asset()) ?>" type="video/mp4">
         </video>
         <button type="button" class="hero-video-start">
-          <img class="hero-video-poster" src="/static/video/ourcircle-pause.jpg?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720" alt="" />
+          <img class="hero-video-poster" src="/static/video/ourcircle-pause.webp?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720" alt="" fetchpriority="high" />
           <span class="hero-video-cue">
-            <img class="hero-video-who" src="/static/video/grandma-still.jpg?v=<?= Http::e(Layout::asset()) ?>" width="160" height="160" alt="" />
+            <img class="hero-video-who" src="/static/video/grandma-still.webp?v=<?= Http::e(Layout::asset()) ?>" width="160" height="160" alt="" />
           </span>
           <span class="hero-video-play"><span class="hero-video-play-icon" aria-hidden="true"></span> Watch the story</span>
         </button>
@@ -30,7 +30,7 @@ $phone = $phone ?? Layout::contactPhone();
 
   <div class="too-good">
     <h2>If it sounds too good to be true, it usually is.</h2>
-    <p class="really">Really!!!</p>
+    <p>Pause and call someone you trust before you pay.</p>
   </div>
 
   <h2>Three steps before anyone pays</h2>
@@ -49,7 +49,11 @@ $phone = $phone ?? Layout::contactPhone();
     </div>
     <div class="panel">
       <h3>Text with your circle</h3>
-      <p>Invites and “Please call me before I pay” can go by text. Forward a sketchy message to the Family Shield Pro number. We never say a request is safe. Reply STOP to opt out.</p>
+      <?php if ($phone !== ''): ?>
+        <p>Invites and “Please call me before I pay” can go by text when texting is connected. To talk with a person about your circle, call <?= Http::e($phone) ?>. Paste a sketchy message into the circle and call someone on your trusted list. We never say a request is safe. Reply STOP to opt out of texts.</p>
+      <?php else: ?>
+        <p>Invites and “Please call me before I pay” can go by text when texting is connected. Paste a sketchy message into the circle and call someone on your trusted list. We never say a request is safe. Reply STOP to opt out of texts.</p>
+      <?php endif; ?>
     </div>
     <div class="panel">
       <h3>If something already went wrong</h3>
@@ -77,6 +81,7 @@ $phone = $phone ?? Layout::contactPhone();
       <p><a class="btn gold wide" href="<?= !empty($user) ? '/billing' : '/signup?plan=yearly' ?>"><?= !empty($user) ? 'Go to plans' : 'Start yearly' ?></a></p>
     </div>
   </div>
+  <?php Layout::faq(); ?>
   <p class="disclaimer">This application offers guidance, not a guarantee. A paid plan is a family tool, not a stamp that a request is safe.</p>
   <p class="muted partner-line">Churches, senior centers, and veterans groups: ask us about a shared license. Credit unions and insurers: per-member partnership pricing.</p>
 

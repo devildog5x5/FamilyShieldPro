@@ -7,6 +7,7 @@ final class Guides
     public static function all(): array
     {
         return [
+            self::awarenessMonth(),
             self::olderParents(),
             self::beforeYouPay(),
             self::giftCards(),
@@ -45,6 +46,63 @@ final class Guides
             }
         }
         return null;
+    }
+
+    /** @return array<string, mixed> */
+    private static function awarenessMonth(): array
+    {
+        return [
+            'slug' => 'cybersecurity-awareness-month',
+            'path' => '/guides/cybersecurity-awareness-month',
+            'nav' => 'Awareness Month',
+            'title' => 'Cybersecurity Awareness Month for families · OurCircle',
+            'description' => 'October is U.S. Cybersecurity Awareness Month. Save real phone numbers and pause with your family before anyone pays. OurCircle. Not a guarantee.',
+            'keywords' => 'Family Shield Pro, OurCircle, Cybersecurity Awareness Month, CISA, family scam pause, gift card scam, trusted phone list',
+            'h1' => 'Cybersecurity Awareness Month, at the kitchen table',
+            'lede' => 'Every October, the U.S. marks Cybersecurity Awareness Month. CISA is the federal lead, with the National Cybersecurity Alliance. In 2026 their published theme is “Securing the Next 250.” A household can use the month for one practical pause: save the real numbers, and look at one message together before anyone pays.',
+            'sections' => [
+                [
+                    'h2' => 'What this month is, and what OurCircle is not',
+                    'paragraphs' => [
+                        'Cybersecurity Awareness Month started in 2004. It is a public campaign, not a product review and not a promise that a text is safe. OurCircle is not a government program. We do not stamp a request as safe or fake.',
+                        'The useful part for a family is the same rule we already use: never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified. Independently verified means a number or website you already had. It does not mean the link or the phone number inside the message that just arrived.',
+                    ],
+                    'links' => [
+                        ['href' => 'https://www.cisa.gov/cybersecurity-awareness-month', 'label' => 'CISA: Cybersecurity Awareness Month', 'note' => 'The federal campaign page, including the 2026 theme.'],
+                        ['href' => 'https://www.staysafeonline.org/cybersecurity-awareness-month', 'label' => 'National Cybersecurity Alliance', 'note' => 'The organization that co-leads the October campaign.'],
+                    ],
+                ],
+                [
+                    'h2' => 'Four things to do this month',
+                    'paragraphs' => [
+                        'Do these on a calm day, before a scare arrives. None of them requires special software on a parent’s phone.',
+                    ],
+                    'list' => [
+                        'Say the pause out loud: no money, gift cards, crypto, passwords, or account information until you check it through a number you already trust.',
+                        'Write down the real bank, doctor, insurer, utility, and family numbers. Copy them from the card, a statement, or a site you typed yourself — not from a text.',
+                        'Pick one recent “urgent” message and put it in OurCircle. Paste the text or upload the screenshot so the household is looking at one copy.',
+                        'If money is close to moving, tap “Please call me before I pay.” The alert names the person who pasted the check, so the family knows who to call.',
+                    ],
+                ],
+                [
+                    'h2' => 'What a check will and will not do',
+                    'paragraphs' => [
+                        'Someone has to bring the message in. OurCircle does not read a phone by itself. A check can point at gift cards, crypto, wires, a rush, a secret, or a relative “in trouble,” and it can compare a number to the list you saved. That is a warning, not a verdict.',
+                        'It does not freeze a card, reverse a payment, or file a report for you. A 14-day trial, then Family monthly at $14.99 or Family yearly at $119.99, pays for the family tool. Paying does not make a request safe. A circle holds up to five people. We do not sell people’s information.',
+                    ],
+                ],
+                [
+                    'h2' => 'If money already went out',
+                    'paragraphs' => [
+                        'Call the bank on the number printed on the card or a statement, not a number from the text. Tell the gift-card seller, the crypto exchange, or the wire service the same day. Those payments are hard to undo. Still report them.',
+                    ],
+                    'links' => [
+                        ['href' => 'https://reportfraud.ftc.gov', 'label' => 'ReportFraud.ftc.gov', 'note' => 'Official U.S. fraud report.'],
+                        ['href' => 'https://www.ic3.gov', 'label' => 'IC3.gov', 'note' => 'FBI internet-crime report.'],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /** @return array<string, mixed> */
