@@ -158,11 +158,15 @@ final class Layout
             $current = self::navCurrent($href) ? ' aria-current="page"' : '';
             echo '<a href="' . Http::e($href) . '"' . $current . '>' . Http::e($label) . '</a>';
         }
+        $onGuide = str_starts_with(Http::path(), '/guides/');
+        echo '<details class="nav-guides"' . ($onGuide ? ' open' : '') . '>';
+        echo '<summary>Guide topics</summary><div class="nav-guides-panel">';
         foreach (Guides::all() as $guide) {
             $href = (string) $guide['path'];
             $current = Http::path() === $href ? ' aria-current="page"' : '';
             echo '<a class="nav-guide" href="' . Http::e($href) . '"' . $current . '>' . Http::e((string) $guide['nav']) . '</a>';
         }
+        echo '</div></details>';
         if ($user || !empty($_SESSION['user_id'])) {
             echo '<a href="/logout">Sign out</a>';
         } else {

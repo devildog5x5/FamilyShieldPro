@@ -19,7 +19,7 @@ The menu always links to every site activity, in this order:
 9. Contact
 10. Guides (the index at `/guides`)
 
-The same menu then links to each public guide, using the short name on that guide. Those links are part of this menu, not a second menu.
+The same menu then has Guide topics. That control lists each public guide by its short name. It is part of this menu, not a second menu. It stays closed until someone opens it, so the trial headline is not pushed down.
 
 When nobody is signed in, the same menu also links to Sign in and Start a 14-day trial. When someone is signed in, that slot is Sign out. Do not add a second, shorter menu on a “simple” screen.
 
