@@ -1,5 +1,8 @@
 RewriteEngine On
 RewriteBase /
+AddType application/manifest+json .webmanifest
+AddType image/x-icon .ico
+AddType text/plain .txt
 
 RewriteRule ^(\.env|bootstrap\.php)$ - [F,L]
 RewriteRule ^(src|views|data)(/|$) - [F,L]

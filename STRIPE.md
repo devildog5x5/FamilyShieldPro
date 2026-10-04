@@ -1,7 +1,9 @@
 # Family Shield Pro — Stripe test payments
 
-Sandbox return URL: `https://sandbox.familyshieldpro.com/billing/success?session_id={CHECKOUT_SESSION_ID}`  
-Webhook (must stay public, no login): `https://sandbox.familyshieldpro.com/billing/webhook`
+`sandbox.familyshieldpro.com` now returns 404. Use the live site.
+
+Return URL: `https://familyshieldpro.com/billing/success?session_id={CHECKOUT_SESSION_ID}`  
+Webhook (must stay public, no login): `https://familyshieldpro.com/billing/webhook`
 
 Plans: **Family monthly $14.99** and **Family yearly $119.99**.
 
@@ -16,7 +18,7 @@ cd C:\Users\rober\Documents\GitHub\FamilyShieldPro
 powershell -File .\deploy\check_stripe.ps1
 ```
 
-That writes `stripe-check.log` (and `php/data/stripe-check.txt`) from local `php/.env`, then lists MISSING / OK / NOTES. It also reads the live sandbox version from `/healthz`.
+That writes `stripe-check.log` (and `php/data/stripe-check.txt`) from local `php/.env`, then lists MISSING / OK / NOTES. It also reads the live site version from `/healthz`.
 
 You already have a Stripe account for another application. **Keep that account.** Do not reuse its products, prices, Payment Links, or webhook. Family Shield Pro adds its own catalog next to it. The **test API keys can be the same** `sk_test_` / `pk_test_` pair.
 
@@ -26,7 +28,7 @@ You already have a Stripe account for another application. **Keep that account.*
 2. Developers → API keys → copy:
    - `STRIPE_SECRET_KEY=sk_test_…`
    - `STRIPE_PUBLISHABLE_KEY=pk_test_…`
-3. Put those two lines in Hostinger `public_html/.env` (and local `php/.env` if you run the setup script). Do not put `sk_live_` on sandbox.
+3. Put those two lines in Hostinger `public_html/.env` (and local `php/.env` if you run the setup script). Do not put `sk_live_` on the test site.
 
 Do not create products, prices, Payment Links, or a webhook by hand unless the operator button cannot reach Stripe.
 
@@ -39,10 +41,10 @@ That call uses the test secret key to create (or reuse) all of the following and
 - Product `Family Shield Pro — Monthly` · recurring **$14.99 / month**
 - Product `Family Shield Pro — Yearly` · recurring **$119.99 / year**
 - Payment Links that return to `/billing/success?session_id={CHECKOUT_SESSION_ID}`
-- Webhook `https://sandbox.familyshieldpro.com/billing/webhook` for  
+- Webhook `https://familyshieldpro.com/billing/webhook` for  
   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`
 
-The other application’s webhook is left alone. Each endpoint has its own `whsec_`. If that sandbox webhook already existed, Stripe will not show the signing secret again — copy it from Developers → Webhooks into `STRIPE_WEBHOOK_SECRET`.
+The other application’s webhook is left alone. Each endpoint has its own `whsec_`. If that webhook already existed, Stripe will not show the signing secret again — copy it from Developers → Webhooks into `STRIPE_WEBHOOK_SECRET`.
 
 Same result from a machine that can reach Stripe:
 
@@ -71,4 +73,4 @@ Landing **Start monthly** / **Start yearly** signs up a new owner and then sends
 - Checkout starts, then the plan does not change — webhook URL or `STRIPE_WEBHOOK_SECRET` is wrong. A success return with `session_id` still updates the circle if the secret key is present.
 - Real cards are declined in test mode. Use `4242…` only.
 
-Do not put live `sk_live_` keys on sandbox. Switch the Dashboard to live mode only when you are ready to charge families.
+Do not put live `sk_live_` keys on the test site. Switch the Dashboard to live mode only when you are ready to charge families.

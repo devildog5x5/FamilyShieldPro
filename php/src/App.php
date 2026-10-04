@@ -41,6 +41,8 @@ final class App
             $this->legal('privacy');
         } elseif ($method === 'GET' && $path === '/terms') {
             $this->legal('terms');
+        } elseif ($method === 'GET' && preg_match('#^/guides/([a-z0-9-]+)$#', $path, $m)) {
+            $this->guide($m[1], $user);
         } elseif ($method === 'GET' && $path === '/robots.txt') {
             $this->robots();
         } elseif ($method === 'GET' && $path === '/sitemap.xml') {
@@ -81,9 +83,23 @@ final class App
             $user = $this->requireUser($user);
             $this->authed($method, $path, $user);
         } else {
-            http_response_code(404);
-            echo 'Not found';
+            $this->missing($user);
         }
+    }
+
+    private function guide(string $slug, ?array $user): never
+    {
+        $page = Guides::find($slug);
+        if (!$page) {
+            $this->missing($user);
+        }
+        $this->view('guide', ['user' => $user, 'page' => $page]);
+    }
+
+    private function missing(?array $user): never
+    {
+        http_response_code(404);
+        $this->view('missing', ['user' => $user]);
     }
 
     private function loadUser(): ?array
@@ -251,8 +267,7 @@ final class App
         } elseif ($path === '/account/2fa/setup') {
             $this->totpSetup($user, $method);
         } else {
-            http_response_code(404);
-            echo 'Not found';
+            $this->missing($user);
         }
     }
 
@@ -670,6 +685,7 @@ final class App
         $row = $st->fetch();
         if (!$row || !is_file((string) $row['abs_path'])) {
             http_response_code(404);
+            header('Content-Type: text/plain; charset=utf-8');
             echo 'Not found';
             exit;
         }
@@ -686,9 +702,7 @@ final class App
         $st->execute([$id, $user['circle_id']]);
         $row = $st->fetch();
         if (!$row) {
-            http_response_code(404);
-            echo 'Not found';
-            exit;
+            $this->missing($user);
         }
         return $row;
     }
@@ -886,9 +900,7 @@ final class App
         $st->execute([$token]);
         $inv = $st->fetch();
         if (!$inv) {
-            http_response_code(404);
-            echo 'Not found';
-            exit;
+            $this->missing($user);
         }
         $circleTrial = Trial::forCircle($this->db, (int) $inv['circle_id']);
         if (!empty($circleTrial['expired'])) {
@@ -972,9 +984,8 @@ final class App
         $st = $this->db->prepare('SELECT id FROM trusted WHERE id=? AND circle_id=?');
         $st->execute([$id, $user['circle_id']]);
         if (!$st->fetch()) {
-            http_response_code(404);
-            echo 'Not found';
-            exit;
+            Http::flash('That saved number is not on this circle’s list.', 'error');
+            Http::redirect('/trusted');
         }
         $this->db->prepare('DELETE FROM trusted WHERE id=? AND circle_id=?')->execute([$id, $user['circle_id']]);
         Http::flash('Removed from the trusted list.');
@@ -1218,8 +1229,8 @@ final class App
     {
         header('Content-Type: text/plain; charset=utf-8');
         $host = parse_url(Http::baseUrl(), PHP_URL_HOST) ?: 'familyshieldpro.com';
-        echo "User-agent: *\nAllow: /\nAllow: /signup\nAllow: /login\nAllow: /forgot\nAllow: /privacy\nAllow: /terms\n";
-        echo "Disallow: /home\nDisallow: /circle\nDisallow: /trusted\nDisallow: /checks\nDisallow: /uploads\nDisallow: /join\nDisallow: /billing\nDisallow: /report\nDisallow: /account\nDisallow: /logout\nDisallow: /admin\nDisallow: /reset\n\n";
+        echo "User-agent: *\nAllow: /\n";
+        echo "Disallow: /home\nDisallow: /circle\nDisallow: /trusted\nDisallow: /checks\nDisallow: /uploads\nDisallow: /join\nDisallow: /billing\nDisallow: /report\nDisallow: /account\nDisallow: /logout\nDisallow: /admin\nDisallow: /reset\nDisallow: /healthz\nDisallow: /billing/webhook\n\n";
         echo 'Host: ' . $host . "\n";
         echo 'Sitemap: ' . Http::baseUrl() . "/sitemap.xml\n";
         exit;
@@ -1231,7 +1242,7 @@ final class App
         $b = Http::baseUrl();
         echo '<?xml version="1.0" encoding="UTF-8"?>';
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        foreach (['/', '/signup', '/login', '/forgot', '/privacy', '/terms'] as $p) {
+        foreach (Layout::publicPaths() as $p) {
             echo '<url><loc>' . Http::e($b . $p) . '</loc><changefreq>weekly</changefreq></url>';
         }
         echo '</urlset>';

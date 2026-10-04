@@ -1,10 +1,8 @@
 <?php
-Layout::start('Start a circle · OurCircle', null, 'auth-page');
+Layout::start('Start a 14-day OurCircle trial · Family Shield Pro', null, 'auth-page');
 $plan = $plan ?? '';
 ?>
 <div class="auth-card">
-  <?php Layout::brand(); ?>
-  <p class="core-rule">Never send money, cryptocurrency, gift cards, passwords, or account information until the request is independently verified.</p>
   <?php Layout::flash(); ?>
   <form method="post">
     <?= Http::csrfField() ?>

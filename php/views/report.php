@@ -1,5 +1,5 @@
 <?php
-Layout::start('Report &amp; recover', $user);
+Layout::start('Report and recover', $user);
 ?>
 <div class="wrap app-main">
   <h1>If money or information already moved</h1>

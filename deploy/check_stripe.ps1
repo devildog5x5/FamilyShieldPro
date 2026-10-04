@@ -54,7 +54,7 @@ $linkM = [string]$envMap["STRIPE_PAYMENT_LINK_MONTHLY"]
 $linkY = [string]$envMap["STRIPE_PAYMENT_LINK_YEARLY"]
 
 if (-not $base) { $missing.Add("BASE_URL in .env") }
-elseif ($base -match "localhost|127\.0\.0\.1") { $warn.Add("BASE_URL is localhost. Sandbox webhooks need https://sandbox.familyshieldpro.com") }
+elseif ($base -match "localhost|127\.0\.0\.1") { $warn.Add("BASE_URL is localhost. Webhooks need https://familyshieldpro.com (sandbox.familyshieldpro.com now returns 404).") }
 else { $ok.Add("BASE_URL is set ($base)") }
 
 if (-not (Test-Set $secret "sk_" 20)) { $missing.Add("STRIPE_SECRET_KEY (sk_test_... for sandbox)") }
@@ -101,8 +101,8 @@ if (Test-Set $secret "sk_" 20) {
     if (Test-Set $yearly "price_" 20) { Check-Price $yearly 11999 "year" "yearly" }
     $hookUrl = ($base.TrimEnd("/")) + "/billing/webhook"
     if ($base -match "localhost|127\.0\.0\.1" -or -not $base) {
-        $hookUrl = "https://sandbox.familyshieldpro.com/billing/webhook"
-        $warn.Add("Webhook URL checked against sandbox because local BASE_URL cannot receive Stripe events")
+        $hookUrl = "https://familyshieldpro.com/billing/webhook"
+        $warn.Add("Webhook URL checked against familyshieldpro.com because local BASE_URL cannot receive Stripe events")
     }
     try {
         $hooks = Get-Stripe "/v1/webhook_endpoints?limit=20"
@@ -123,21 +123,21 @@ if (Test-Set $secret "sk_" 20) {
 }
 
 try {
-    $hz = Invoke-RestMethod -Uri "https://sandbox.familyshieldpro.com/healthz" -TimeoutSec 20
+    $hz = Invoke-RestMethod -Uri "https://familyshieldpro.com/healthz" -TimeoutSec 20
     $ver = [string]$hz.version
     if ($ver) {
-        $ok.Add("Live sandbox /healthz version $ver")
+        $ok.Add("Live site /healthz version $ver")
         $parts = $ver.Split(".")
         $minor = 0
         $patch = 0
         if ($parts.Count -ge 2) { [void][int]::TryParse($parts[1], [ref]$minor) }
         if ($parts.Count -ge 3) { [void][int]::TryParse($parts[2], [ref]$patch) }
         if ($minor -lt 3 -or ($minor -eq 3 -and $patch -lt 12)) {
-            $missing.Add("Sandbox is still v$ver. Upload v1.3.12+ so Plans can send the owner to Stripe Checkout (prices in .env are not enough on 1.3.11).")
+            $missing.Add("Live site is still v$ver. Upload a current zip so Plans can send the owner to Stripe Checkout.")
         }
     }
 } catch {
-    $warn.Add("Could not read https://sandbox.familyshieldpro.com/healthz")
+    $warn.Add("Could not read https://familyshieldpro.com/healthz")
 }
 
 $ready = $missing.Count -eq 0

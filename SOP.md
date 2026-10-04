@@ -1,0 +1,25 @@
+# SOP
+
+How we ship Family Shield Pro (OurCircle). Git and release steps stay in `CONTRIBUTING.md`. This file is the product standard.
+
+## Main menu
+
+Every page shows the same main menu. That includes the home page, guides, sign-in, forgot password, join, reset, settings (Account), a single check, two-factor setup, Plans, the operator console, and a missing page.
+
+The menu always links to every site activity, in this order:
+
+1. Home
+2. Check
+3. Circle
+4. Trusted list
+5. Report
+6. Plans
+7. Account
+8. Look it up
+9. Contact
+
+When nobody is signed in, the same menu also links to Sign in and Start a 14-day trial. When someone is signed in, that slot is Sign out. Do not add a second, shorter menu on a “simple” screen.
+
+No dead ends. From any page a person can open every activity without the browser back button. New pages use `Layout::start()`, which prints this menu. Do not build a page that omits it.
+
+Public guides are linked from the footer on every page and from each other. They are not a substitute for the activity menu.

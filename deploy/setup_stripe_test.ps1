@@ -64,7 +64,7 @@ if (-not $BaseUrl) {
     if ($fromEnv -match '^https://' -and $fromEnv -notmatch 'localhost|127\.0\.0\.1') {
         $BaseUrl = $fromEnv
     } else {
-        $BaseUrl = "https://sandbox.familyshieldpro.com"
+        $BaseUrl = "https://familyshieldpro.com"
     }
 }
 $base = $BaseUrl.TrimEnd("/")

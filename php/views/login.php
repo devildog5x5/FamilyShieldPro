@@ -5,7 +5,6 @@ $showDemo = !empty($showDemo);
 $needOtp = !empty($needOtp);
 ?>
 <div class="auth-card">
-  <?php Layout::brand(); ?>
   <?php Layout::flash(); ?>
   <form method="post">
     <?= Http::csrfField() ?>

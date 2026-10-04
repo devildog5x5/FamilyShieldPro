@@ -3,6 +3,16 @@ declare(strict_types=1);
 
 final class Http
 {
+    private static ?string $cspNonce = null;
+
+    public static function cspNonce(): string
+    {
+        if (self::$cspNonce === null) {
+            self::$cspNonce = bin2hex(random_bytes(16));
+        }
+        return self::$cspNonce;
+    }
+
     public static function json(mixed $data, int $status = 200): never
     {
         http_response_code($status);
@@ -122,7 +132,8 @@ final class Http
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: DENY');
         header('Referrer-Policy: strict-origin-when-cross-origin');
-        header('Content-Security-Policy: default-src \'self\'; img-src \'self\' data:; style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src \'self\'; connect-src \'self\'; frame-ancestors \'none\'; upgrade-insecure-requests');
+        $nonce = self::cspNonce();
+        header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'nonce-{$nonce}'; connect-src 'self'; frame-ancestors 'none'; upgrade-insecure-requests");
         $base = strtolower(Env::get('BASE_URL'));
         if (str_starts_with($base, 'https://')) {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains');

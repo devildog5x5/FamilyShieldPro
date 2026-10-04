@@ -4,12 +4,23 @@ declare(strict_types=1);
 $db = require __DIR__ . '/bootstrap.php';
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
-if ($path === '/favicon.ico') {
-    $file = __DIR__ . '/static/img/logo.png';
-    if (is_file($file)) {
-        header('Content-Type: image/png');
+$rel = ltrim($path, '/');
+if ($rel !== '' && !str_contains($rel, '/') && !str_contains($rel, '\\') && !str_contains($rel, '..') && ($rel[0] ?? '') !== '.') {
+    $rootFile = __DIR__ . '/' . $rel;
+    $ext = strtolower(pathinfo($rootFile, PATHINFO_EXTENSION));
+    $rootTypes = [
+        'ico' => 'image/x-icon',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'txt' => 'text/plain; charset=utf-8',
+        'webmanifest' => 'application/manifest+json; charset=utf-8',
+    ];
+    if (isset($rootTypes[$ext]) && is_file($rootFile)) {
+        header('Content-Type: ' . $rootTypes[$ext]);
+        header('X-Content-Type-Options: nosniff');
         header('Cache-Control: public, max-age=86400');
-        readfile($file);
+        readfile($rootFile);
         exit;
     }
 }

@@ -1,6 +1,5 @@
 <?php
 Layout::start('Terms & Conditions · OurCircle');
-Layout::publicNav();
 $email = $email ?? Layout::supportEmail();
 ?>
 <div class="wrap app-main legal-doc">
