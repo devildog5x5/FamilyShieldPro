@@ -20,13 +20,22 @@ Get-ChildItem -Path (Join-Path $Root "php") -Force | Where-Object { $_.Name -ne 
     Copy-Item -Path $_.FullName -Destination (Join-Path $Stage $_.Name) -Recurse -Force
 }
 
-# Never ship secrets or live data
-Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $Stage ".env")
+# Never ship secrets, live data, archives, build scripts, or dev files.
+# .env.example stays so the operator can copy it to .env. The live site denies serving it.
+$dropExt = @('.zip','.ps1','.sql','.bak','.log','.sh','.apk','.exe','.msi','.dmg','.7z','.phar','.tgz','.gz')
+$dropNames = @('.env','.git','.gitignore','.gitattributes','.ds_store','dockerfile','makefile','composer.json','composer.lock','package.json','package-lock.json','hostinger.txt')
+Get-ChildItem -Path $Stage -Recurse -Force -File | Where-Object {
+    $ext = $_.Extension.ToLower()
+    $name = $_.Name.ToLower()
+    ($dropExt -contains $ext) -or ($dropNames -contains $name)
+} | Remove-Item -Force
+Get-ChildItem -Path $Stage -Recurse -Force -Directory | Where-Object {
+    $_.Name -in @('.git','node_modules','vendor','tests')
+} | Sort-Object FullName -Descending | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 Get-ChildItem -Path (Join-Path $Stage "data") -Filter "*.db" -ErrorAction SilentlyContinue | Remove-Item -Force
 Get-ChildItem -Path (Join-Path $Stage "data") -Filter "*.db-*" -ErrorAction SilentlyContinue | Remove-Item -Force
 $uploads = Join-Path $Stage "data\uploads"
 if (Test-Path $uploads) { Remove-Item -Recurse -Force $uploads }
-Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $Stage "HOSTINGER.txt")
 
 Get-ChildItem -Path $Out -Filter "FamilyShieldPro-PHP*.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
 if (Test-Path $Zip) { Remove-Item -Force $Zip }

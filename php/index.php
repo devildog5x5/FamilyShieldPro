@@ -8,6 +8,13 @@ $rel = ltrim($path, '/');
 if ($rel !== '' && !str_contains($rel, '/') && !str_contains($rel, '\\') && !str_contains($rel, '..') && ($rel[0] ?? '') !== '.') {
     $rootFile = __DIR__ . '/' . $rel;
     $ext = strtolower(pathinfo($rootFile, PATHINFO_EXTENSION));
+    $blocked = ['zip', 'ps1', 'sql', 'bak', 'log', 'sh', 'sqlite', 'db', 'md', 'yml', 'yaml', 'ini', 'dist', 'apk', 'exe', 'msi', 'dmg', '7z', 'phar', 'tgz', 'gz', 'git'];
+    if (in_array($ext, $blocked, true) || str_contains($rel, '.env')) {
+        http_response_code(403);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'Not available';
+        exit;
+    }
     $rootTypes = [
         'ico' => 'image/x-icon',
         'png' => 'image/png',
@@ -29,6 +36,13 @@ if (str_starts_with($path, '/static/')) {
     $file = __DIR__ . '/static/' . $rel;
     if (is_file($file)) {
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $blocked = ['zip', 'ps1', 'sql', 'bak', 'log', 'sh', 'sqlite', 'db', 'md', 'yml', 'yaml', 'ini', 'dist', 'apk', 'exe', 'msi', 'dmg', '7z', 'phar', 'tgz', 'gz', 'git'];
+        if (in_array($ext, $blocked, true) || str_contains($rel, '.env')) {
+            http_response_code(403);
+            header('Content-Type: text/plain; charset=utf-8');
+            echo 'Not available';
+            exit;
+        }
         $types = [
             'css' => 'text/css; charset=utf-8',
             'js' => 'application/javascript; charset=utf-8',
@@ -41,7 +55,13 @@ if (str_starts_with($path, '/static/')) {
             'svg' => 'image/svg+xml',
             'mp4' => 'video/mp4',
         ];
-        header('Content-Type: ' . ($types[$ext] ?? 'application/octet-stream'));
+        if (!isset($types[$ext])) {
+            http_response_code(403);
+            header('Content-Type: text/plain; charset=utf-8');
+            echo 'Not available';
+            exit;
+        }
+        header('Content-Type: ' . $types[$ext]);
         header('Cache-Control: public, max-age=86400');
         readfile($file);
         exit;

@@ -23,3 +23,11 @@ When nobody is signed in, the same menu also links to Sign in and Start a 14-day
 No dead ends. From any page a person can open every activity without the browser back button. New pages use `Layout::start()`, which prints this menu. Do not build a page that omits it.
 
 Public guides are linked from the footer on every page and from each other. They are not a substitute for the activity menu.
+
+## Source and releases
+
+Never link to or serve source code or release zips from a live site.
+
+Do not put GitHub, a repository, source code, an APK, an installer, or a release download in pages, the menu, the footer, admin, the sitemap, or structured data. The Hostinger zip is for upload into `public_html`. Visitors do not download it from the website.
+
+`.htaccess` must keep denying `*.zip`, `*.ps1`, `*.sql`, `.env`, and similar dev files. The release zip itself must not contain other zips, build scripts, `.git`, or those dev files.
