@@ -1,5 +1,5 @@
 <?php
-Layout::start('Page not found · OurCircle', $user ?? null);
+Layout::start('This OurCircle address does not have a page', $user ?? null);
 ?>
 <div class="wrap app-main missing-page">
   <h1>That page is not here</h1>

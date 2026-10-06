@@ -1,5 +1,5 @@
 <?php
-Layout::start('Sign in · OurCircle', null, 'auth-page');
+Layout::start('Sign in to your OurCircle family account', null, 'auth-page');
 $next = $next ?? '/home';
 $showDemo = !empty($showDemo);
 $needOtp = !empty($needOtp);

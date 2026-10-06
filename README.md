@@ -8,9 +8,9 @@ Live site: https://familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.4.0**.
+Canonical PHP source for Hostinger (`public_html`). Version **1.4.1**.
 
-**Hostinger zip:** `FamilyShieldPro-PHP-1.4.0.zip` — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`. Keep the live `.env` and database. Do not overwrite them.
+**Hostinger zip:** `FamilyShieldPro-PHP-1.4.1.zip` — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`. Keep the live `.env` and database. Do not overwrite them.
 
 ## Local run
 

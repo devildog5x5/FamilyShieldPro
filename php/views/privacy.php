@@ -1,5 +1,5 @@
 <?php
-Layout::start('Privacy Policy · OurCircle');
+Layout::start('OurCircle privacy policy for family circle data');
 $email = $email ?? Layout::supportEmail();
 ?>
 <div class="wrap app-main">

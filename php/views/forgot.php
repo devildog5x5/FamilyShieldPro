@@ -1,5 +1,5 @@
 <?php
-Layout::start('Forgot password · OurCircle', null, 'auth-page');
+Layout::start('Request an OurCircle password reset link', null, 'auth-page');
 ?>
 <div class="auth-card">
   <h1>Reset with email</h1>

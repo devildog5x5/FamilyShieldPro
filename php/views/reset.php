@@ -1,5 +1,5 @@
 <?php
-Layout::start(($is_operator ?? false) ? 'Reset operator password · Family Shield Pro' : 'Choose a new password · OurCircle', null, 'auth-page');
+Layout::start(($is_operator ?? false) ? 'Reset operator password · Family Shield Pro' : 'Choose a new password for your OurCircle', null, 'auth-page');
 ?>
 <div class="auth-card">
   <h1><?= !empty($is_operator) ? 'Reset operator password' : 'Choose a new password' ?></h1>
