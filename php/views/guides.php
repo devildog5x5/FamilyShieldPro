@@ -1,6 +1,6 @@
 <?php
 /** @var list<array<string, mixed>> $pages */
-Layout::start('Family guides · OurCircle', $user ?? null);
+Layout::start('OurCircle guides for a family pause before you pay', $user ?? null);
 ?>
 <div class="wrap app-main guide">
   <h1>Guides for a family pause</h1>

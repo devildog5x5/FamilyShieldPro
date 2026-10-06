@@ -17,9 +17,9 @@ $phone = $phone ?? Layout::contactPhone();
           <source src="/static/video/ourcircle-pause.mp4?v=<?= Http::e(Layout::asset()) ?>" type="video/mp4">
         </video>
         <button type="button" class="hero-video-start">
-          <img class="hero-video-poster" src="/static/video/ourcircle-pause.webp?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720" alt="" fetchpriority="high" />
+          <img class="hero-video-poster" src="/static/video/ourcircle-pause.webp?v=<?= Http::e(Layout::asset()) ?>" width="1280" height="720" alt="Grandma with short white hair and glasses, in a pink cardigan, sits on a living-room couch and looks at a smartphone." fetchpriority="high" />
           <span class="hero-video-cue">
-            <img class="hero-video-who" src="/static/video/grandma-still.webp?v=<?= Http::e(Layout::asset()) ?>" width="160" height="160" alt="" />
+            <img class="hero-video-who" src="/static/video/grandma-still.webp?v=<?= Http::e(Layout::asset()) ?>" width="160" height="160" alt="Close-up of the grandma in the story, with short white hair, glasses, and a pink cardigan." />
           </span>
           <span class="hero-video-play"><span class="hero-video-play-icon" aria-hidden="true"></span> Watch the story</span>
         </button>

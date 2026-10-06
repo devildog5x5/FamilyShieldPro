@@ -44,7 +44,7 @@ final class Layout
         $htmlClass = $mode === 'dark' ? ' class="dark"' : '';
         $seo = self::seo();
         $img = $base . '/static/img/og-card.jpg';
-        $alt = 'OurCircle — Pause. Ask family. Then pay.';
+        $alt = 'OurCircle logo beside the words Pause. Ask family. Then pay.';
         $nonce = Http::cspNonce();
         echo '<!DOCTYPE html><html lang="en"' . $htmlClass . '><head><meta charset="UTF-8" />';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1.0" />';
@@ -213,7 +213,7 @@ final class Layout
     public static function brand(): void
     {
         echo '<a class="brand" href="/">';
-        echo '<img src="/static/img/logo-mark.webp?v=' . Http::e(self::asset()) . '" width="56" height="56" alt="OurCircle" />';
+        echo '<img src="/static/img/logo-mark.webp?v=' . Http::e(self::asset()) . '" width="56" height="56" alt="OurCircle logo" />';
         echo '<strong>OurCircle</strong>';
         echo '</a>';
     }

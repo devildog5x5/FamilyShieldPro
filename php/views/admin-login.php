@@ -1,5 +1,5 @@
 <?php
-Layout::start('Operator console · Family Shield Pro', null, 'auth-page');
+Layout::start('OurCircle operator sign-in · Family Shield Pro', null, 'auth-page');
 ?>
 <div class="auth-card">
   <h1>Operator console</h1>

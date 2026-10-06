@@ -1,5 +1,5 @@
 <?php
-Layout::start('Join a circle · OurCircle', null, 'auth-page');
+Layout::start('Join an OurCircle household from an invite', null, 'auth-page');
 $inv = $invite;
 ?>
 <div class="auth-card">

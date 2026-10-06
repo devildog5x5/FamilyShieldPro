@@ -1,5 +1,5 @@
 <?php
-Layout::start('Reset operator password · Family Shield Pro', null, 'auth-page');
+Layout::start('Forgot operator password · Family Shield Pro', null, 'auth-page');
 ?>
 <div class="auth-card">
   <h1>Reset operator password</h1>

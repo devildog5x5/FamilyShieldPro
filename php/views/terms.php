@@ -1,5 +1,5 @@
 <?php
-Layout::start('Terms & Conditions · OurCircle');
+Layout::start('OurCircle terms for the family pause tool');
 $email = $email ?? Layout::supportEmail();
 ?>
 <div class="wrap app-main legal-doc">

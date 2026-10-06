@@ -30,7 +30,7 @@ $canWrite = !empty($user['trial']['can_write']);
       <p><strong>Website:</strong> <?= Http::e(implode(', ', $analysis['urls'])) ?></p>
     <?php endif; ?>
     <?php if (!empty($check['screenshot_token'])): ?>
-      <p><img src="/uploads/<?= Http::e($check['screenshot_token']) ?>" alt="Uploaded screenshot" /></p>
+      <p><img src="/uploads/<?= Http::e($check['screenshot_token']) ?>" alt="Screenshot a family member uploaded for this check" /></p>
     <?php endif; ?>
   </div>
 
