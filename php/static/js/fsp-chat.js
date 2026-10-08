@@ -21,10 +21,8 @@
       }
       return '<a href="' + url + '">' + url + "</a>";
     });
-    html = html.replace(
-      /(^|[\s>])([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})/g,
-      '$1<a href="mailto:$2">$2</a>'
-    );
+    html = html.replace(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g, "");
+    html = html.replace(/801\.319\.1061/g, '<a href="sms:+18013191061">801.319.1061</a>');
     return html;
   }
 
@@ -47,7 +45,7 @@
     toggle.setAttribute("aria-expanded", "true");
     try { localStorage.setItem("fsp-help", "open"); } catch (e) {}
     if (!log.childNodes.length) {
-      add("assistant", "Hi — I can help with plans, login, and how OurCircle works. I will never tell you a request is safe. For a person, email CustomerService@FamilyShieldPro.com.");
+      add("assistant", "Hi — I can help with plans, login, and how OurCircle works. I will never tell you a request is safe. Inquiries Text: 801.319.1061");
     }
     input.focus();
   }
@@ -99,12 +97,12 @@
       body: JSON.stringify({ message: msg, history: history.slice(-8) })
     }).then(function (r) { return r.json(); }).then(function (data) {
       wait.remove();
-      var reply = (data && data.reply) ? data.reply : "Please email CustomerService@FamilyShieldPro.com.";
+      var reply = (data && data.reply) ? data.reply : "Inquiries Text: 801.319.1061";
       add("assistant", reply);
       history.push({ role: "assistant", content: reply });
     }).catch(function () {
       wait.remove();
-      add("assistant", "The chat could not reach the server. Email CustomerService@FamilyShieldPro.com.");
+      add("assistant", "The chat could not reach the server. Inquiries Text: 801.319.1061");
     });
   });
 })();

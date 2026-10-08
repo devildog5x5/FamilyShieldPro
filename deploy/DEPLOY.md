@@ -2,7 +2,7 @@
 
 PHP app in `php/` → Hostinger `public_html`.
 
-**Easiest:** download [familyshieldpro-v1.4.2.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.4.2/familyshieldpro-v1.4.2.zip) and unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (the zip is named `familyshieldpro-v` plus the build number from `Db::VERSION`).
+**Easiest:** download [familyshieldpro-v1.4.3.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.4.3/familyshieldpro-v1.4.3.zip) and unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (the zip is named `familyshieldpro-v` plus the build number from `Db::VERSION`). Keep the live `.env` and database.
 
 Or by hand:
 
@@ -11,7 +11,7 @@ Or by hand:
 3. Copy `.env.example` to `.env`. Set:
    - `APP_SECRET` — long random string
    - `BASE_URL=https://yourdomain.com`
-   - `CONTACT_PHONE` only if you have a real number (leave blank rather than XXX)
+   - The site contact line is Inquiries Text: 801.319.1061. `SUPPORT_EMAIL` and `CONTACT_PHONE` are not shown.
    - `OPERATOR_EMAIL` — where operator password-reset mail goes (defaults to `SUPPORT_EMAIL`)
    - `OPERATOR_PASSWORD` for `/admin/login` (hashed into the database on first load so forgot-password can replace it)
    - Resend or SMTP when you want invite/reset mail. If mail is off, circle and operator reset links are written to `data/password-reset.txt` (blocked from the web).

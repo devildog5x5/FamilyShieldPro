@@ -8,9 +8,9 @@ Live site: https://familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.4.2**.
+Canonical PHP source for Hostinger (`public_html`). Version **1.4.3**.
 
-**Hostinger zip:** `familyshieldpro-v1.4.2.zip` — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename is `familyshieldpro-v` plus the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`. Keep the live `.env` and database. Do not overwrite them.
+**Hostinger zip:** `familyshieldpro-v1.4.3.zip` — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename is `familyshieldpro-v` plus the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`. Keep the live `.env` and database. Do not overwrite them.
 
 ## Local run
 
@@ -75,6 +75,6 @@ The same main menu is on every page. See `SOP.md`.
 
 ## Support
 
-CustomerService@FamilyShieldPro.com
+Inquiries Text: 801.319.1061. `SUPPORT_EMAIL` in `.env` is for outbound mail only and is not shown on the site.
 
-FamilyShieldPro v1.4.2 · © 2026 Robert Foster · CustomerService@FamilyShieldPro.com
+FamilyShieldPro v1.4.3 · © 2026 Robert Foster · Inquiries Text: 801.319.1061

@@ -74,7 +74,7 @@ $canWrite = !empty($user['trial']['can_write']);
     <?= Http::csrfField() ?>
     <h2>Invite someone</h2>
     <label>Email</label>
-    <input name="email" type="email" required autocomplete="off" placeholder="family@example.com" />
+    <input name="email" type="email" required autocomplete="off" placeholder="Family email" />
     <details class="more">
       <summary>Name or mobile (optional)</summary>
       <label>Their name</label>

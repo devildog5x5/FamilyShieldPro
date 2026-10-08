@@ -1,6 +1,5 @@
 <?php
 Layout::start('OurCircle terms for the family pause tool');
-$email = $email ?? Layout::supportEmail();
 ?>
 <div class="wrap app-main legal-doc">
   <h1>Terms &amp; Conditions</h1>
@@ -23,7 +22,7 @@ $email = $email ?? Layout::supportEmail();
 
   <h2>5. Trial, plans, and billing</h2>
   <p>Every new circle includes a 14-day trial. Family monthly is $14.99. Family yearly is $119.99. After the trial the owner pays to keep checking new requests, inviting family, and using call-me. If the trial ends or a subscription lapses, we do not lock you out of the personal information you entered — the trusted list, past checks, and account details stay readable.</p>
-  <p>When card payments are connected, the circle owner pays through Stripe. We do not store full card numbers. If payments are not connected, choosing a plan only records it on the circle and nothing is charged. Subscriptions renew until the owner cancels through the card-management portal (when available) or by emailing us. Fees already paid are not refunded except where the law requires it.</p>
+  <p>When card payments are connected, the circle owner pays through Stripe. We do not store full card numbers. If payments are not connected, choosing a plan only records it on the circle and nothing is charged. Subscriptions renew until the owner cancels through the card-management portal (when available). <?php echo Layout::supportNote(); ?> Fees already paid are not refunded except where the law requires it.</p>
   <p>Prices may change for later billing periods. We will describe the current plans on the site. Taxes, if any, are extra where required.</p>
 
   <h2>6. What you paste and upload</h2>
@@ -40,7 +39,7 @@ $email = $email ?? Layout::supportEmail();
 
   <h2>10. Changes and availability</h2>
   <p>We may update these Terms. The effective date at the top will change. Continued use after an update means you accept the revised Terms. We may change, pause, or discontinue features. We do not promise uninterrupted service.</p>
-  <p>You may stop using the service at any time. To delete a circle, email <a href="mailto:<?= Http::e($email) ?>"><?= Http::e($email) ?></a>. We may close an account that violates these Terms.</p>
+  <p>You may stop using the service at any time. To delete a circle, <?php echo Layout::supportNote(); ?> We may close an account that violates these Terms.</p>
 
   <h2>11. Our materials</h2>
   <p>Family Shield Pro, OurCircle, the site, and related marks are ours. You may use the service for your household. You may not copy the product, reverse-engineer it, or present it as your own.</p>
@@ -58,7 +57,7 @@ $email = $email ?? Layout::supportEmail();
   <p>These Terms are governed by the laws of the United States. If you are a consumer, nothing here takes away rights your state does not let you waive. If a part of these Terms cannot be enforced, the rest still applies.</p>
 
   <h2>16. Contact</h2>
-  <p>Questions about these Terms, your circle, or billing: <a href="mailto:<?= Http::e($email) ?>"><?= Http::e($email) ?></a>.</p>
+  <p>Questions about these Terms, your circle, or billing: <?php echo Layout::supportNote(); ?></p>
   <p><a href="/privacy">Privacy Policy</a> · <a href="/">Home</a></p>
 </div>
 <?php Layout::end();

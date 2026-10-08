@@ -332,7 +332,6 @@ final class Layout
     private static function jsonLd(string $base): string
     {
         $org = $base . '/#organization';
-        $email = self::supportEmail();
         $organization = [
             '@type' => 'Organization',
             '@id' => $org,
@@ -340,13 +339,9 @@ final class Layout
             'alternateName' => 'OurCircle',
             'url' => $base . '/',
             'logo' => $base . '/static/img/logo-mark.webp',
-            'email' => $email,
+            'telephone' => '+1-801-319-1061',
             'description' => 'Family pause tool for scam texts, prizes, and urgent payment asks. Guidance, not a guarantee.',
         ];
-        $phone = self::contactPhone();
-        if ($phone !== '') {
-            $organization['telephone'] = $phone;
-        }
         $graph = [
             '@context' => 'https://schema.org',
             '@graph' => [
@@ -466,7 +461,8 @@ final class Layout
             return;
         }
         $cls = $f['type'] === 'error' ? 'flash error' : 'flash ok';
-        echo '<div class="' . $cls . '">' . Http::e($f['text']) . '</div>';
+        $text = str_replace('801.319.1061', self::supportLink(), Http::e($f['text']));
+        echo '<div class="' . $cls . '">' . $text . '</div>';
     }
 
     public static function end(?array $user = null): void
@@ -507,15 +503,34 @@ final class Layout
         return '<a href="/privacy">Privacy</a> · <a href="/terms">Terms &amp; Conditions</a>';
     }
 
+    public static function supportNumber(): string
+    {
+        return '801.319.1061';
+    }
+
+    public static function supportLink(): string
+    {
+        return '<a href="sms:+18013191061">' . Http::e(self::supportNumber()) . '</a>';
+    }
+
+    public static function supportNote(): string
+    {
+        return 'Inquiries Text: ' . self::supportLink();
+    }
+
+    public static function supportPlain(): string
+    {
+        return 'Inquiries Text: 801.319.1061';
+    }
+
     public static function versionLine(): void
     {
-        $email = self::supportEmail();
         echo '<p class="site-meta">';
         echo '<span class="site-meta-bit">FamilyShieldPro v' . Http::e(self::asset()) . '</span>';
         echo '<span class="site-meta-sep"> · </span>';
         echo '<span class="site-meta-bit">© 2026 Robert Foster</span>';
         echo '<span class="site-meta-sep"> · </span>';
-        echo '<a href="mailto:' . Http::e($email) . '">' . Http::e($email) . '</a>';
+        echo '<span class="site-meta-bit">Inquiries Text: ' . self::supportLink() . '</span>';
         echo '</p>';
     }
 
@@ -533,7 +548,6 @@ final class Layout
 
     public static function chat(): void
     {
-        $em = self::supportEmail();
         echo '<div class="fsp-chat" id="fsp-chat">';
         echo '<button type="button" class="fsp-chat-tab" id="fsp-chat-toggle" aria-expanded="false" aria-controls="fsp-chat-panel">Help</button>';
         echo '<div class="fsp-chat-panel" id="fsp-chat-panel" hidden>';
@@ -544,7 +558,7 @@ final class Layout
         echo '<label class="sr-only" for="fsp-chat-input">Message</label>';
         echo '<input id="fsp-chat-input" maxlength="800" placeholder="Ask about plans, login, or the pause rule." autocomplete="off" />';
         echo '<button class="btn" type="submit">Send</button></form>';
-        echo '<p class="fsp-chat-mail">Email <a href="mailto:' . Http::e($em) . '">' . Http::e($em) . '</a></p>';
+        echo '<p class="fsp-chat-mail">' . self::supportNote() . '</p>';
         echo '</div></div>';
     }
 

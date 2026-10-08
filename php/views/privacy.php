@@ -1,6 +1,5 @@
 <?php
 Layout::start('OurCircle privacy policy for family circle data');
-$email = $email ?? Layout::supportEmail();
 ?>
 <div class="wrap app-main">
   <h1>Privacy Policy</h1>
@@ -17,9 +16,9 @@ $email = $email ?? Layout::supportEmail();
   <h2>Sharing</h2>
   <p>People you invite can see checks, notes, and the trusted list for that circle. We may use email and (when connected) SMS providers to deliver invites and alerts. We may disclose information if required by law.</p>
   <h2>Retention</h2>
-  <p>We keep circle data while the account is open. You can ask us to delete a circle by emailing <a href="mailto:<?= Http::e($email) ?>"><?= Http::e($email) ?></a>.</p>
+  <p>We keep circle data while the account is open. You can ask us to delete a circle. <?php echo Layout::supportNote(); ?></p>
   <h2>Contact</h2>
-  <p><a href="mailto:<?= Http::e($email) ?>"><?= Http::e($email) ?></a></p>
+  <p><?php echo Layout::supportNote(); ?></p>
   <p><a href="/terms">Terms &amp; Conditions</a> · <a href="/">Home</a></p>
 </div>
 <?php Layout::end();
