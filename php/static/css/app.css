@@ -471,13 +471,30 @@ textarea.stripe-log {
 .guide h2 { font-family: var(--font); font-size: 1.35rem; margin: 1.5rem 0 0.45rem; }
 .guide-next { margin-top: 28px; }
 .guide-next h2 { margin-top: 0; }
-.site-foot { padding: 8px 0 36px; }
+.site-foot { padding: 8px 0 4px; }
 .guide-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 10px; }
+.site-meta {
+  margin: 0;
+  padding: 10px 16px 16px;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--muted);
+}
+.site-meta-bit { white-space: nowrap; }
+.site-meta a {
+  color: inherit;
+  font-size: 12.5px;
+  font-weight: 400;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .app-bare { position: relative; min-height: 100vh; }
 .auth-card { width: min(440px, calc(100% - 32px)); margin: 8px auto 28px; padding: 28px; }
 .auth-card .brand { margin-bottom: 16px; }
 .disclaimer { font-size: 0.95rem; color: var(--muted); }
-.build { white-space: nowrap; }
 .otp-secret, .recovery-codes {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   letter-spacing: 0.08em;

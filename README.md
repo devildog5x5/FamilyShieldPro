@@ -8,9 +8,9 @@ Live site: https://familyshieldpro.com/
 
 ## What this repo is
 
-Canonical PHP source for Hostinger (`public_html`). Version **1.4.1**.
+Canonical PHP source for Hostinger (`public_html`). Version **1.4.2**.
 
-**Hostinger zip:** `FamilyShieldPro-PHP-1.4.1.zip` — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename includes the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`. Keep the live `.env` and database. Do not overwrite them.
+**Hostinger zip:** `familyshieldpro-v1.4.2.zip` — unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (filename is `familyshieldpro-v` plus the build number from `Db::VERSION`). The zip stores paths with forward slashes so it opens on Linux and on Hostinger. Do not link that zip, this repo, or any installer from the live site. See `SOP.md`. Keep the live `.env` and database. Do not overwrite them.
 
 ## Local run
 
@@ -26,7 +26,7 @@ Open http://127.0.0.1:8080 — demo login `family@ourcircle.app` / `password123`
 
 ## Deploy (Hostinger)
 
-1. Download the latest [FamilyShieldPro-PHP zip](https://github.com/devildog5x5/FamilyShieldPro/releases/latest) and unzip into `public_html` (not a nested folder).
+1. Download the latest [familyshieldpro zip](https://github.com/devildog5x5/FamilyShieldPro/releases/latest) (`familyshieldpro-v<version>.zip`) and unzip into `public_html` (not a nested folder).
 2. Copy `.env.example` to `.env`. Set `APP_SECRET`, `BASE_URL`, `OPERATOR_EMAIL`, and `OPERATOR_PASSWORD`. Stripe test keys: see `STRIPE.md`.
 3. PHP 8.2/8.3 with `pdo_sqlite`.
 4. Database file: `public_html/data/ourcircle.db` (blocked by `.htaccess`).
@@ -77,4 +77,4 @@ The same main menu is on every page. See `SOP.md`.
 
 CustomerService@FamilyShieldPro.com
 
-Copyright © 2026 Family Shield Pro. All rights reserved.
+FamilyShieldPro v1.4.2 · © 2026 Robert Foster · CustomerService@FamilyShieldPro.com

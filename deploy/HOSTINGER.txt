@@ -2,7 +2,7 @@ Family Shield Pro (OurCircle) — Hostinger
 =========================================
 This file is for you. It is not put in the public_html zip.
 
-1. Unzip ALL files from FamilyShieldPro-PHP-<version>.zip into public_html (not a subfolder).
+1. Unzip ALL files from familyshieldpro-v<version>.zip into public_html (not a subfolder).
 2. Copy .env.example to .env
 3. Set APP_SECRET (long random string) and BASE_URL=https://familyshieldpro.com
    Optional search tags (paste the code only, or the whole meta tag; leave blank to omit):
