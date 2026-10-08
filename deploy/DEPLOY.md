@@ -11,7 +11,7 @@ Or by hand:
 3. Copy `.env.example` to `.env`. Set:
    - `APP_SECRET` — long random string
    - `BASE_URL=https://yourdomain.com`
-   - Customer support on the site is text 801-319-1061. `SUPPORT_EMAIL` and `CONTACT_PHONE` are not shown.
+   - The site contact line is Inquiries Text: 801.319.1061. `SUPPORT_EMAIL` and `CONTACT_PHONE` are not shown.
    - `OPERATOR_EMAIL` — where operator password-reset mail goes (defaults to `SUPPORT_EMAIL`)
    - `OPERATOR_PASSWORD` for `/admin/login` (hashed into the database on first load so forgot-password can replace it)
    - Resend or SMTP when you want invite/reset mail. If mail is off, circle and operator reset links are written to `data/password-reset.txt` (blocked from the web).

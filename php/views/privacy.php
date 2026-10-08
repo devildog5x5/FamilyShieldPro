@@ -16,9 +16,9 @@ Layout::start('OurCircle privacy policy for family circle data');
   <h2>Sharing</h2>
   <p>People you invite can see checks, notes, and the trusted list for that circle. We may use email and (when connected) SMS providers to deliver invites and alerts. We may disclose information if required by law.</p>
   <h2>Retention</h2>
-  <p>We keep circle data while the account is open. You can ask us to delete a circle. <?php echo Layout::supportNote(); ?>.</p>
+  <p>We keep circle data while the account is open. You can ask us to delete a circle. <?php echo Layout::supportNote(); ?></p>
   <h2>Contact</h2>
-  <p><?php echo Layout::supportNote(); ?>.</p>
+  <p><?php echo Layout::supportNote(); ?></p>
   <p><a href="/terms">Terms &amp; Conditions</a> · <a href="/">Home</a></p>
 </div>
 <?php Layout::end();

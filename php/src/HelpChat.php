@@ -43,7 +43,7 @@ final class HelpChat
             return self::fallback('');
         }
         if (!self::allow()) {
-            return 'Please wait a minute, then try Help again. ' . Layout::supportPlain() . '.';
+            return 'Please wait a minute, then try Help again. ' . Layout::supportPlain();
         }
         if (!self::configured()) {
             return self::fallback($msg);
@@ -163,17 +163,18 @@ final class HelpChat
             return '';
         }
         if (preg_match('/github\.com|gitlab\.com|bitbucket\.org|sourceforge|source code|releases\/download|\.zip\b|\.apk\b|\.exe\b|\.msi\b|installer/i', $text)) {
-            return 'Family Shield Pro does not offer a code or app download on this site. ' . Layout::supportPlain() . '.';
+            return 'Family Shield Pro does not offer a code or app download on this site. ' . Layout::supportPlain();
         }
         if (preg_match('/\b(this is safe|that is safe|it is safe|not a scam|isn\'t a scam|is legitimate|is legit|go ahead and (pay|send)|you (can|should) (pay|send|wire))\b/i', $text)) {
-            return 'OurCircle cannot tell you that a request is safe. Pause. Check your trusted list. Call someone in your circle. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. ' . Layout::supportPlain() . '.';
+            return 'OurCircle cannot tell you that a request is safe. Pause. Check your trusted list. Call someone in your circle. Search the claim on Snopes, FTC Scam Alerts, or BBB Scam Tracker — do not tap links in the message. ' . Layout::supportPlain();
         }
         if (preg_match('/mailto:|[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/', $text)) {
             $text = preg_replace('/mailto:[^\s]+/i', '', $text) ?? $text;
             $text = preg_replace('/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/', '', $text) ?? $text;
             $text = trim(preg_replace('/\s{2,}/', ' ', $text) ?? $text);
-            if (!str_contains($text, '801-319-1061')) {
-                $text = trim($text . ' ' . Layout::supportPlain() . '.');
+            $text = str_replace('801-319-1061', '801.319.1061', $text);
+            if (!str_contains($text, 'Inquiries Text: 801.319.1061')) {
+                $text = trim($text . ' ' . Layout::supportPlain());
             }
         }
         return $text;
@@ -192,17 +193,17 @@ Hard rules:
 - The pause rule: never send those until the request is independently verified through a number or site the family already trusts — not a number or link inside the suspicious message.
 - Paying for a plan does not make a request safe. This application offers guidance, not a guarantee.
 - Never mention GitHub, a repository, source code, an APK, an installer, or a release download. This site does not offer those.
-- Never give an email address or a mailto link. Customer support is text only: {$support}.
+- Never give an email address or a mailto link. When a person needs the operator, say exactly: {$support}
 
 Product facts (do not invent others):
 - New circles get a 14-day trial. Then Family monthly is \$14.99 or Family yearly is \$119.99 for up to five people.
 - After the trial, new checks, invites, and call-me need the owner to pay. We do not lock people out of personal information they entered. Trusted list, past checks, and account details stay readable. We do not sell people’s information.
 - Sign up at /signup. Sign in at /login. Forgot password at /forgot. Plans at /billing. Terms at /terms. Privacy at /privacy.
 - Card payments go through Stripe when connected. Test cards only work in Stripe test mode.
-- For a person, {$support}. That text line is not an emergency line.
+- For a person, say exactly {$support}. That is not an emergency line.
 
 If the visitor pastes a suspicious message, do not analyze it as safe or unsafe in a verdict. Tell them to paste it into Check on OurCircle, call someone they trust, and use the lookup links (Snopes, FTC, BBB, IC3).
-If you do not know, say so and tell them to text 801-319-1061. Do not invent prices, other phone numbers, email addresses, or features.
+If you do not know, say so and then say exactly {$support}. Do not invent prices, other phone numbers, or email addresses.
 TXT;
     }
 
@@ -210,7 +211,7 @@ TXT;
     {
         $support = Layout::supportPlain();
         if ($msg === '') {
-            return 'Ask me about plans, login, or how the circle works. ' . $support . '.';
+            return 'Ask me about plans, login, or how the circle works. ' . $support;
         }
         $low = strtolower($msg);
         if (preg_match('/terms|privacy|legal|conditions|t&c|\bt and c\b|t\'s and c/', $low)) {
@@ -226,12 +227,12 @@ TXT;
             return 'Family Shield Pro is $14.99 per month or $119.99 per year for one circle of up to five people. Yearly is the better family value. Start at /signup. Paying does not make a request safe.';
         }
         if (preg_match('/login|password|forgot|sign in/', $low)) {
-            return 'Use /login with the email on your circle. After several wrong tries, sign-in pauses for 15 minutes. Forgot password sends a one-hour link, or saves it next to the database if mail is not connected. 2FA recovery codes also work. ' . $support . '.';
+            return 'Use /login with the email on your circle. After several wrong tries, sign-in pauses for 15 minutes. Forgot password sends a one-hour link, or saves it next to the database if mail is not connected. 2FA recovery codes also work. ' . $support;
         }
         if (preg_match('/sms|text|twilio|forward/', $low)) {
-            return 'Save your mobile on Account. When texting is connected, invites and “Please call me before I pay” can go by SMS. Reply STOP to opt out. That number is not customer support. ' . $support . '.';
+            return 'Save your mobile on Account. When texting is connected, invites and “Please call me before I pay” can go by SMS. Reply STOP to opt out. That number is not customer support. ' . $support;
         }
-        return 'Family Shield Pro (OurCircle) is a trusted family circle for sketchy texts, calls, prizes, and urgent payment asks. It is not an AI stamp of safety. Paste the request, read the warning signs, and call someone you trust. ' . $support . '.';
+        return 'Family Shield Pro (OurCircle) is a trusted family circle for sketchy texts, calls, prizes, and urgent payment asks. It is not an AI stamp of safety. Paste the request, read the warning signs, and call someone you trust. ' . $support;
     }
 
     private static function allow(): bool

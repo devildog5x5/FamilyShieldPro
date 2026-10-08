@@ -461,7 +461,7 @@ final class Layout
             return;
         }
         $cls = $f['type'] === 'error' ? 'flash error' : 'flash ok';
-        $text = str_replace('801-319-1061', self::supportLink(), Http::e($f['text']));
+        $text = str_replace('801.319.1061', self::supportLink(), Http::e($f['text']));
         echo '<div class="' . $cls . '">' . $text . '</div>';
     }
 
@@ -505,7 +505,7 @@ final class Layout
 
     public static function supportNumber(): string
     {
-        return '801-319-1061';
+        return '801.319.1061';
     }
 
     public static function supportLink(): string
@@ -515,12 +515,12 @@ final class Layout
 
     public static function supportNote(): string
     {
-        return 'Text ' . self::supportLink() . ' for customer support';
+        return 'Inquiries Text: ' . self::supportLink();
     }
 
     public static function supportPlain(): string
     {
-        return 'Text 801-319-1061 for customer support';
+        return 'Inquiries Text: 801.319.1061';
     }
 
     public static function versionLine(): void
@@ -530,7 +530,7 @@ final class Layout
         echo '<span class="site-meta-sep"> · </span>';
         echo '<span class="site-meta-bit">© 2026 Robert Foster</span>';
         echo '<span class="site-meta-sep"> · </span>';
-        echo '<span class="site-meta-bit">Text ' . self::supportLink() . ' for support</span>';
+        echo '<span class="site-meta-bit">Inquiries Text: ' . self::supportLink() . '</span>';
         echo '</p>';
     }
 

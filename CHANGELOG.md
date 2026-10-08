@@ -2,7 +2,7 @@
 
 ## 1.4.3
 
-Customer support on the site is text only: 801-319-1061 (`sms:+18013191061`). Support email addresses are no longer shown. Footer: FamilyShieldPro v1.4.3 · © 2026 Robert Foster · Text 801-319-1061 for support.
+Customer contact on the site is exactly “Inquiries Text: 801.319.1061” (`sms:+18013191061`). Support email addresses are not shown. Footer: FamilyShieldPro v1.4.3 · © 2026 Robert Foster · Inquiries Text: 801.319.1061.
 
 ## 1.4.2
 

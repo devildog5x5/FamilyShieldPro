@@ -77,11 +77,11 @@ Layout::start('OurCircle — Pause. Ask family. Then pay.');
   </div>
   <?php Layout::faq(); ?>
   <p class="disclaimer">This application offers guidance, not a guarantee. A paid plan is a family tool, not a stamp that a request is safe.</p>
-  <p class="muted partner-line">Churches, senior centers, and veterans groups: ask about a shared license. Credit unions and insurers: per-member partnership pricing. <?php echo Layout::supportNote(); ?>.</p>
+  <p class="muted partner-line">Churches, senior centers, and veterans groups: ask about a shared license. Credit unions and insurers: per-member partnership pricing. <?php echo Layout::supportNote(); ?></p>
 
   <section class="support-contact" id="contact">
     <h2>Customer service</h2>
-    <p>Questions about your circle, billing, login, or this site? <?php echo Layout::supportNote(); ?>. A person reads every message.</p>
+    <p>Questions about your circle, billing, login, or this site? <?php echo Layout::supportNote(); ?> A person reads every message.</p>
     <p class="muted">OurCircle is built for families — including parents, adult children, and grandparents — who want a second set of eyes.</p>
     <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms &amp; Conditions</a></p>
   </section>

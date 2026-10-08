@@ -75,6 +75,6 @@ The same main menu is on every page. See `SOP.md`.
 
 ## Support
 
-Text 801-319-1061 for customer support. `SUPPORT_EMAIL` in `.env` is for outbound mail only and is not shown on the site.
+Inquiries Text: 801.319.1061. `SUPPORT_EMAIL` in `.env` is for outbound mail only and is not shown on the site.
 
-FamilyShieldPro v1.4.3 · © 2026 Robert Foster · Text 801-319-1061 for support
+FamilyShieldPro v1.4.3 · © 2026 Robert Foster · Inquiries Text: 801.319.1061
