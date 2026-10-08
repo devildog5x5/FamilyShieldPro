@@ -480,9 +480,10 @@ final class Layout
             echo '<a href="' . Http::e((string) $guide['path']) . '"' . $current . '>' . Http::e((string) $guide['nav']) . '</a>';
         }
         echo '</nav>';
-        echo '<p class="disclaimer"><span class="copy">© 2026 Family Shield Pro. All rights reserved.</span> This application offers guidance, not a guarantee. '
+        echo '<p class="disclaimer">This application offers guidance, not a guarantee. '
             . self::legalLinks()
-            . ' <span class="build">' . Http::e(self::asset()) . '</span></p></div>';
+            . '</p></div>';
+        self::versionLine();
         self::chat();
         echo '<script src="/static/js/fsp-chat.js?v=' . Http::e(self::asset()) . '" defer></script>';
         echo '<script src="/static/js/fsp-password.js?v=' . Http::e(self::asset()) . '" defer></script>';
@@ -504,6 +505,18 @@ final class Layout
     public static function legalLinks(): string
     {
         return '<a href="/privacy">Privacy</a> · <a href="/terms">Terms &amp; Conditions</a>';
+    }
+
+    public static function versionLine(): void
+    {
+        $email = self::supportEmail();
+        echo '<p class="site-meta">';
+        echo '<span class="site-meta-bit">FamilyShieldPro v' . Http::e(self::asset()) . '</span>';
+        echo '<span class="site-meta-sep"> · </span>';
+        echo '<span class="site-meta-bit">© 2026 Robert Foster</span>';
+        echo '<span class="site-meta-sep"> · </span>';
+        echo '<a href="mailto:' . Http::e($email) . '">' . Http::e($email) . '</a>';
+        echo '</p>';
     }
 
     public static function agreeCheckbox(): void

@@ -2,7 +2,7 @@
 
 PHP app in `php/` → Hostinger `public_html`.
 
-**Easiest:** download [FamilyShieldPro-PHP-1.3.19.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.3.19/FamilyShieldPro-PHP-1.3.19.zip) and unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (the zip name includes the build number).
+**Easiest:** download [familyshieldpro-v1.4.2.zip](https://github.com/devildog5x5/FamilyShieldPro/releases/download/v1.4.2/familyshieldpro-v1.4.2.zip) and unzip into `public_html`. Rebuild locally with `powershell -File .\build_php_zip.ps1` (the zip is named `familyshieldpro-v` plus the build number from `Db::VERSION`).
 
 Or by hand:
 

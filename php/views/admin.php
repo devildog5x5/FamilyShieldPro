@@ -3,7 +3,6 @@ Layout::start('OurCircle operator console · Family Shield Pro', null, 'app-bare
 ?>
 <div class="wrap app-main">
   <h1>Circles</h1>
-  <p class="muted">Family Shield Pro <?= Http::e(Db::VERSION) ?></p>
   <?php $authLimit = $authLimit ?? ['fails' => 0, 'locked' => 0]; ?>
   <p class="muted">Sign-in pause: <?= (int) $authLimit['fails'] ?> failed tries in the last 15 minutes
     · <?= (int) $authLimit['locked'] ?> locked <?= ((int) $authLimit['locked'] === 1) ? 'identity' : 'identities' ?>.

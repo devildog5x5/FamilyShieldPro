@@ -1,4 +1,4 @@
-# Build FamilyShieldPro-PHP-<version>.zip for Hostinger public_html
+# Build familyshieldpro-v<version>.zip for Hostinger public_html
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $Out = Join-Path $Root "installers"
@@ -9,7 +9,7 @@ if ($DbText -notmatch "VERSION\s*=\s*'([^']+)'") {
     throw "Could not read VERSION from php/src/Db.php"
 }
 $Version = $Matches[1]
-$ZipName = "FamilyShieldPro-PHP-$Version.zip"
+$ZipName = "familyshieldpro-v$Version.zip"
 $Zip = Join-Path $Out $ZipName
 
 New-Item -ItemType Directory -Force -Path $Out | Out-Null
@@ -37,6 +37,7 @@ Get-ChildItem -Path (Join-Path $Stage "data") -Filter "*.db-*" -ErrorAction Sile
 $uploads = Join-Path $Stage "data\uploads"
 if (Test-Path $uploads) { Remove-Item -Recurse -Force $uploads }
 
+Get-ChildItem -Path $Out -Filter "familyshieldpro-v*.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
 Get-ChildItem -Path $Out -Filter "FamilyShieldPro-PHP*.zip" -ErrorAction SilentlyContinue | Remove-Item -Force
 if (Test-Path $Zip) { Remove-Item -Force $Zip }
 
