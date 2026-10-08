@@ -14,6 +14,7 @@ Layout::start('Turn on 2FA', $user);
     <input class="otp" name="otp" inputmode="numeric" autocomplete="one-time-code" required />
     <p><button class="btn" type="submit">Confirm and turn on 2FA</button>
        <a class="btn ghost" href="/account">Cancel</a></p>
+    <p class="muted"><?php echo Layout::supportNote(); ?>.</p>
   </form>
 </div>
 <?php Layout::end($user);

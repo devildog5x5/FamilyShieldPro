@@ -1,7 +1,5 @@
 <?php
 Layout::start('OurCircle — Pause. Ask family. Then pay.');
-$email = $email ?? Layout::supportEmail();
-$phone = $phone ?? Layout::contactPhone();
 ?>
 <div class="wrap home">
   <section class="hero">
@@ -49,11 +47,7 @@ $phone = $phone ?? Layout::contactPhone();
     </div>
     <div class="panel">
       <h3>Text with your circle</h3>
-      <?php if ($phone !== ''): ?>
-        <p>Invites and “Please call me before I pay” can go by text when texting is connected. To talk with a person about your circle, call <?= Http::e($phone) ?>. Paste a sketchy message into the circle and call someone on your trusted list. We never say a request is safe. Reply STOP to opt out of texts.</p>
-      <?php else: ?>
-        <p>Invites and “Please call me before I pay” can go by text when texting is connected. Paste a sketchy message into the circle and call someone on your trusted list. We never say a request is safe. Reply STOP to opt out of texts.</p>
-      <?php endif; ?>
+      <p>Invites and “Please call me before I pay” can go by text when texting is connected. Paste a sketchy message into the circle and call someone on your trusted list. We never say a request is safe. Reply STOP to opt out of texts.</p>
     </div>
     <div class="panel">
       <h3>If something already went wrong</h3>
@@ -83,15 +77,11 @@ $phone = $phone ?? Layout::contactPhone();
   </div>
   <?php Layout::faq(); ?>
   <p class="disclaimer">This application offers guidance, not a guarantee. A paid plan is a family tool, not a stamp that a request is safe.</p>
-  <p class="muted partner-line">Churches, senior centers, and veterans groups: ask us about a shared license. Credit unions and insurers: per-member partnership pricing.</p>
+  <p class="muted partner-line">Churches, senior centers, and veterans groups: ask about a shared license. Credit unions and insurers: per-member partnership pricing. <?php echo Layout::supportNote(); ?>.</p>
 
   <section class="support-contact" id="contact">
     <h2>Customer service</h2>
-    <p>Questions about your circle, billing, login, or this site? Email us. A person reads every message.</p>
-    <p><a href="mailto:<?= Http::e($email) ?>"><?= Http::e($email) ?></a></p>
-    <?php if ($phone !== ''): ?>
-      <p class="support-phone"><a href="tel:<?= Http::e(preg_replace('/\D+/', '', $phone) ?? '') ?>"><?= Http::e($phone) ?></a></p>
-    <?php endif; ?>
+    <p>Questions about your circle, billing, login, or this site? <?php echo Layout::supportNote(); ?>. A person reads every message.</p>
     <p class="muted">OurCircle is built for families — including parents, adult children, and grandparents — who want a second set of eyes.</p>
     <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms &amp; Conditions</a></p>
   </section>

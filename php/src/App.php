@@ -316,8 +316,6 @@ final class App
     {
         $this->view('landing', [
             'user' => $user,
-            'phone' => Layout::contactPhone(),
-            'email' => Layout::supportEmail(),
         ]);
     }
 
@@ -1044,7 +1042,7 @@ final class App
         if (!Billing::ready()) {
             $why = Billing::notReadyReason();
             Billing::logFailure('not-ready', $why);
-            Http::flash('Card checkout could not start. Try again in a moment, or email ' . Layout::supportEmail() . '.', 'error');
+            Http::flash('Card checkout could not start. Try again in a moment. ' . Layout::supportPlain() . '.', 'error');
             Http::redirect('/billing');
         }
         try {
@@ -1052,7 +1050,7 @@ final class App
         } catch (Throwable $e) {
             $safe = Billing::safeMessage($e->getMessage());
             Billing::logFailure('checkout', $safe);
-            Http::flash('Card checkout could not start. Try again in a moment, or email ' . Layout::supportEmail() . '.', 'error');
+            Http::flash('Card checkout could not start. Try again in a moment. ' . Layout::supportPlain() . '.', 'error');
             Http::redirect('/billing');
         }
     }
@@ -1071,13 +1069,13 @@ final class App
                 } else {
                     $st = (string) ($checkout['status'] ?? 'unknown');
                     Billing::logFailure('success', 'Checkout session was not paid (status ' . $st . ')');
-                    Http::flash('That payment could not be confirmed. Try Plans again, or email ' . Layout::supportEmail() . '.', 'error');
+                    Http::flash('That payment could not be confirmed. Try Plans again. ' . Layout::supportPlain() . '.', 'error');
                     Http::redirect('/billing');
                 }
             } catch (Throwable $e) {
                 $safe = Billing::safeMessage($e->getMessage());
                 Billing::logFailure('success', $safe);
-                Http::flash('That payment could not be confirmed. Try Plans again, or email ' . Layout::supportEmail() . '.', 'error');
+                Http::flash('That payment could not be confirmed. Try Plans again. ' . Layout::supportPlain() . '.', 'error');
                 Http::redirect('/billing');
             }
         }
@@ -1110,7 +1108,7 @@ final class App
         } catch (Throwable $e) {
             $safe = Billing::safeMessage($e->getMessage());
             Billing::logFailure('portal', $safe);
-            Http::flash('Card management could not be opened. Try again in a moment, or email ' . Layout::supportEmail() . '.', 'error');
+            Http::flash('Card management could not be opened. Try again in a moment. ' . Layout::supportPlain() . '.', 'error');
             Http::redirect('/billing');
         }
     }
@@ -1226,7 +1224,7 @@ final class App
         $token = (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
         $need = Http::csrfToken();
         if ($token === '' || strlen($token) !== strlen($need) || !hash_equals($need, $token)) {
-            Http::json(['reply' => 'That help session expired. Refresh the page, or email ' . Layout::supportEmail() . '.'], 403);
+            Http::json(['reply' => 'That help session expired. Refresh the page. ' . Layout::supportPlain() . '.'], 403);
         }
         $body = Http::bodyJson();
         $msg = trim((string) ($body['message'] ?? ''));
@@ -1239,7 +1237,7 @@ final class App
 
     private function legal(string $which): never
     {
-        $this->view($which, ['email' => Layout::supportEmail()]);
+        $this->view($which);
     }
 
     private function robots(): never

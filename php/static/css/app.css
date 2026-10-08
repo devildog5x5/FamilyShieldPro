@@ -120,18 +120,19 @@ img { max-width: 100%; height: auto; }
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  background: var(--teal);
+  background: #0f6f6a;
   color: #fff;
 }
-.btn:hover { background: var(--teal-hover); }
-.btn.gold { background: var(--gold); color: #1c2a2a; }
-.btn.gold:hover { filter: brightness(0.95); }
+.btn:hover { background: #0b4f4b; color: #fff; }
+.btn.gold { background: #7a5200; color: #fff; }
+.btn.gold:hover { background: #5c3d06; color: #fff; filter: none; }
 .btn.ghost {
   background: transparent;
   color: var(--link);
   box-shadow: inset 0 0 0 2px var(--teal);
 }
-.btn.danger { background: var(--danger); color: #fff; }
+.btn.danger { background: #9f1d14; color: #fff; }
+.btn.danger:hover { background: #7a1c14; color: #fff; }
 .btn.wide { width: 100%; padding: 16px; font-size: 1.05rem; }
 .btn.sm { padding: 8px 14px; font-size: 0.95rem; }
 .theme-toggle {
@@ -279,7 +280,8 @@ img { max-width: 100%; height: auto; }
   border-color: transparent transparent transparent #fff;
 }
 .hero-video-start:hover .hero-video-play {
-  background: var(--teal-hover);
+  background: #0b4f4b;
+  color: #fff;
 }
 .hero-video.is-playing .hero-video-start { display: none; }
 .hero-video figcaption {
@@ -554,7 +556,7 @@ input.otp { font-size: 1.4rem; letter-spacing: 0.3em; text-align: center; }
 .fsp-chat-tab {
   border: 0;
   border-radius: 14px 0 0 14px;
-  background: var(--teal);
+  background: #0f6f6a;
   color: #fff;
   font: inherit;
   font-weight: 800;
@@ -563,7 +565,7 @@ input.otp { font-size: 1.4rem; letter-spacing: 0.3em; text-align: center; }
   cursor: pointer;
   box-shadow: -4px 6px 22px rgba(11, 79, 75, 0.3);
 }
-.fsp-chat-tab:hover { background: var(--teal-hover); }
+.fsp-chat-tab:hover { background: #0b4f4b; color: #fff; }
 .fsp-chat.open .fsp-chat-tab { display: none; }
 .fsp-chat-panel {
   display: none;
@@ -584,7 +586,7 @@ input.otp { font-size: 1.4rem; letter-spacing: 0.3em; text-align: center; }
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  background: var(--teal-hover);
+  background: #0b4f4b;
   color: #fff;
 }
 .fsp-chat-head strong {
@@ -625,9 +627,10 @@ input.otp { font-size: 1.4rem; letter-spacing: 0.3em; text-align: center; }
 }
 .fsp-chat-msg.user {
   align-self: flex-end;
-  background: var(--teal);
+  background: #0f6f6a;
   color: #fff;
 }
+.fsp-chat-msg.user a { color: #fff; }
 .fsp-chat-msg.assistant {
   align-self: flex-start;
   background: var(--paper);

@@ -67,7 +67,7 @@ $canWrite = !empty($user['trial']['can_write']);
           <?= Http::csrfField() ?>
           <input type="hidden" name="return" value="home" />
           <label>Invite by email</label>
-          <input name="email" type="email" required placeholder="family@example.com" autocomplete="off" />
+          <input name="email" type="email" required placeholder="Family email" autocomplete="off" />
           <p><button class="btn wide" type="submit">Send invite</button></p>
         </form>
         <?php endif; ?>
