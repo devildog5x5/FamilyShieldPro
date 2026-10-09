@@ -42,7 +42,7 @@ Layout::start('OurCircle terms for the family pause tool');
   <p>You may stop using the service at any time. To delete a circle, <?php echo Layout::supportNote(); ?> We may close an account that violates these Terms.</p>
 
   <h2>11. Our materials</h2>
-  <p>Family Shield Pro, OurCircle, the site, and related marks are ours. You may use the service for your household. You may not copy the product, reverse-engineer it, or present it as your own.</p>
+  <p>Family Shield Pro, OurCircle, the site, and related marks are owned by REKKY Consulting LLC. You may use the service for your household. You may not copy the product, reverse-engineer it, or present it as your own.</p>
 
   <h2>12. No warranty</h2>
   <p>The service is provided as-is. We do not warrant that warning signs are complete, that a number or site is genuine, that a request is or is not a scam, or that using Family Shield Pro will prevent loss. Third-party sites we link to (for example Snopes, the FTC, BBB, or IC3) are not part of our service.</p>
@@ -58,6 +58,7 @@ Layout::start('OurCircle terms for the family pause tool');
 
   <h2>16. Contact</h2>
   <p>Questions about these Terms, your circle, or billing: <?php echo Layout::supportNote(); ?></p>
+  <p>© 2026 REKKY Consulting LLC</p>
   <p><a href="/privacy">Privacy Policy</a> · <a href="/">Home</a></p>
 </div>
 <?php Layout::end();

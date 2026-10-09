@@ -45,7 +45,7 @@
     toggle.setAttribute("aria-expanded", "true");
     try { localStorage.setItem("fsp-help", "open"); } catch (e) {}
     if (!log.childNodes.length) {
-      add("assistant", "Hi — I can help with plans, login, and how OurCircle works. I will never tell you a request is safe. Inquiries Text: 801.319.1061");
+      add("assistant", "Hi — I can help with plans, login, and how OurCircle works. I will never tell you a request is safe. Inquiries Text First Then Call: 801.319.1061");
     }
     input.focus();
   }
@@ -97,12 +97,12 @@
       body: JSON.stringify({ message: msg, history: history.slice(-8) })
     }).then(function (r) { return r.json(); }).then(function (data) {
       wait.remove();
-      var reply = (data && data.reply) ? data.reply : "Inquiries Text: 801.319.1061";
+      var reply = (data && data.reply) ? data.reply : "Inquiries Text First Then Call: 801.319.1061";
       add("assistant", reply);
       history.push({ role: "assistant", content: reply });
     }).catch(function () {
       wait.remove();
-      add("assistant", "The chat could not reach the server. Inquiries Text: 801.319.1061");
+      add("assistant", "The chat could not reach the server. Inquiries Text First Then Call: 801.319.1061");
     });
   });
 })();

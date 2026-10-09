@@ -485,6 +485,7 @@ textarea.stripe-log {
   color: var(--muted);
 }
 .site-meta-bit { white-space: nowrap; }
+.site-meta-inquiries { white-space: normal; }
 .site-meta a {
   color: inherit;
   font-size: 12.5px;

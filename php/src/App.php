@@ -568,7 +568,8 @@ final class App
         $body = "Reset your {$who} password\n\n"
             . "We received a request to reset the password for this account.\n\n"
             . "Open this link within 1 hour:\n{$url}\n\n"
-            . "If you didn't request this, you can ignore this message.\n";
+            . "If you didn't request this, you can ignore this message.\n\n"
+            . Layout::supportPlain() . "\nsms:+18013191061\n";
         $sent = false;
         if (Mailer::configured()) {
             try {
@@ -854,7 +855,8 @@ final class App
             Mailer::send(
                 $email,
                 $from['name'] . ' invited you to an OurCircle',
-                "Open this join link on a device you trust:\n{$link}\n\nWe will never tell you a payment request is safe.\n"
+                "Open this join link on a device you trust:\n{$link}\n\nWe will never tell you a payment request is safe.\n\n"
+                . Layout::supportPlain() . "\nsms:+18013191061\n"
             );
         } catch (Throwable $e) {
         }
@@ -1656,7 +1658,7 @@ final class App
                 ? 'Please call before a payment — OurCircle'
                 : 'Look at this with your circle — OurCircle';
             try {
-                Mailer::send((string) $m['email'], $subj, "Open this check:\n{$link}\n");
+                Mailer::send((string) $m['email'], $subj, "Open this check:\n{$link}\n\n" . Layout::supportPlain() . "\nsms:+18013191061\n");
             } catch (Throwable $e) {
             }
         }
