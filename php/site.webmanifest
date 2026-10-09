@@ -8,6 +8,8 @@
   "background_color": "#f7f1e8",
   "theme_color": "#0f6f6a",
   "lang": "en",
+  "author": "REKKY Consulting LLC",
+  "copyright": "© 2026 REKKY Consulting LLC",
   "icons": [
     {
       "src": "/static/img/icon-192.png",

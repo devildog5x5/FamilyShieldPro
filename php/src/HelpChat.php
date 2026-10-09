@@ -172,11 +172,12 @@ final class HelpChat
             $text = preg_replace('/mailto:[^\s]+/i', '', $text) ?? $text;
             $text = preg_replace('/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/', '', $text) ?? $text;
             $text = trim(preg_replace('/\s{2,}/', ' ', $text) ?? $text);
-            $text = str_replace('801-319-1061', '801.319.1061', $text);
-            if (!str_contains($text, 'Inquiries Text: 801.319.1061')) {
+            if (!str_contains($text, Layout::supportPlain())) {
                 $text = trim($text . ' ' . Layout::supportPlain());
             }
         }
+        $text = str_replace('801-319-1061', '801.319.1061', $text);
+        $text = preg_replace('/Inquiries Text(?! First Then Call):/', 'Inquiries Text First Then Call:', $text) ?? $text;
         return $text;
     }
 

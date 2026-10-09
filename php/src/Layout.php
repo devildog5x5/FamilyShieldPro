@@ -52,7 +52,8 @@ final class Layout
         echo '<meta name="description" content="' . Http::e($seo['description']) . '" />';
         echo '<meta name="keywords" content="' . Http::e($seo['keywords']) . '" />';
         echo '<meta name="robots" content="' . Http::e($seo['robots']) . '" />';
-        echo '<meta name="author" content="Family Shield Pro" />';
+        echo '<meta name="author" content="REKKY Consulting LLC" />';
+        echo '<meta name="copyright" content="© 2026 REKKY Consulting LLC" />';
         echo '<meta name="application-name" content="Family Shield Pro ' . Http::e($v) . '" />';
         echo '<meta name="theme-color" content="#0f6f6a" />';
         self::verificationTags();
@@ -332,6 +333,10 @@ final class Layout
     private static function jsonLd(string $base): string
     {
         $org = $base . '/#organization';
+        $owner = [
+            '@type' => 'Organization',
+            'name' => 'REKKY Consulting LLC',
+        ];
         $organization = [
             '@type' => 'Organization',
             '@id' => $org,
@@ -340,6 +345,7 @@ final class Layout
             'url' => $base . '/',
             'logo' => $base . '/static/img/logo-mark.webp',
             'telephone' => '+1-801-319-1061',
+            'copyrightHolder' => $owner,
             'description' => 'Family pause tool for scam texts, prizes, and urgent payment asks. Guidance, not a guarantee.',
         ];
         $graph = [
@@ -354,7 +360,8 @@ final class Layout
                     'url' => $base . '/',
                     'description' => 'A household pause before money, gift cards, or crypto. Guidance, not a guarantee.',
                     'inLanguage' => 'en-US',
-                    'publisher' => ['@id' => $org],
+                    'copyrightHolder' => $owner,
+                    'publisher' => $owner,
                 ],
                 [
                     '@type' => 'SoftwareApplication',
@@ -364,7 +371,8 @@ final class Layout
                     'operatingSystem' => 'Web',
                     'url' => $base . '/',
                     'description' => 'A family circle to pause on a text, call, prize, or urgent payment ask, read warning signs, and call someone you trust. It does not stamp a request as safe.',
-                    'publisher' => ['@id' => $org],
+                    'copyrightHolder' => $owner,
+                    'publisher' => $owner,
                     'offers' => [
                         [
                             '@type' => 'Offer',
@@ -515,12 +523,12 @@ final class Layout
 
     public static function supportNote(): string
     {
-        return 'Inquiries Text: ' . self::supportLink();
+        return 'Inquiries Text First Then Call: ' . self::supportLink();
     }
 
     public static function supportPlain(): string
     {
-        return 'Inquiries Text: 801.319.1061';
+        return 'Inquiries Text First Then Call: 801.319.1061';
     }
 
     public static function versionLine(): void
@@ -528,9 +536,9 @@ final class Layout
         echo '<p class="site-meta">';
         echo '<span class="site-meta-bit">FamilyShieldPro v' . Http::e(self::asset()) . '</span>';
         echo '<span class="site-meta-sep"> · </span>';
-        echo '<span class="site-meta-bit">© 2026 Robert Foster</span>';
+        echo '<span class="site-meta-bit">© 2026 REKKY Consulting LLC</span>';
         echo '<span class="site-meta-sep"> · </span>';
-        echo '<span class="site-meta-bit">Inquiries Text: ' . self::supportLink() . '</span>';
+        echo '<span class="site-meta-bit site-meta-inquiries">Inquiries Text First Then Call: ' . self::supportLink() . '</span>';
         echo '</p>';
     }
 

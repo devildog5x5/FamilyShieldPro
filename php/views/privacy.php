@@ -19,6 +19,7 @@ Layout::start('OurCircle privacy policy for family circle data');
   <p>We keep circle data while the account is open. You can ask us to delete a circle. <?php echo Layout::supportNote(); ?></p>
   <h2>Contact</h2>
   <p><?php echo Layout::supportNote(); ?></p>
+  <p>© 2026 REKKY Consulting LLC</p>
   <p><a href="/terms">Terms &amp; Conditions</a> · <a href="/">Home</a></p>
 </div>
 <?php Layout::end();
